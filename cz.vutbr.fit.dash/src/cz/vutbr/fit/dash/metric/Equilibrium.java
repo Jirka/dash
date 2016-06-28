@@ -2,11 +2,12 @@ package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Equilibrium extends AbstractMetric implements IMetric {
 
-	public Equilibrium(Dashboard dashboard) {
-		super(dashboard);
+	public Equilibrium(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -24,13 +25,13 @@ public class Equilibrium extends AbstractMetric implements IMetric {
 		double EM = 0.0;
 		int areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(getTypes())) {
 			int area = graphicalElement.area();
 			EM += area*(graphicalElement.d(dashboardCenter, dimension));
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n();
+		int elemCount = dashboard.n(getTypes());
 		return 2*EM/(elemCount*dashboard.length(dimension)*areas);
 	}
 
@@ -44,14 +45,14 @@ public class Equilibrium extends AbstractMetric implements IMetric {
 		double EM_y = 0.0;
 		int areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(getTypes())) {
 			int area = graphicalElement.area();
 			EM_x += area*(graphicalElement.dx(centerX));
 			EM_y += area*(graphicalElement.dy(centerY));
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n();
+		int elemCount = dashboard.n(getTypes());
 		EM_x = 2*EM_x/(elemCount*dashboard.width*areas);
 		EM_y = 2*EM_y/(elemCount*dashboard.height*areas);
 		

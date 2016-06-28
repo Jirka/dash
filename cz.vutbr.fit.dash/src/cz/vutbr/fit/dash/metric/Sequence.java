@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
 import cz.vutbr.fit.dash.model.Quadrant;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 import cz.vutbr.fit.dash.util.QuadrantMap;
 import cz.vutbr.fit.dash.util.QuadrantResolver;
 import cz.vutbr.fit.dash.util.QuadrantUpdater;
@@ -17,8 +18,8 @@ public class Sequence extends AbstractMetric implements IMetric {
 	private QuadrantMap<Integer> quadrants;
 	//private QuadrantMap<Double> quadrants2;
 
-	public Sequence(Dashboard dashboard) {
-		super(dashboard);
+	public Sequence(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -50,7 +51,7 @@ public class Sequence extends AbstractMetric implements IMetric {
 			protected void performAll(GraphicalElement graphicalElement) {
 				quadrants.replace(this.q, quadrants.get(q)+graphicalElement.area());
 			}
-		}.perform(dashboard, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getTypes(), QuadrantResolver.BY_CENTER, false);
 		
 		/*new QuadrantResolver() {
 			

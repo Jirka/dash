@@ -6,6 +6,7 @@ import java.util.Set;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class NgoLayoutAnalysis implements IAnalysis {
 	
@@ -27,7 +28,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double weightLeft = 0.0;
 		double weightRight = 0.0;
 		// count weights
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			double distanceCenter = graphicalElement.centerX() - center;
 			if(distanceCenter < 0) {
 				// left side
@@ -48,7 +49,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double weightTop = 0.0;
 		double weightBottom = 0.0;
 		// count weights
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			double distanceCenter = graphicalElement.centerY() - center;
 			if(distanceCenter < 0) {
 				// top side
@@ -71,13 +72,13 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double EM_x = 0.0;
 		int areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			int area = graphicalElement.area();
 			EM_x += area*(graphicalElement.centerX()-centerX);
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n();
+		int elemCount = dashboard.n(Type.ALL_TYPES);
 		return 2*EM_x/(elemCount*dashboard.width*areas);
 	}
 	
@@ -86,13 +87,13 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double EM_y = 0.0;
 		int areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			int area = graphicalElement.area();
 			EM_y += area*(graphicalElement.centerY()-centerY);
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n();
+		int elemCount = dashboard.n(Type.ALL_TYPES);
 		return 2*EM_y/(elemCount*dashboard.height*areas);
 	}
 	
@@ -105,14 +106,14 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double EM_y = 0.0;
 		int areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			int area = graphicalElement.area();
 			EM_x += area*(graphicalElement.centerX()-centerX);
 			EM_y += area*(graphicalElement.centerY()-centerY);
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n();
+		int elemCount = dashboard.n(Type.ALL_TYPES);
 		
 		EM_x = 2*EM_x/(elemCount*dashboard.width*areas);
 		EM_y = 2*EM_y/(elemCount*dashboard.height*areas);
@@ -148,7 +149,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double O_max = (Y_max)/(X_min), R_max = Math.sqrt(X_max*X_max+Y_max*Y_max);
 		
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			d_x = graphicalElement.dx(centerX);
 			d_y = graphicalElement.dy(centerY);
 			d_fract = Math.abs(d_y/d_x);
@@ -253,7 +254,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double dx, dy;
 		int area;
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			dx = graphicalElement.dx(centerX);
 			dy = graphicalElement.dy(centerY);
 			area = graphicalElement.area();
@@ -301,7 +302,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	public static int getLayoutWidth(Dashboard dashboard) {
 		// calculate width and height of layout
 		int minX = dashboard.width, maxX = 0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			if(minX > graphicalElement.x) {
 				minX = graphicalElement.x;
 			}
@@ -314,7 +315,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	
 	public static int getLayoutHeight(Dashboard dashboard) {
 		int minY = dashboard.height, maxY = 0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			if(minY > graphicalElement.y) {
 				minY = graphicalElement.y;
 			}
@@ -341,14 +342,14 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		}
 		
 		double CM_lo = 0.0, ti;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) { 
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) { 
 			ti = (((double) graphicalElement.height)/ ((double) graphicalElement.width)) / ratioLaout;
 			if(ti > 1.0) {
 				ti = 1/ti;
 			}
 			CM_lo+=ti;
 		}
-		CM_lo = CM_lo/dashboard.n();
+		CM_lo = CM_lo/dashboard.n(Type.ALL_TYPES);
 		
 		return (Math.abs(CM_fl)+Math.abs(CM_lo))/2.0;
 	}
@@ -356,7 +357,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	public static int getNumberOfSizes(Dashboard dashboard) {
 		Set<Point> sizes = new HashSet<Point>();
 		Point p;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			p = new Point(graphicalElement.width, graphicalElement.height);
 			if(!(sizes.contains(p))) {
 				sizes.add(p);
@@ -367,7 +368,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	
 	public static int getElementsArea(Dashboard dashboard) {
 		int areas = 0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			areas += graphicalElement.area();
 		}
 		return areas;
@@ -376,13 +377,13 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	public static double getUnity(Dashboard dashboard) {
 		
 		int areas = getElementsArea(dashboard);
-		double UM_form = 1 - (((double)(getNumberOfSizes(dashboard)-1))/dashboard.n());
+		double UM_form = 1 - (((double)(getNumberOfSizes(dashboard)-1))/dashboard.n(Type.ALL_TYPES));
 		double UM_space = 1 - ((double) (getLayoutArea(dashboard)-areas))/(dashboard.area()-areas);
 		
 		double x = 0.32515;
 		x = x*2-Math.abs(UM_space);
 		x = -x+1;
-		x = x*dashboard.n()+1;
+		x = x*dashboard.n(Type.ALL_TYPES)+1;
 		
 		return (Math.abs(UM_form)+Math.abs(UM_space))/2;
 	}
@@ -394,7 +395,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		
 		// proportion of objects
 		double PM_object = 0.0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			pi = ((double) graphicalElement.height)/graphicalElement.width;
 			if(pi > 1.0) {
 				pi = 1/pi;
@@ -408,7 +409,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 			}
 			PM_object += 1-(min/0.5);
 		}
-		PM_object *= 1.0/dashboard.n();
+		PM_object *= 1.0/dashboard.n(Type.ALL_TYPES);
 		
 		// proportion of layout
 		pi = ((double) getLayoutHeight(dashboard))/getLayoutWidth(dashboard);
@@ -430,7 +431,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	
 	public static int getHAP(Dashboard dashboard) {
 		Set<Integer> listX = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			if(!listX.contains(graphicalElement.x)) {
 				listX.add(graphicalElement.x);
 			}
@@ -440,7 +441,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	
 	public static int getVAP(Dashboard dashboard) {
 		Set<Integer> listY = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			if(!listY.contains(graphicalElement.y)) {
 				listY.add(graphicalElement.y);
 			}
@@ -449,7 +450,7 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	}
 	
 	public static double getSimplicity(Dashboard dashboard) {
-		return 3.0/(getHAP(dashboard)+getVAP(dashboard)+dashboard.n());
+		return 3.0/(getHAP(dashboard)+getVAP(dashboard)+dashboard.n(Type.ALL_TYPES));
 	}
 	
 	public static double getDensity(Dashboard dashboard) {
@@ -460,11 +461,11 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		double RM_alignment, RM_spacing;
 		int n_spacing = 4; // TODO
 		
-		if(dashboard.n() == 1) {
+		if(dashboard.n(Type.ALL_TYPES) == 1) {
 			RM_alignment = RM_spacing = 1;
 		} else {
-			RM_alignment = 1-(((double) getVAP(dashboard)+getHAP(dashboard))/(2*dashboard.n()));
-			RM_spacing = 1-(((double) n_spacing-1)/(2*(dashboard.n()-1)));
+			RM_alignment = 1-(((double) getVAP(dashboard)+getHAP(dashboard))/(2*dashboard.n(Type.ALL_TYPES)));
+			RM_spacing = 1-(((double) n_spacing-1)/(2*(dashboard.n(Type.ALL_TYPES)-1)));
 			System.out.println(RM_alignment);
 			System.out.println(RM_spacing);
 		}
@@ -492,13 +493,13 @@ public class NgoLayoutAnalysis implements IAnalysis {
 	}
 	
 	public static double getHomogenity(Dashboard dashboard) {
-		double N = fact(dashboard.n());
+		double N = fact(dashboard.n(Type.ALL_TYPES));
 		
 		double centerX = dashboard.ownCenterX();
 		double centerY = dashboard.ownCenterY();
 		double dx, dy;
 		int countA = 0, countB = 0, countC = 0, countD = 0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(Type.ALL_TYPES)) {
 			dx = graphicalElement.dx(centerX);
 			dy = graphicalElement.dy(centerY);
 			if(dx <= 0) {

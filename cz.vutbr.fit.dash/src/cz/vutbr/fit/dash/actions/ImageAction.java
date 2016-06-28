@@ -26,6 +26,7 @@ import cz.vutbr.fit.dash.analyses.ActualAnalysis;
 import cz.vutbr.fit.dash.analyses.ColorAnalysis;
 import cz.vutbr.fit.dash.analyses.ColorfulnessAnalysis;
 import cz.vutbr.fit.dash.analyses.ComplexRasterAnalysis;
+import cz.vutbr.fit.dash.analyses.ComplexWidgetAnalysis;
 import cz.vutbr.fit.dash.analyses.GrayscaleAnalysis;
 import cz.vutbr.fit.dash.analyses.IAnalysis;
 import cz.vutbr.fit.dash.analyses.NgoLayoutAnalysis;
@@ -52,10 +53,11 @@ public class ImageAction extends AbstractAction {
 	public static final int ADAPTIVE2 = 2;
 	public static final int GRAY_SCALE = 3;
 	public static final int POSTERIZE = 4;
-	public static final int HISTOGRAM = 5;
-	public static final int ANALYSES = 6;
-	public static final int HSB_SATURATION = 7;
-	public static final int LCH_SATURATION = 8;
+	public static final int HSB_SATURATION = 5;
+	public static final int LCH_SATURATION = 6;
+	public static final int HISTOGRAM = 7;
+	public static final int RASTER_ANALYSIS = 8;
+	public static final int WIDGET_ANALYSIS = 9;
 	
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 400;
@@ -138,7 +140,7 @@ public class ImageAction extends AbstractAction {
 						MatrixUtils.grayScale(matrix, true, false);
 						int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
 						new Histogram(histogram).openWindow();
-					} else if(kind == ANALYSES) {
+					} else if(kind == RASTER_ANALYSIS || kind == WIDGET_ANALYSIS) {
 						DashAppModel model = DashAppModel.getInstance();
 						String path = model.getFolderPath();
 						File folder = new File(path);
@@ -169,7 +171,11 @@ public class ImageAction extends AbstractAction {
 										//report += new ActualAnalysis(selectedDashboard).analyse();
 										System.out.println("Analysing " + dashboardFile.toString() + "...");
 										report += dashboardFile.toString()+ "\t\t";
-										report += new ComplexRasterAnalysis(dashboard).analyse() + "\n";
+										if(kind == RASTER_ANALYSIS) {
+											report += new ComplexRasterAnalysis(dashboard).analyse() + "\n";
+										} else if(kind == WIDGET_ANALYSIS) {
+											report += new ComplexWidgetAnalysis(dashboard).analyse() + "\n";
+										}
 										//report += "\n\n\n\n=============== " + dashboardFile.toString() + " ===============\n\n";
 										//report += new ColorfulnessAnalysis(dashboard).analyse() + "\n";
 										//report += new RasterAnalysis(dashboard).analyse() + "\n";

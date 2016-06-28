@@ -2,13 +2,14 @@ package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Proportion extends AbstractMetric implements IMetric {
 	
 	public static final double[] constants = { 1, 1/1.414, 1/1.618, 1/1.732, 1.0/2 };
 
-	public Proportion(Dashboard dashboard) {
-		super(dashboard);
+	public Proportion(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class Proportion extends AbstractMetric implements IMetric {
 		
 		// proportion of objects
 		double PM_object = 0.0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(getTypes())) {
 			// normalized aspect ratio of graphical element 
 			aspectRatio = graphicalElement.getAspectRatio(true);
 			// find out if aspect ratio is close to some preferred constant 
@@ -42,7 +43,7 @@ public class Proportion extends AbstractMetric implements IMetric {
 			// add distance
 			PM_object += 1-(dist*2);
 		}
-		PM_object /= dashboard.n();
+		PM_object /= dashboard.n(getTypes());
 		
 		// proportion of layout
 		aspectRatio = dashboard.getAspectRatio(true);

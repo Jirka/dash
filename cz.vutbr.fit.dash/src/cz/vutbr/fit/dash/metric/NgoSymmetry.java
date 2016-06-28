@@ -3,6 +3,7 @@ package cz.vutbr.fit.dash.metric;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
 import cz.vutbr.fit.dash.model.Quadrant;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 import cz.vutbr.fit.dash.util.Cloneable;
 import cz.vutbr.fit.dash.util.QuadrantMap;
 import cz.vutbr.fit.dash.util.QuadrantResolver;
@@ -12,12 +13,12 @@ public class NgoSymmetry extends AbstractMetric implements IMetric {
 	
 	private QuadrantMap<SymmetryValues> quadrants;
 
-	public NgoSymmetry(Dashboard dashboard) {
-		super(dashboard);
+	public NgoSymmetry(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 	
-	public NgoSymmetry(Dashboard dashboard, String name) {
-		super(dashboard, name);
+	public NgoSymmetry(Dashboard dashboard, Type[] types, String name) {
+		super(dashboard, types, name);
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class NgoSymmetry extends AbstractMetric implements IMetric {
 				value.r += dsqrt;
 			};
 			
-		}.perform(dashboard, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getTypes(), QuadrantResolver.BY_CENTER, false);
 		
 		// normalize symmetry values in each quadrant
 		quadrants = new QuadrantUpdater<SymmetryValues, Object>(quadrants, null, false) {

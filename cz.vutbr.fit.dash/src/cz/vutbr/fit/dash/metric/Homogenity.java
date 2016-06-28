@@ -2,11 +2,12 @@ package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Homogenity extends AbstractMetric implements IMetric {
 
-	public Homogenity(Dashboard dashboard) {
-		super(dashboard);
+	public Homogenity(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -25,13 +26,13 @@ public class Homogenity extends AbstractMetric implements IMetric {
 
 	@Override
 	public Object measure() {
-		double N = fact(dashboard.n());
+		double N = fact(dashboard.n(getTypes()));
 		
 		double centerX = dashboard.ownCenterX();
 		double centerY = dashboard.ownCenterY();
 		double dx, dy;
 		int countA = 0, countB = 0, countC = 0, countD = 0;
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(getTypes())) {
 			dx = graphicalElement.dx(centerX);
 			dy = graphicalElement.dy(centerY);
 			if(dx <= 0) {

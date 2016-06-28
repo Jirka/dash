@@ -1,11 +1,12 @@
 package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class KimBalance extends AbstractMetric implements IMetric {
 	
-	public KimBalance(Dashboard dashboard) {
-		super(dashboard);
+	public KimBalance(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -96,7 +97,7 @@ public class KimBalance extends AbstractMetric implements IMetric {
 
 	@Override
 	public Object measure() {
-		boolean[][] matrix = dashboard.getMattrix();
+		boolean[][] matrix = dashboard.getMattrix(getTypes());
 		double BM_V = getVerticalBalance(matrix);
 		double BM_H = getHorizontalBalance(matrix);
 		return new Object[] { 1-(Math.abs(BM_V)+Math.abs(BM_H))/2.0, BM_V, BM_H };

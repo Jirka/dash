@@ -72,7 +72,8 @@ public class Menu implements IComponent {
         addItem(imageMenu, "HSB Saturation", new ImageAction(ImageAction.HSB_SATURATION));
         addItem(imageMenu, "LCH Saturation", new ImageAction(ImageAction.LCH_SATURATION));
         addItem(imageMenu, "Histogram", new ImageAction(ImageAction.HISTOGRAM));
-        addItem(imageMenu, "Make reports", new ImageAction(ImageAction.ANALYSES));
+        addItem(imageMenu, "Make raster reports", new ImageAction(ImageAction.RASTER_ANALYSIS));
+        addItem(imageMenu, "Make widget reports", new ImageAction(ImageAction.WIDGET_ANALYSIS));
         menuBar.add(imageMenu);
 
     }

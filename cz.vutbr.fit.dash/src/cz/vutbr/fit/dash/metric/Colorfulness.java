@@ -1,6 +1,7 @@
 package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 import cz.vutbr.fit.dash.util.MatrixUtils;
 import cz.vutbr.fit.dash.util.MatrixUtils.ColorChannel;
 import cz.vutbr.fit.dash.util.MatrixUtils.ColorChannel.ColorChannelType;
@@ -11,7 +12,7 @@ public class Colorfulness extends AbstractMetric implements IMetric {
 	protected ColorChannelType type;
 	
 	public Colorfulness(Dashboard dashboard, ColorChannel[][] matrix, ColorChannelType type) {
-		super(dashboard);
+		super(dashboard, Type.ALL_TYPES);
 		this.matrix = matrix;
 		setType(type);
 	}

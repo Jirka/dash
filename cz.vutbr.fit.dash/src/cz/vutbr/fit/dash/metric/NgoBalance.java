@@ -3,15 +3,16 @@ package cz.vutbr.fit.dash.metric;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.Constants;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class NgoBalance extends AbstractMetric implements IMetric {
 
-	public NgoBalance(Dashboard dashboard) {
-		super(dashboard);
+	public NgoBalance(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 	
-	public NgoBalance(Dashboard dashboard, String name) {
-		super(dashboard, name);
+	public NgoBalance(Dashboard dashboard, Type[] types, String name) {
+		super(dashboard, types, name);
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class NgoBalance extends AbstractMetric implements IMetric {
 		double weight1 = 0.0;
 		double weight2 = 0.0;
 		// count weights
-		for (GraphicalElement ge : dashboard.getGraphicalElements()) {
+		for (GraphicalElement ge : dashboard.getGraphicalElements(getTypes())) {
 			double distanceCenter = ge.center(dimension) - center;
 			if(distanceCenter < 0) {
 				// left side

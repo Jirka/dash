@@ -7,11 +7,12 @@ import java.util.List;
 import cz.vutbr.fit.dash.model.Constants;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Regularity extends AbstractMetric implements IMetric {
 
-	public Regularity(Dashboard dashboard) {
-		super(dashboard);
+	public Regularity(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -20,11 +21,11 @@ public class Regularity extends AbstractMetric implements IMetric {
 	}
 	
 	private int computeNumberOfSpacings(int dimension) {
-		int n = dashboard.n();
-		if(dashboard.n() > 0) {
+		int n = dashboard.n(getTypes());
+		if(dashboard.n(getTypes()) > 0) {
 			int[] points = new int[n];
 			int i = 0;
-			for (GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+			for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(getTypes())) {
 				points[i] = graphicalElement.p(dimension);
 				i++;
 			}
@@ -54,11 +55,11 @@ public class Regularity extends AbstractMetric implements IMetric {
 		int n_spacing = computeNumberOfSpacings(Constants.X) + computeNumberOfSpacings(Constants.Y);//4; // TODO
 		//int n_spacing = 16; // TODO
 		
-		if(dashboard.n() == 1) {
+		if(dashboard.n(getTypes()) == 1) {
 			RM_alignment = RM_spacing = 1;
 		} else {
-			RM_alignment = 1-(((double) dashboard.getVAP()+dashboard.getHAP())/(2*dashboard.n()));
-			RM_spacing = 1-(((double) n_spacing-1)/(2*(dashboard.n()-1)));
+			RM_alignment = 1-(((double) dashboard.getVAP(getTypes())+dashboard.getHAP(getTypes()))/(2*dashboard.n(getTypes())));
+			RM_spacing = 1-(((double) n_spacing-1)/(2*(dashboard.n(getTypes())-1)));
 			System.out.println(RM_alignment);
 			System.out.println(RM_spacing);
 		}

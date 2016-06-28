@@ -1,13 +1,14 @@
 package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class KimSymmetry extends AbstractMetric implements IMetric {
 	
 	private boolean[][] matrix;
 
-	public KimSymmetry(Dashboard dashboard) {
-		super(dashboard);
+	public KimSymmetry(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -19,14 +20,14 @@ public class KimSymmetry extends AbstractMetric implements IMetric {
 		return new String[] { "", "V", "H"/*, "R"*/ };
 	};
 	
-	public void initMatrix() {
+	public void initMatrix(Type[] types) {
 		if(matrix == null) {
-			matrix = dashboard.getMattrix();
+			matrix = dashboard.getMattrix(types);
 		}
 	}
 	
 	public double getHorizontalSymmetry() {
-		initMatrix();
+		initMatrix(getTypes());
 		long hit = 0, miss = 0;
 		int center = dashboard.height/2;
 		int up = center-1;
@@ -55,7 +56,7 @@ public class KimSymmetry extends AbstractMetric implements IMetric {
 	}
 	
 	public double getVerticalSymmetry() {
-		initMatrix();
+		initMatrix(getTypes());
 		int center = dashboard.width/2;
 		
 		long hit = 0, miss = 0;

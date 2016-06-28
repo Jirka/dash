@@ -433,7 +433,7 @@ public class Surface extends JPanel implements PropertyChangeListener, MouseList
 		if(dashboard != null && widgetActionKind != WidgetActionKind.VIEW) {
 			if(widgetActionKind != WidgetActionKind.BOUND) {
 				// graphical elements
-				List<GraphicalElement> elements = dashboard.getGraphicalElements();
+				List<GraphicalElement> elements = dashboard.getGraphicalElements(Type.ALL_TYPES);
 				g1.setComposite(AlphaComposite.SrcOver.derive(0.4f));
 				for (GraphicalElement element : elements) {
 					if(element != backupElement) {
@@ -565,7 +565,7 @@ public class Surface extends JPanel implements PropertyChangeListener, MouseList
 			if(widgetActionKind == WidgetActionKind.INSERT || widgetActionKind == WidgetActionKind.WAND) {
 				// create candidate element at selected position
 				Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
-				List<GraphicalElement> elements = dashboard.getGraphicalElements();
+				List<GraphicalElement> elements = dashboard.getGraphicalElements(Type.ALL_TYPES);
 				candidateElement = new WorkingCopy(getPreferredX(dashboard, elements, unscale(e.getX()), null, null),
 													getPreferredY(dashboard, elements, unscale(e.getY()), null, null));
 			} else if(widgetActionKind == WidgetActionKind.SELECT || widgetActionKind == WidgetActionKind.BOUND
@@ -575,7 +575,7 @@ public class Surface extends JPanel implements PropertyChangeListener, MouseList
 				int y = unscale(e.getY());
 				// try to locate existing element
 				if(widgetActionKind == WidgetActionKind.SELECT) {
-					backupElement = findGraphicalElement(DashAppModel.getInstance().getSelectedDashboard().getGraphicalElements(), x, y);
+					backupElement = findGraphicalElement(DashAppModel.getInstance().getSelectedDashboard().getGraphicalElements(Type.ALL_TYPES), x, y);
 				}/* else {
 					Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
 					if(isInElement(dashboard, x, y)) {
@@ -701,7 +701,7 @@ public class Surface extends JPanel implements PropertyChangeListener, MouseList
 			if(candidateElement != null) {
 				// calculate and update candidate element size (consider border of existing elements)
 				Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
-				List<GraphicalElement> elements = dashboard.getGraphicalElements();
+				List<GraphicalElement> elements = dashboard.getGraphicalElements(Type.ALL_TYPES);
 				if(DashAppModel.getInstance().isAttachEnabled()) {
 					candidateElement.x2 = getPreferredX(dashboard, elements, unscale(e.getX()), null, null);
 					candidateElement.y2 = getPreferredY(dashboard, elements, unscale(e.getY()), null, null);
@@ -722,7 +722,7 @@ public class Surface extends JPanel implements PropertyChangeListener, MouseList
 				if(dx != 0 || dy != 0) {
 					// calculate and update selected element position (move and resize action) and size (resize action)
 					Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
-					updatePosition(dashboard, dashboard.getGraphicalElements(), backupElement,
+					updatePosition(dashboard, dashboard.getGraphicalElements(Type.ALL_TYPES), backupElement,
 									selectedElement, dx, dy, p, getCursor().getType(), DashAppModel.getInstance().isAttachEnabled());
 					// save actual position that can be used in next possible drag event 
 					previousPoint.x = x;

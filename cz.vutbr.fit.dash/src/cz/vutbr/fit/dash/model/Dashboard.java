@@ -121,13 +121,22 @@ public class Dashboard extends GraphicalElement {
 		return false;
 	}
 	
-	public List<GraphicalElement> getGraphicalElements() {
+	public List<GraphicalElement> getGraphicalElements(Type[] types) {
+		if(types != null) {
+			List<GraphicalElement> filteredGraphicalElements = new ArrayList<>();
+			for (GraphicalElement ge : graphicalElements) {
+				if(Type.contains(types, type)) {
+					filteredGraphicalElements.add(ge);
+				}
+			}
+			return filteredGraphicalElements;
+		}
 		return graphicalElements;
 	}
 	
-	public boolean[][] getMattrix() {
+	public boolean[][] getMattrix(Type[] types) {
 		boolean[][] mattrix = new boolean[width][height];
-		MatrixUtils.printDashboard(mattrix, dashboard, true);
+		MatrixUtils.printDashboard(mattrix, dashboard, true, types);
 		return mattrix;
 	}
 	
@@ -137,14 +146,14 @@ public class Dashboard extends GraphicalElement {
 			y = y-this.y;
 		}
 		GraphicalElement graphicalElement = new GraphicalElement(this, x, y, width, height);
-		getGraphicalElements().add(graphicalElement);
+		graphicalElements.add(graphicalElement);
 		getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.DASHBOARD_ELEMENTS, null, this));
 		return graphicalElement;
 	}
 	
 	public GraphicalElement deleteGrapicalElement(GraphicalElement graphicalElement) {
-		if(getGraphicalElements().contains(graphicalElement)) {
-			getGraphicalElements().remove(graphicalElement);
+		if(graphicalElements.contains(graphicalElement)) {
+			graphicalElements.remove(graphicalElement);
 			getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.DASHBOARD_ELEMENTS, null, this));
 		}
 		return graphicalElement;
@@ -170,7 +179,7 @@ public class Dashboard extends GraphicalElement {
 	private void updateDashboardModel(Dashboard dashboard) {
 		if(dashboard != null) {
 			initSize(dashboard.x, dashboard.y, dashboard.width, dashboard.height);
-			graphicalElements = dashboard.getGraphicalElements();
+			graphicalElements = dashboard.graphicalElements;
 			if(graphicalElements == null) {
 				graphicalElements = new ArrayList<GraphicalElement>();
 			}
@@ -240,14 +249,14 @@ public class Dashboard extends GraphicalElement {
 	
 	
 	
-	public int n() {
-		return dashboard.getGraphicalElements().size();
+	public int n(Type[] types) {
+		return dashboard.getGraphicalElements(types).size();
 	}
 	
-	public int getLayoutWidth() {
+	public int getLayoutWidth(Type[] types) {
 		// calculate width and height of layout
 		int minX = this.width, maxX = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			if(minX > graphicalElement.x) {
 				minX = graphicalElement.x;
 			}
@@ -258,9 +267,9 @@ public class Dashboard extends GraphicalElement {
 		return maxX-minX;
 	}
 	
-	public int getLayoutHeight() {
+	public int getLayoutHeight(Type[] types) {
 		int minY = this.height, maxY = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			if(minY > graphicalElement.y) {
 				minY = graphicalElement.y;
 			}
@@ -272,14 +281,14 @@ public class Dashboard extends GraphicalElement {
 		return maxY-minY;
 	}
 	
-	public int getLayoutArea() {
-		return getLayoutWidth()*getLayoutHeight();
+	public int getLayoutArea(Type[] types) {
+		return getLayoutWidth(types)*getLayoutHeight(types);
 	}
 	
-	public int getNumberOfSizes() {
+	public int getNumberOfSizes(Type[] types) {
 		Set<Point> sizes = new HashSet<Point>();
 		Point p;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			p = new Point(graphicalElement.width, graphicalElement.height);
 			if(!(sizes.contains(p))) {
 				sizes.add(p);
@@ -288,17 +297,17 @@ public class Dashboard extends GraphicalElement {
 		return sizes.size();
 	}
 	
-	public int getElementsArea() {
+	public int getElementsArea(Type[] types) {
 		int areas = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			areas += graphicalElement.area();
 		}
 		return areas;
 	}
 	
-	public int getHAP() {
+	public int getHAP(Type[] types) {
 		Set<Integer> listX = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			if(!listX.contains(graphicalElement.x)) {
 				listX.add(graphicalElement.x);
 			}
@@ -306,9 +315,9 @@ public class Dashboard extends GraphicalElement {
 		return listX.size();
 	}
 	
-	public int getVAP() {
+	public int getVAP(Type[] types) {
 		Set<Integer> listY = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getGraphicalElements()) {
+		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
 			if(!listY.contains(graphicalElement.y)) {
 				listY.add(graphicalElement.y);
 			}

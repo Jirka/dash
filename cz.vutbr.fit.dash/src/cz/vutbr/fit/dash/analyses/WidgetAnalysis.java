@@ -17,6 +17,7 @@ import cz.vutbr.fit.dash.metric.Simplicity;
 import cz.vutbr.fit.dash.metric.NgoSymmetry;
 import cz.vutbr.fit.dash.metric.Unity;
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -37,20 +38,20 @@ public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 		if(dashboard != null) {
 			DecimalFormat df = new DecimalFormat("#.#####");
 			
-			formatMetric(buffer, new NgoBalance(dashboard, "Balance"), df);
+			formatMetric(buffer, new NgoBalance(dashboard, Type.ALL_TYPES, "Balance"), df);
 			//formatMetric(buffer, new KimBalance(dashboard), df);
-			formatMetric(buffer, new Equilibrium(dashboard), df);
-			formatMetric(buffer, new NgoSymmetry(dashboard, "Symmetry"), df);
+			formatMetric(buffer, new Equilibrium(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new NgoSymmetry(dashboard, Type.ALL_TYPES, "Symmetry"), df);
 			//formatMetric(buffer, new KimSymmetry(dashboard), df);
-			formatMetric(buffer, new Sequence(dashboard), df);
-			formatMetric(buffer, new Cohesion(dashboard), df);
-			formatMetric(buffer, new Unity(dashboard), df);
-			formatMetric(buffer, new Proportion(dashboard), df);
-			formatMetric(buffer, new Simplicity(dashboard), df);
-			formatMetric(buffer, new Density(dashboard), df);
-			formatMetric(buffer, new Regularity(dashboard), df);
-			formatMetric(buffer, new Economy(dashboard), df);
-			formatMetric(buffer, new Homogenity(dashboard), df);
+			formatMetric(buffer, new Sequence(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Cohesion(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Unity(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Proportion(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Simplicity(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Density(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Regularity(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Economy(dashboard, Type.ALL_TYPES), df);
+			formatMetric(buffer, new Homogenity(dashboard, Type.ALL_TYPES), df);
 		}
 		
 		return buffer.toString();

@@ -1,11 +1,12 @@
 package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Economy extends AbstractMetric implements IMetric {
 
-	public Economy(Dashboard dashboard) {
-		super(dashboard);
+	public Economy(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -15,7 +16,7 @@ public class Economy extends AbstractMetric implements IMetric {
 
 	@Override
 	public Object measure() {
-		return 1.0/dashboard.getNumberOfSizes();
+		return 1.0/dashboard.getNumberOfSizes(getTypes());
 	}
 
 }

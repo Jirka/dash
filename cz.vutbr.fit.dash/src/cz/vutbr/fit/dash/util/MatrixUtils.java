@@ -7,6 +7,7 @@ import java.util.Map;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 import cz.vutbr.fit.dash.util.MatrixUtils.ColorChannel;
 import cz.vutbr.fit.dash.util.MatrixUtils.ColorChannel.ColorChannelType;
 
@@ -196,11 +197,11 @@ public class MatrixUtils {
 		}*/
 	}
 
-	public static void printDashboard(boolean[][] matrix, Dashboard dashboard, boolean clear) {
+	public static void printDashboard(boolean[][] matrix, Dashboard dashboard, boolean clear, Type[] types) {
 		if(clear) {
 			initMattrix(matrix, false);
 		}
-		for(GraphicalElement graphicalElement : dashboard.getGraphicalElements()) {
+		for(GraphicalElement graphicalElement : dashboard.getGraphicalElements(types)) {
 			printGraphicalElement(matrix, graphicalElement);
 		}
 	}

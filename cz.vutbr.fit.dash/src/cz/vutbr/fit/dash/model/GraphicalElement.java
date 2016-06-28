@@ -8,7 +8,18 @@ import cz.vutbr.fit.dash.model.DashAppModel.PropertyKind;
 public class GraphicalElement {
 	
 	public static enum Type {
-		TOOLBAR, BUTTON, HEADER, CHART, LABEL, DECORATION
+		TOOLBAR, BUTTON, HEADER, CHART, LABEL, DECORATION;
+		
+		public static final Type[] ALL_TYPES = null;
+
+		public static boolean contains(Type[] types, Type type) {
+			for (Type preferredType : types) {
+				if(type == preferredType) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 	
 	@Element

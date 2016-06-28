@@ -1,11 +1,12 @@
 package cz.vutbr.fit.dash.metric;
 
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class Simplicity extends AbstractMetric implements IMetric {
 
-	public Simplicity(Dashboard dashboard) {
-		super(dashboard);
+	public Simplicity(Dashboard dashboard, Type[] types) {
+		super(dashboard, types);
 	}
 
 	@Override
@@ -15,7 +16,7 @@ public class Simplicity extends AbstractMetric implements IMetric {
 
 	@Override
 	public Object measure() {
-		return 3.0/(dashboard.getHAP()+dashboard.getVAP()+dashboard.n());
+		return 3.0/(dashboard.getHAP(getTypes())+dashboard.getVAP(getTypes())+dashboard.n(getTypes()));
 	}
 
 }

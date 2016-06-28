@@ -2,6 +2,7 @@ package cz.vutbr.fit.dash.util;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 
 public class BinaryMatrix {
 
@@ -12,8 +13,8 @@ public class BinaryMatrix {
 		MatrixUtils.initMattrix(mattrix, initValue);
 	}
 
-	public void printDashboard(Dashboard dashboard, boolean clear) {
-		MatrixUtils.printDashboard(mattrix, dashboard, clear);
+	public void printDashboard(Dashboard dashboard, boolean clear, Type[] types) {
+		MatrixUtils.printDashboard(mattrix, dashboard, clear, types);
 	}
 
 	public void printGraphicalElement(boolean[][] mattrix, GraphicalElement graphicalElement) {
