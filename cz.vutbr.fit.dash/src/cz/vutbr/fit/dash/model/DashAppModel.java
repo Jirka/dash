@@ -207,7 +207,7 @@ public class DashAppModel {
 	public void initModel() {
 		setZoomLevel(DashAppModel.DEFAULT_ZOOM_LEVEL);
 		setWidgetAction(WidgetActionKind.VIEW);
-		setFolderPath("/home/jurij/Plocha/dashboards/evals/widget-based/random");
+		setFolderPath("/home/jurij/work/dashboards/evals/widget-based/random");
 		//setFolderPath(System.getProperty("user.home"));
 	}
 

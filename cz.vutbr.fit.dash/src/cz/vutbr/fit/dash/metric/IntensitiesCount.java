@@ -32,12 +32,13 @@ public class IntensitiesCount extends HistogramMetric implements IMetric {
 
 	@Override
 	public Object measure() {
+		int area = getArea();
 		int count = calculateIntensities(-1);
-		int reducedCount = calculateIntensities((int) (dashboard.area()*0.1));
-		int reducedCount2 = calculateIntensities((int) (dashboard.area()*0.05));
-		int reducedCount3 = calculateIntensities((int) (dashboard.area()*0.01));
-		int reducedCount4 = calculateIntensities((int) (dashboard.area()*0.005));
-		int reducedCount5 = calculateIntensities((int) (dashboard.area()*0.001));
+		int reducedCount = calculateIntensities((int) (area*0.1));
+		int reducedCount2 = calculateIntensities((int) (area*0.05));
+		int reducedCount3 = calculateIntensities((int) (area*0.01));
+		int reducedCount4 = calculateIntensities((int) (area*0.005));
+		int reducedCount5 = calculateIntensities((int) (area*0.001));
 		return new Object[] { count, (((double) count)/256)*100, reducedCount, reducedCount2, reducedCount3,
 				reducedCount4, reducedCount5 };
 	}

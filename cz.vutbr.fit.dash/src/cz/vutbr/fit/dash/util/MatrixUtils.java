@@ -228,11 +228,23 @@ public class MatrixUtils {
 		return matrix;
 	}
 	
-	public static int[][] printBufferedImage(BufferedImage image, Dashboard dashboard) {
+	/*public static int[][] printBufferedImage(BufferedImage image, Dashboard dashboard) {
 		int[][] matrix = new int[dashboard.width][dashboard.height];
 		//int dashX, dashY;
 		for (int i = 0, dashX = dashboard.x; i < dashboard.width; i++, dashX++) {
 			for (int j = 0, dashY = dashboard.y; j < dashboard.height; j++, dashY++) {
+				matrix[i][j] = image.getRGB(dashX, dashY);
+			}
+		}
+		return matrix;
+	}*/
+	
+	public static int[][] printBufferedImage(BufferedImage image, GraphicalElement graphicalElement) {
+		int[][] matrix = new int[graphicalElement.width][graphicalElement.height];
+		
+		//int dashX, dashY;
+		for (int i = 0, dashX = graphicalElement.absoluteX(); i < graphicalElement.width; i++, dashX++) {
+			for (int j = 0, dashY = graphicalElement.absoluteY(); j < graphicalElement.height; j++, dashY++) {
 				matrix[i][j] = image.getRGB(dashX, dashY);
 			}
 		}

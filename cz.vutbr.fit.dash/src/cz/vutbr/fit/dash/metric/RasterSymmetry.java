@@ -18,20 +18,24 @@ public class RasterSymmetry extends RasterMetric implements IMetric {
 	};
 	
 	public double getHorizontalSymmetry() {
+		
+		int width = matrix.length;
+		int height = matrix[0].length;
+		
 		double hits = 0, misses = 0;
 		double hit, miss;
-		int center = dashboard.height/2;
+		int center = height/2;
 		int up = center-1;
 		int down;
-		if(dashboard.height % 2 == 0) {
+		if(height % 2 == 0) {
 			down = center;
 		} else {
 			down = center+1;
-			hits = dashboard.width;
+			hits = width;
 		}
 		
 		while(up >= 0) {
-			for (int i = 0; i < dashboard.width; i++) {
+			for (int i = 0; i < width; i++) {
 				miss = ((double) Math.abs(matrix[i][up]-matrix[i][down]))/255;
 				hit = 1-miss;
 				misses += miss;
@@ -46,20 +50,24 @@ public class RasterSymmetry extends RasterMetric implements IMetric {
 	}
 	
 	public double getVerticalSymmetry() {
+		
+		int width = matrix.length;
+		int height = matrix[0].length;
+		
 		double hits = 0, misses = 0;
 		double hit, miss;
-		int center = dashboard.width/2;
+		int center = width/2;
 		int left = center-1;
 		int right;
-		if(dashboard.width % 2 == 0) {
+		if(width % 2 == 0) {
 			right = center;
 		} else {
 			right = center+1;
-			hits = dashboard.height;
+			hits = height;
 		}
 		
 		while(left >= 0) {
-			for (int j = 0; j < dashboard.height; j++) {
+			for (int j = 0; j < height; j++) {
 				miss = ((double) Math.abs(matrix[left][j]-matrix[right][j]))/255;
 				hit = 1-miss;
 				misses += miss;

@@ -61,7 +61,7 @@ public class ColorShare extends RasterMetric implements IMetric {
 		Map.Entry<Integer, Integer> max = getMax(histogram, null);
 		Integer key = max.getKey();
 		Integer color1Count = max.getValue();
-		int area = dashboard.area();
+		int area = posterizedMatrix.length*posterizedMatrix[0].length;
 		String color1 = "(" + MatrixUtils.getRed(key) + "," + MatrixUtils.getGreen(key) + "," + MatrixUtils.getBlue(key) + ")";
 		double color1Share = ((((double) color1Count)/(area))*100);
 		

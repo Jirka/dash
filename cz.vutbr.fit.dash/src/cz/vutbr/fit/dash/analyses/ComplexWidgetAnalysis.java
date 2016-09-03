@@ -2,8 +2,11 @@ package cz.vutbr.fit.dash.analyses;
 
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import cz.vutbr.fit.dash.metric.Area;
 import cz.vutbr.fit.dash.metric.BackgroundShare;
 import cz.vutbr.fit.dash.metric.Cohesion;
 import cz.vutbr.fit.dash.metric.ColorShare;
@@ -15,6 +18,8 @@ import cz.vutbr.fit.dash.metric.RasterSymmetry;
 import cz.vutbr.fit.dash.metric.Regularity;
 import cz.vutbr.fit.dash.metric.ThresholdDensity;
 import cz.vutbr.fit.dash.model.Dashboard;
+import cz.vutbr.fit.dash.model.GraphicalElement;
+import cz.vutbr.fit.dash.model.GraphicalElement.Type;
 import cz.vutbr.fit.dash.util.MatrixUtils;
 import cz.vutbr.fit.dash.util.MatrixUtils.ColorChannel.ColorChannelType;
 import cz.vutbr.fit.dash.util.MatrixUtils.HSB;
@@ -44,13 +49,123 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 		DecimalFormat df = new DecimalFormat("#.#####");
 		
 		if(dashboard != null) {
+			Type[] chartType = new Type[] { Type.CHART };
 			appendValue(buffer, df, new Cohesion(dashboard, null).measure(), 0, false);
-			appendValue(buffer, df, new Proportion(dashboard, null).measure(), 1, false);
-			appendValue(buffer, df, new Regularity(dashboard, null).measure(), 1, false);
+			appendValue(buffer, df, new Cohesion(dashboard, new Type[] { Type.CHART }).measure(), 1, false);
+			
+			appendValue(buffer, df, new Proportion(dashboard, null).measure(), 2, false);
+			appendValue(buffer, df, new Proportion(dashboard, new Type[] { Type.CHART }).measure(), 1, false);
+			
+			appendValue(buffer, df, new Regularity(dashboard, null).measure(), 2, false);
+			appendValue(buffer, df, new Regularity(dashboard, new Type[] { Type.CHART }).measure(), 1, false);
+			
+			appendValue(buffer, df, new Area(dashboard, new Type[] { Type.BUTTON, Type.HEADER, Type.TOOLBAR, Type.DECORATION } ).measure(), 2, false);
+			appendValue(buffer, df, new Area(dashboard, new Type[] { Type.BUTTON, Type.DECORATION, Type.HEADER, Type.TOOLBAR, Type.LABEL } ).measure(), 1, false);
+			
+			BufferedImage image = dashboard.getImage();
+			if(image != null) {
+				List<GraphicalElement> elements = dashboard.getGraphicalElements(chartType);
+				List<Double> hsbSaturation = new ArrayList<>();
+				List<Double> lchSaturation = new ArrayList<>();
+				List<Double> rgb12amount = new ArrayList<>();
+				List<Double> rgb12first = new ArrayList<>();
+				List<Double> rgb12firstSecond = new ArrayList<>();
+				List<Double> rgb4amount = new ArrayList<>();
+				List<Double> rgb4amount10 = new ArrayList<>();
+				List<Double> rgb4amount5 = new ArrayList<>();
+				List<Double> rgb4amount1 = new ArrayList<>();
+				List<Double> rgb4first = new ArrayList<>();
+				List<Double> rgb4firstSecond = new ArrayList<>();
+				List<Double> rgb4Balance = new ArrayList<>();
+				List<Double> rgb4Symmetry = new ArrayList<>();
+				List<Double> bwBlack = new ArrayList<>();
+				for (GraphicalElement ge : elements) {
+					int[][] matrix = MatrixUtils.printBufferedImage(image, ge);
+					//MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 4)));
+					
+					// HSB
+					HSB matrixHSB[][] = MatrixUtils.RGBtoHSB(matrix);
+					Colorfulness colorfunessMetric = new Colorfulness(dashboard, matrixHSB, null);
+					hsbSaturation.add(new Double((double) ((Object[]) colorfunessMetric.measure(ColorChannelType.SATURATION))[0]));
+					
+					// CIE Lab/Lch
+					LCH matrixLCH[][] = MatrixUtils.RGBtoLCH(matrix);
+					colorfunessMetric = new Colorfulness(dashboard, matrixLCH, null);
+					lchSaturation.add(new Double((double) ((Object[]) colorfunessMetric.measure(ColorChannelType.SATURATION))[0]));
+					
+					// RGB 12 bit
+					ColorShare colorShare = new ColorShare(dashboard, matrix);
+					Object[] result = (Object[]) colorShare.measure(4);
+					rgb12amount.add(new Double((long) result[0]));
+					rgb12first.add(new Double((double) result[3]));
+					rgb12firstSecond.add(new Double((double) result[7]));
+					
+					// Gray 4 bit
+					int matrixGray[][] = MatrixUtils.grayScale(matrix, false, true);
+					int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(MatrixUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), false);
+					int histogram[] = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
+					
+					result = (Object[]) (new IntensitiesCount(dashboard, histogram)).measure();
+					rgb4amount.add(new Double((int) result[0]));
+					rgb4amount10.add(new Double((int) result[2]));
+					rgb4amount5.add(new Double((int) result[3]));
+					rgb4amount1.add(new Double((int) result[4]));
+					
+					result = (Object[]) (new BackgroundShare(dashboard, histogram)).measure();
+					rgb4firstSecond.add(new Double((double) result[0]));
+					rgb4first.add(new Double((double) result[1]));
+					
+					result = (Object[]) (new RasterBalance(dashboard, matrixGrayValue)).measure();
+					rgb4Balance.add(new Double((double) result[0]));
+					
+					result = (Object[]) (new RasterSymmetry(dashboard, matrixGrayValue)).measure();
+					rgb4Symmetry.add(new Double((double) result[0]));
+					
+					// BW 1 bit
+					int matrixBW[][] = MatrixUtils.grayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+					bwBlack.add(new Double((double) (new ThresholdDensity(dashboard, matrixBW)).measure()));
+				}
+				
+				appendValue(buffer, df, getStdDev(hsbSaturation), 2, false);
+				appendValue(buffer, df, getStdDev(lchSaturation), 2, false);
+				appendValue(buffer, df, getStdDev(rgb12amount), 2, false);
+				appendValue(buffer, df, getStdDev(rgb12first), 2, false);
+				appendValue(buffer, df, getStdDev(rgb12firstSecond), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4amount), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4amount10), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4amount5), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4amount1), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4first), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4firstSecond), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4Balance), 2, false);
+				appendValue(buffer, df, getStdDev(rgb4Symmetry), 2, false);
+				appendValue(buffer, df, getStdDev(bwBlack), 2, false);
+			}
 		}
 		
 		return buffer.toString();
 	}
+
+    double getMean(List<Double> values) {
+        double sum = 0.0;
+        for(double a : values)
+            sum += a;
+        return sum/values.size();
+    }
+	
+	Double[] getVariance(List<Double> values) {
+        double mean = getMean(values);
+        double temp = 0;
+        for(double a : values)
+            temp += (mean-a)*(mean-a);
+        return new Double[] { mean, (temp/values.size()) };
+    }
+	
+	Double[] getStdDev(List<Double> values) {
+		Double[] result = getVariance(values);
+		result[1] = Math.sqrt(result[1]);
+        return result;
+    }
 	
 	private void appendValue(StringBuffer buffer, DecimalFormat df, Object value, int tabNum, boolean rolFirst) {
 		for (int i = 0; i < tabNum; i++) {

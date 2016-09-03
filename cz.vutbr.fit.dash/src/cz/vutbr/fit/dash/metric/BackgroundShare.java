@@ -34,7 +34,7 @@ public class BackgroundShare extends HistogramMetric implements IMetric {
 	public Object measure() {
 		int max = findMax(-1);
 		int secondMax = findMax(max);
-		int pixelCount = dashboard.area();
+		int pixelCount = getArea();
 		double first = ((double) histogram[max])/pixelCount*100;
 		double second = ((double) histogram[secondMax])/pixelCount*100;
 		return new Object[] { first+second, first, second };

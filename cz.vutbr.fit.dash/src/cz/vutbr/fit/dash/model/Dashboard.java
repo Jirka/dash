@@ -125,7 +125,7 @@ public class Dashboard extends GraphicalElement {
 		if(types != null) {
 			List<GraphicalElement> filteredGraphicalElements = new ArrayList<>();
 			for (GraphicalElement ge : graphicalElements) {
-				if(Type.contains(types, type)) {
+				if(Type.contains(types, ge.type)) {
 					filteredGraphicalElements.add(ge);
 				}
 			}

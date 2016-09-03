@@ -11,5 +11,13 @@ public abstract class HistogramMetric extends AbstractMetric implements IMetric 
 		super(dashboard, Type.ALL_TYPES);
 		this.histogram = historgram;
 	}
+	
+	protected int getArea() {
+		int area = 0;
+		for (int i : histogram) {
+			area += i;
+		}
+		return area;
+	}
 
 }
