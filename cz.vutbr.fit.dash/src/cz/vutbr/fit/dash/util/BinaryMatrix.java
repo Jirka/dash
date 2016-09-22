@@ -2,7 +2,7 @@ package cz.vutbr.fit.dash.util;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
-import cz.vutbr.fit.dash.model.GraphicalElement.Type;
+import cz.vutbr.fit.dash.model.GraphicalElement.GEType;
 
 public class BinaryMatrix {
 
@@ -13,7 +13,7 @@ public class BinaryMatrix {
 		MatrixUtils.initMattrix(mattrix, initValue);
 	}
 
-	public void printDashboard(Dashboard dashboard, boolean clear, Type[] types) {
+	public void printDashboard(Dashboard dashboard, boolean clear, GEType[] types) {
 		MatrixUtils.printDashboard(mattrix, dashboard, clear, types);
 	}
 

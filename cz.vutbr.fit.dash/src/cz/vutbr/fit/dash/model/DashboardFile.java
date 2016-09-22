@@ -2,6 +2,13 @@ package cz.vutbr.fit.dash.model;
 
 import java.io.File;
 
+/**
+ * This class represents dashboard source file
+ * which can be represented by XML file or image file or both.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashboardFile {
 
 	private File imageFile;
@@ -50,28 +57,28 @@ public class DashboardFile {
 			setName(xmlFile);
 		}
 	}
-
-	@Override
-	public String toString() {
-		return name;
-	}
-
+	
 	private void setName(File file) {
 		String name = file.getName();
 		int dotPosition = name.lastIndexOf('.');
 		this.name = name.substring(0, dotPosition);
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return toString().equals(obj.toString());
-	}
-
+	
 	public Dashboard getDashboard() {
 		return dashboard;
 	}
 
 	public void setDashboard(Dashboard dashboard) {
 		this.dashboard = dashboard;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return toString().equals(obj.toString());
 	}
 }

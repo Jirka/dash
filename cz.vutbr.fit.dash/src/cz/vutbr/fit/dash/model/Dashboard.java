@@ -2,12 +2,8 @@ package cz.vutbr.fit.dash.model;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,53 +11,67 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 
 import cz.vutbr.fit.dash.Main;
-import cz.vutbr.fit.dash.model.DashAppModel.PropertyKind;
 import cz.vutbr.fit.dash.util.MatrixUtils;
 
+/**
+ * This class represents dashboard definition.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 @Root(name="dashboard")
 public class Dashboard extends GraphicalElement {
 	
-	@ElementList(inline=true, required=false)
-	private List<GraphicalElement> graphicalElements;
-	
+	/**
+	 * dashboard physical representation (image or structural description)
+	 */
 	private DashboardFile dashboardFile;
 	
+	/**
+	 * actual serialized representation (unsaved structural description - working copy)
+	 */
 	private SerializedDashboard serializedDashboard;
 	
+	/**
+	 * model definition
+	 */
 	private DashAppModel model;
-
-	private boolean reloadingFromFile;
 	
+	/**
+	 * flag which specifies whether dashboard has already been initialized
+	 */
 	private boolean sizeInitialized;
 	
+	/**
+	 * This constructor is used by XML deserialization 
+	 */
 	public Dashboard() {
 		sizeInitialized = true;
 		// used by deserialization
 	}
 	
+	/**
+	 * 
+	 * @param model
+	 * @param dashboardFile
+	 */
 	public Dashboard(DashAppModel model, DashboardFile dashboardFile) {
 		setModel(model);
 		setDashboardFile(dashboardFile);
-		graphicalElements = new ArrayList<GraphicalElement>();
 		serializedDashboard = new SerializedDashboard(this);
 		// graphical element
-		setDashboard(this);
+		setParent(this);
 		sizeInitialized = false;
 	}
 	
-	public void initSize(int x, int y, int width, int height) {
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		sizeInitialized = true;
-		DashAppModel.getInstance().firePropertyChange(new PropertyChangeEvent(PropertyKind.GRAPHICAL_ELEMENT, null, this));
+	public void setDimension(int x, int y, int width, int height) {
+		super.setDimension(x, y, width, height);
+		if(!sizeInitialized) {
+			sizeInitialized = true;
+		}
 	}
 	
 	public boolean isSizeInitialized() {
@@ -87,7 +97,7 @@ public class Dashboard extends GraphicalElement {
 	
 	public BufferedImage getImage() {
 		BufferedImage image = null;
-		File file = dashboard.getDashboardFile().getImageFile();
+		File file = getDashboard().getDashboardFile().getImageFile();
 		if(file != null && file.exists() && file.canRead()) {
 			try {
 		        image = ImageIO.read(file);
@@ -101,6 +111,15 @@ public class Dashboard extends GraphicalElement {
 	
 	public SerializedDashboard getSerializedDashboard() {
 		return serializedDashboard;
+	}
+	
+	@Override
+	public List<GraphicalElement> getChildren(GEType[] types) {
+		List<GraphicalElement> children = super.getChildren(types);
+		if(children == null) {
+			children = new ArrayList<GraphicalElement>();
+		}
+		return children;
 	}
 
 	@Override
@@ -121,142 +140,20 @@ public class Dashboard extends GraphicalElement {
 		return false;
 	}
 	
-	public List<GraphicalElement> getGraphicalElements(Type[] types) {
-		if(types != null) {
-			List<GraphicalElement> filteredGraphicalElements = new ArrayList<>();
-			for (GraphicalElement ge : graphicalElements) {
-				if(Type.contains(types, ge.type)) {
-					filteredGraphicalElements.add(ge);
-				}
-			}
-			return filteredGraphicalElements;
-		}
-		return graphicalElements;
-	}
-	
-	public boolean[][] getMattrix(Type[] types) {
+	public boolean[][] getMattrix(GEType[] types) {
 		boolean[][] mattrix = new boolean[width][height];
-		MatrixUtils.printDashboard(mattrix, dashboard, true, types);
+		MatrixUtils.printDashboard(mattrix, this, true, types);
 		return mattrix;
 	}
 	
-	public GraphicalElement createGrapicalElement(int x, int y, int width, int height, boolean convertToRelative) {
-		if(convertToRelative) {
-			x = x-this.x;
-			y = y-this.y;
-		}
-		GraphicalElement graphicalElement = new GraphicalElement(this, x, y, width, height);
-		graphicalElements.add(graphicalElement);
-		getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.DASHBOARD_ELEMENTS, null, this));
-		return graphicalElement;
+	public int n(GEType[] types) {
+		return getChildren(types).size();
 	}
 	
-	public GraphicalElement deleteGrapicalElement(GraphicalElement graphicalElement) {
-		if(graphicalElements.contains(graphicalElement)) {
-			graphicalElements.remove(graphicalElement);
-			getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.DASHBOARD_ELEMENTS, null, this));
-		}
-		return graphicalElement;
-	}
-	
-	public SerializedDashboard serialize() throws Exception {
-		Serializer serializer = new Persister();
-		StringWriter writer = new StringWriter();
-		serializer.write(this, writer);
-		this.serializedDashboard.setXml(writer.toString(), true);
-		return this.serializedDashboard;
-	}
-	
-	public Dashboard deserialize(boolean update) throws Exception {
-		Serializer serializer = new Persister();
-		Dashboard dashboard = serializer.read(Dashboard.class, serializedDashboard.getXml());
-		if(update) {
-			updateDashboardModel(dashboard);
-		}
-		return dashboard;
-	}
-
-	private void updateDashboardModel(Dashboard dashboard) {
-		if(dashboard != null) {
-			initSize(dashboard.x, dashboard.y, dashboard.width, dashboard.height);
-			graphicalElements = dashboard.graphicalElements;
-			if(graphicalElements == null) {
-				graphicalElements = new ArrayList<GraphicalElement>();
-			}
-			for (GraphicalElement graphicalElement : graphicalElements) {
-				graphicalElement.setDashboard(this);
-			}
-			getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.DASHBOARD_ELEMENTS, null, this));
-		}
-	}
-	
-	public void saveToFile() throws IOException {
-		File xmlFile = getDashboardFile().getXmlFile();
-		if(!xmlFile.exists()) {
-			xmlFile.createNewFile();
-		}
-		FileOutputStream out = new FileOutputStream(xmlFile);
-		out.write(getSerializedDashboard().getXml().getBytes());
-		out.close();
-		getSerializedDashboard().setDirty(false);
-	}
-	
-	public void reloadFromFile() throws Exception {
-		File xmlFile = getDashboardFile().getXmlFile();
-		if(xmlFile.exists() && xmlFile.canRead()) {
-			BufferedReader br = new BufferedReader(new FileReader(xmlFile));
-		    try {
-		    	setReloadingFromFile(true);
-		        StringBuilder sb = new StringBuilder();
-		        String line = br.readLine();
-
-		        while (line != null) {
-		            sb.append(line);
-		            sb.append("\n");
-		            line = br.readLine();
-		        }
-		        getSerializedDashboard().setXml(sb.toString(), false);
-		        deserialize(true);
-		    } finally {
-		        br.close();
-		        setReloadingFromFile(false);
-		    }
-		}
-	}
-
-	public boolean isReloadingFromFile() {
-		return reloadingFromFile;
-	}
-
-	public void setReloadingFromFile(boolean reloadingFromFile) {
-		this.reloadingFromFile = reloadingFromFile;
-	}
-	
-	@Override
-	public void update(int x, int y, int width, int height, boolean convertToRelative) {
-		// TODO Auto-generated method stub
-		model.setListenersDisabled(true);
-		// all child graphical elements with relative position need to be updated 
-		if(this.x != x || this.y != y) {
-			for (GraphicalElement graphicalElement : graphicalElements) {
-				graphicalElement.update(graphicalElement.x+(this.x-x), graphicalElement.y+(this.y-y),
-						graphicalElement.width, graphicalElement.height, false);
-			}
-		}
-		model.setListenersDisabled(false);
-		super.update(x, y, width, height, convertToRelative);
-	}
-	
-	
-	
-	public int n(Type[] types) {
-		return dashboard.getGraphicalElements(types).size();
-	}
-	
-	public int getLayoutWidth(Type[] types) {
+	public int getLayoutWidth(GEType[] types) {
 		// calculate width and height of layout
 		int minX = this.width, maxX = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			if(minX > graphicalElement.x) {
 				minX = graphicalElement.x;
 			}
@@ -267,9 +164,9 @@ public class Dashboard extends GraphicalElement {
 		return maxX-minX;
 	}
 	
-	public int getLayoutHeight(Type[] types) {
+	public int getLayoutHeight(GEType[] types) {
 		int minY = this.height, maxY = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			if(minY > graphicalElement.y) {
 				minY = graphicalElement.y;
 			}
@@ -281,14 +178,14 @@ public class Dashboard extends GraphicalElement {
 		return maxY-minY;
 	}
 	
-	public int getLayoutArea(Type[] types) {
+	public int getLayoutArea(GEType[] types) {
 		return getLayoutWidth(types)*getLayoutHeight(types);
 	}
 	
-	public int getNumberOfSizes(Type[] types) {
+	public int getNumberOfSizes(GEType[] types) {
 		Set<Point> sizes = new HashSet<Point>();
 		Point p;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			p = new Point(graphicalElement.width, graphicalElement.height);
 			if(!(sizes.contains(p))) {
 				sizes.add(p);
@@ -297,17 +194,17 @@ public class Dashboard extends GraphicalElement {
 		return sizes.size();
 	}
 	
-	public int getElementsArea(Type[] types) {
+	public int getElementsArea(GEType[] types) {
 		int areas = 0;
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			areas += graphicalElement.area();
 		}
 		return areas;
 	}
 	
-	public int getHAP(Type[] types) {
+	public int getHAP(GEType[] types) {
 		Set<Integer> listX = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			if(!listX.contains(graphicalElement.x)) {
 				listX.add(graphicalElement.x);
 			}
@@ -315,9 +212,9 @@ public class Dashboard extends GraphicalElement {
 		return listX.size();
 	}
 	
-	public int getVAP(Type[] types) {
+	public int getVAP(GEType[] types) {
 		Set<Integer> listY = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			if(!listY.contains(graphicalElement.y)) {
 				listY.add(graphicalElement.y);
 			}

@@ -1,10 +1,16 @@
 package cz.vutbr.fit.dash.model;
 
-import cz.vutbr.fit.dash.model.DashAppModel.PropertyKind;
-
+/**
+ * This class represents serialized dashboard
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class SerializedDashboard {
 	
-	private String xml = "<dashboard/>";
+	public static final String EMPTY_XML = "<dashboard/>";
+	
+	private String xml = EMPTY_XML;
 	private boolean isDirty = false;
 	private Dashboard dashboard;
 	
@@ -16,15 +22,8 @@ public class SerializedDashboard {
 		return xml;
 	}
 
-	public void setXml(String xml, boolean dirty) {
-		assert xml == null;
-		
-		setDirty(dirty);
-		if(!this.xml.equals(xml)) {
-			String oldXml = this.xml;
-			this.xml = xml;
-			getDashboard().getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.XML, oldXml, this));
-		}
+	public void setXml(String xml) {
+		this.xml = xml;
 	}
 
 	public boolean isDirty() {
@@ -32,10 +31,7 @@ public class SerializedDashboard {
 	}
 
 	public void setDirty(boolean isDirty) {
-		if(this.isDirty != isDirty) {
-			this.isDirty = isDirty;
-			getDashboard().getModel().firePropertyChange(new PropertyChangeEvent(PropertyKind.IS_DIRTY, !isDirty, this));
-		}
+		this.isDirty = isDirty;
 	}
 
 	public Dashboard getDashboard() {

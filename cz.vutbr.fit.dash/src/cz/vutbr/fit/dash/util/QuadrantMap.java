@@ -2,7 +2,7 @@ package cz.vutbr.fit.dash.util;
 
 import java.util.HashMap;
 
-import cz.vutbr.fit.dash.model.Quadrant;
+import cz.vutbr.fit.dash.model.Constants.Quadrant;
 
 public class QuadrantMap<V> extends HashMap<Quadrant, V> {
 	

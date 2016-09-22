@@ -3,8 +3,9 @@ package cz.vutbr.fit.dash;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import cz.vutbr.fit.dash.gui.DashAppGUI;
+import cz.vutbr.fit.dash.controller.DashAppController;
 import cz.vutbr.fit.dash.model.DashAppModel;
+import cz.vutbr.fit.dash.view.DashAppView;
 
 /**
  * Main class which initiates GUI.
@@ -24,12 +25,15 @@ public class Main {
 
 		// set look and feel
 		setLookAndFeel();
-
-		// initialize GUI
-		DashAppGUI.getInstance().launchApplication();
-
+		
 		// initialize model
 		DashAppModel.getInstance().initModel();
+		
+		// initialize controller
+		DashAppController.getInstance().init();
+
+		// initialize view
+		DashAppView.getInstance().launchApplication();
 	}
 
 	private static void setLookAndFeel() {

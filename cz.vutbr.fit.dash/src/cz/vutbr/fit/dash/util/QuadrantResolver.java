@@ -2,8 +2,8 @@ package cz.vutbr.fit.dash.util;
 
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
-import cz.vutbr.fit.dash.model.Quadrant;
-import cz.vutbr.fit.dash.model.GraphicalElement.Type;
+import cz.vutbr.fit.dash.model.Constants.Quadrant;
+import cz.vutbr.fit.dash.model.GraphicalElement.GEType;
 
 public abstract class QuadrantResolver {
 	
@@ -18,12 +18,12 @@ public abstract class QuadrantResolver {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void perform(Dashboard dashboard, Type[] types, int type, boolean excludeCenterLine) {
+	public void perform(Dashboard dashboard, GEType[] types, int type, boolean excludeCenterLine) {
 		
-		double centerX = dashboard.ownCenterX();
-		double centerY = dashboard.ownCenterY();
+		double centerX = dashboard.halfSizeX();
+		double centerY = dashboard.halfSizeY();
 		
-		for (GraphicalElement graphicalElement : dashboard.getGraphicalElements(types)) {
+		for (GraphicalElement graphicalElement : dashboard.getChildren(types)) {
 			
 			if(type == BY_CENTER) {
 				dx = graphicalElement.dx(centerX);

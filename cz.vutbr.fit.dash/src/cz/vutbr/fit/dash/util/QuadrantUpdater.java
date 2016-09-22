@@ -1,6 +1,6 @@
 package cz.vutbr.fit.dash.util;
 
-import cz.vutbr.fit.dash.model.Quadrant;
+import cz.vutbr.fit.dash.model.Constants.Quadrant;
 
 public abstract class QuadrantUpdater<V, O> {
 	
