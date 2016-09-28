@@ -7,7 +7,8 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dash.view.tools.AttachTool;
 import cz.vutbr.fit.dash.view.tools.FileInfoTool;
-import cz.vutbr.fit.dash.view.tools.FileTool;
+import cz.vutbr.fit.dash.view.tools.LoadTool;
+import cz.vutbr.fit.dash.view.tools.SaveTool;
 import cz.vutbr.fit.dash.view.tools.FolderTool;
 import cz.vutbr.fit.dash.view.tools.FullScreenTool;
 import cz.vutbr.fit.dash.view.tools.GETypeTool;
@@ -56,7 +57,8 @@ public class Settings {
 	private void initTools() {
 		guiTools = new ArrayList<>();;
 		// basic UI tools
-		guiTools.add(new FileTool());
+		guiTools.add(new LoadTool());
+		guiTools.add(new SaveTool());
 		guiTools.add(new HistoryTool());
 		guiTools.add(new ZoomTool());
 		guiTools.add(new FullScreenTool());

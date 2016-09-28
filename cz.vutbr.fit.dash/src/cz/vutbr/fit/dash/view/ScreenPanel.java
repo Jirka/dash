@@ -28,15 +28,15 @@ public class ScreenPanel implements IComponent {
 	/**
 	 * Dashboard canvas.
 	 */
-	private Canvas surface;
+	private Canvas canvas;
 	
 	/**
 	 * Returns dashboard canvas
 	 * 
 	 * @return surface
 	 */
-	public Canvas getSurface() {
-		return surface;
+	public Canvas getCanvas() {
+		return canvas;
 	}
 
 	/**
@@ -44,9 +44,9 @@ public class ScreenPanel implements IComponent {
 	 * @param plugins 
 	 */
 	public ScreenPanel(List<IGUITool> plugins) {
-		surface = new Canvas(plugins);
-		surface.setFocusable(true);
-		panel = new JScrollPane(surface);
+		canvas = new Canvas(plugins);
+		canvas.setFocusable(true);
+		panel = new JScrollPane(canvas);
 	}
 	
 	/**

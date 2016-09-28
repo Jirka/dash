@@ -73,7 +73,7 @@ public class AttachTool extends AbstractGUITool implements IGUITool {
 		}
 		
 		private void updateCanvasAttachRate() {
-			DashAppView.getInstance().getDashboardView().getSurface().updateAttachSize(enabled ? ATTACH_TOLERANCE : 0);
+			DashAppView.getInstance().getDashboardView().getCanvas().updateAttachSize(enabled ? ATTACH_TOLERANCE : 0);
 		}
 	}
 

@@ -64,7 +64,8 @@ public class BoundTool extends SelectTool {
 
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
-		if(e.propertyKind == EventKind.GRAPHICAL_ELEMENT_CHANGED) {
+		if(e.propertyKind == EventKind.GRAPHICAL_ELEMENT_CHANGED
+				|| e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
 			reset();
 		}
 	}

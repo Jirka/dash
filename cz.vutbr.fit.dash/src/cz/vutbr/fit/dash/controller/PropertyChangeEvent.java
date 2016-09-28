@@ -1,16 +1,25 @@
 package cz.vutbr.fit.dash.controller;
 
 import cz.vutbr.fit.dash.controller.EventManager.EventKind;
+import cz.vutbr.fit.dash.model.Dashboard;
 
+/**
+ * Container which stores property change event information.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class PropertyChangeEvent {
 	
-	public PropertyChangeEvent(EventKind propertyKind, Change oldValue, Change newValue) {
+	public PropertyChangeEvent(EventKind propertyKind, Dashboard selectedDashboard, Change oldValue, Change newValue) {
 		this.propertyKind = propertyKind;
+		this.selectedDashboard = selectedDashboard;
 		this.modelChange = oldValue;
 		this.xmlChange = newValue;
 	}
 	
 	public final EventKind propertyKind;
+	public final Dashboard selectedDashboard;
 	public final Change modelChange;
 	public final Change xmlChange;
 	

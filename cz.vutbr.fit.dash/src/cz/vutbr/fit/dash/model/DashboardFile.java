@@ -1,6 +1,10 @@
 package cz.vutbr.fit.dash.model;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  * This class represents dashboard source file
@@ -15,10 +19,12 @@ public class DashboardFile {
 	private File xmlFile;
 	private String name;
 	private Dashboard dashboard;
+	private String cachedXMLFile;
 
 	public DashboardFile(File imageFile, File xmlFile) {
 		setImageFile(imageFile);
 		setXmlFile(xmlFile);
+		cachedXMLFile = null;
 	}
 
 	public DashboardFile(File file) {
@@ -80,5 +86,45 @@ public class DashboardFile {
 	@Override
 	public boolean equals(Object obj) {
 		return toString().equals(obj.toString());
+	}
+	
+	/**
+	 * 
+	 * @param xmlFile
+	 * @return
+	 * @throws IOException
+	 */
+	public String readXMLFile() throws IOException {
+		if(xmlFile.exists() && xmlFile.canRead()) {
+			BufferedReader br = new BufferedReader(new FileReader(xmlFile));
+		    try {
+		        StringBuilder sb = new StringBuilder();
+		        String line = br.readLine();
+
+		        while (line != null) {
+		            sb.append(line);
+		            sb.append("\n");
+		            line = br.readLine();
+		        }
+		        cachedXMLFile = sb.toString();
+		    } finally {
+		        br.close();
+		    }
+		}
+		return cachedXMLFile;
+	}
+	
+	public void updateXMLFile(String xml) throws IOException {
+		cachedXMLFile = xml;
+		if(xmlFile == null && !xmlFile.exists()) {
+			xmlFile.createNewFile();
+		}
+		FileOutputStream out = new FileOutputStream(xmlFile);
+		out.write(dashboard.getSerializedDashboard().getXml().getBytes());
+		out.close();
+	}
+
+	public Object getXML() {
+		return cachedXMLFile;
 	}
 }

@@ -104,7 +104,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			Canvas surface = DashAppView.getInstance().getDashboardView().getSurface();
+			Canvas surface = DashAppView.getInstance().getDashboardView().getCanvas();
 			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
 			
 			if(selectedDashboard != null) {

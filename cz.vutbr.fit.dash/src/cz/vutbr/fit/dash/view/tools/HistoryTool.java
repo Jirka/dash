@@ -15,7 +15,7 @@ import javax.swing.JMenu;
 import cz.vutbr.fit.dash.controller.DashAppController;
 import cz.vutbr.fit.dash.controller.EventManager.EventKind;
 import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dash.controller.PropertyChangeListener;
+import cz.vutbr.fit.dash.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dash.model.DashAppModel;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.SerializedDashboard;
@@ -28,7 +28,7 @@ import cz.vutbr.fit.dash.view.ToolBar;
  * @author Jiri Hynek
  *
  */
-public class HistoryTool extends AbstractGUITool implements IGUITool, PropertyChangeListener {
+public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyChangeListener {
 	
 	protected Map<Dashboard, History> historyCache;
 	protected int HISTORY_LIMIT = 20;
@@ -146,7 +146,7 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, PropertyCh
 				SerializedDashboard sd = selectedDashboard.getSerializedDashboard();
 				userBrowsingHistory = true;
 				try {
-					DashAppController.getEventManager()._updateDashboardXml(selectedDashboard, history.undo(sd.getXml()), true);
+					DashAppController.getEventManager().updateDashboardXml(selectedDashboard, history.undo(sd.getXml()));
 				} finally {
 					userBrowsingHistory = false;
 				}
@@ -164,7 +164,7 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, PropertyCh
 				SerializedDashboard sd = selectedDashboard.getSerializedDashboard();
 				userBrowsingHistory = true;
 				try {
-					DashAppController.getEventManager()._updateDashboardXml(selectedDashboard, history.redo(sd.getXml()), true);
+					DashAppController.getEventManager().updateDashboardXml(selectedDashboard, history.redo(sd.getXml()));
 				} finally {
 					userBrowsingHistory = false;
 				}
@@ -229,10 +229,15 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, PropertyCh
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		if(!userBrowsingHistory && EventKind.isModelChanged(e) && e.xmlChange != null) {
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			History history = getHistory(selectedDashboard);
+			Dashboard updatedDashboard = e.selectedDashboard;
+			History history = getHistory(updatedDashboard);
 			history.save((String) e.xmlChange.oldValue);
-			updateButtons(history);
+			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
+			if(selectedDashboard != null && selectedDashboard == updatedDashboard) {
+				updateButtons(history);
+			}
+		} else if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+			updateButtons(getHistory(e.selectedDashboard));
 		}
 	}
 

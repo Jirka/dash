@@ -41,10 +41,10 @@ public class GETypeTool extends AbstractGUITool implements IGUITool {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource() instanceof JMenuItem && surface.getSelectedElement() != null) {
-				String itemName = ((JMenuItem) e.getSource()).getName();
+				String itemName = ((JMenuItem) e.getSource()).getText();
 				GEType geType = GEType.getValue(itemName);
 				if(geType != null) {
-					DashAppController.getEventManager()._updateGraphicalElement(surface.getSelectedElement(),
+					DashAppController.getEventManager().updateGraphicalElement(surface.getSelectedElement(),
 																				GEType.getValue(itemName));
 				}
 			}

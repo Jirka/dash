@@ -22,7 +22,8 @@ import javax.swing.JPopupMenu;
 import cz.vutbr.fit.dash.controller.DashAppController;
 import cz.vutbr.fit.dash.controller.EventManager.EventKind;
 import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dash.controller.PropertyChangeListener;
+import cz.vutbr.fit.dash.controller.IPropertyChangeListener;
+import cz.vutbr.fit.dash.model.DashAppModel;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.GraphicalElement;
 import cz.vutbr.fit.dash.view.tools.IGUITool;
@@ -34,7 +35,7 @@ import cz.vutbr.fit.dash.view.tools.canvas.AbstractCanvasTool;
  * @author Jiri Hynek
  *
  */
-public class Canvas extends JPanel implements PropertyChangeListener, MouseListener, MouseMotionListener, KeyListener {
+public class Canvas extends JPanel implements IPropertyChangeListener, MouseListener, MouseMotionListener, KeyListener {
 	
 	/**
 	 * Canvas tools which provides UI functionality regarding with canvas. 
@@ -217,17 +218,27 @@ public class Canvas extends JPanel implements PropertyChangeListener, MouseListe
 	}
 	
 	/**
-	 * Initializes variables.
+	 * Initializes variables (this is done only at start of application)
+	 * 
+	 * @param width
+	 * @param height
+	 */
+	private void initVariables(int width, int height) {
+		resetVariables(width, height);
+		this.attachSize = 0;
+	}
+	
+	/**
+	 * Resets variables.
 	 * 
 	 * @param width
 	 * @param height
 	 * @param time
 	 */
-	private void initVariables(int width, int height) {
+	private void resetVariables(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.scaleRate = 1.0;
-		this.attachSize = 0;
 		this.canvasTools = new ArrayList<>();
 		//this.listOfObjects.clear();
 		
@@ -296,7 +307,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, MouseListe
 	public void openDashboardImage(Dashboard dashboard) {
 		if(dashboard == null) {
 			image = null;
-			initVariables(0, 0);
+			resetVariables(0, 0);
 		} else {
 			image = dashboard.getImage();
 			// TODO
@@ -318,7 +329,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, MouseListe
 			}
 	        
 			// initialize canvas variables
-	        initVariables(width, height);
+	        resetVariables(width, height);
 		}
     }
 	
@@ -345,17 +356,20 @@ public class Canvas extends JPanel implements PropertyChangeListener, MouseListe
 
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
-		// another dashboard is selected
-		if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
-			resetSelections();
-			Dashboard dashboard = (Dashboard) e.modelChange.newValue;
-			openDashboardImage(dashboard);
-		} else if(EventKind.isModelChanged(e)) {
-			resetSelections();
+		Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
+		if(selectedDashboard != null && selectedDashboard == e.selectedDashboard) {
+			// another dashboard is selected
+			if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+				resetSelections();
+				Dashboard dashboard = (Dashboard) e.modelChange.newValue;
+				openDashboardImage(dashboard);
+			} else if(EventKind.isModelChanged(e)) {
+				resetSelections();
+			}
+			
+			activeCanvasTool.firePropertyChange(e);
+			repaint();
 		}
-		
-		activeCanvasTool.firePropertyChange(e);
-		repaint();
 	}
 
 	@Override

@@ -59,6 +59,8 @@ public class SelectTool extends ViewTool {
 	protected void toolSelected(ActionEvent e) {
 		// TODO
 		//new ImageAction(ImageAction.GRAY_SCALE).actionPerformed(null);
+		canvas.setSelectedElement(null);
+		candidateElement = null;
 		canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 		canvas.repaint();
 	}
@@ -117,11 +119,15 @@ public class SelectTool extends ViewTool {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(candidateElement != null) {
-			// selected element could have been moved or resized 
-			DashAppController.getEventManager()._updateGraphicalElement(canvas.getSelectedElement(),
+			// selected element could have been moved or resized
+			WorkingCopy candidateElementBackup = candidateElement; // candidate element selection will be cleared by property change event
+			GraphicalElement selectedElementBackup = canvas.selectedElement;
+			DashAppController.getEventManager().updateGraphicalElement(canvas.getSelectedElement(),
 					candidateElement.x(), candidateElement.y(), candidateElement.width(), candidateElement.height(), true);
 			// element is still selected but no operation is active
 			canvas.updateCursor(Cursor.DEFAULT_CURSOR);
+			candidateElement = candidateElementBackup; // restore candidate element selection
+			canvas.selectedElement = selectedElementBackup;
 		}
 	}
 
@@ -189,7 +195,7 @@ public class SelectTool extends ViewTool {
 		} else if(e.getKeyCode() == KeyEvent.VK_DELETE) {
 			if(canvas.getSelectedElement() != null) {
 				if(canvas.getCursor().getType() == Cursor.DEFAULT_CURSOR) {
-					DashAppController.getEventManager()._deleteGraphicalElement(canvas.getSelectedElement());
+					DashAppController.getEventManager().deleteGraphicalElement(canvas.getSelectedElement());
 					candidateElement = null;
 					canvas.setSelectedElement(null);
 					canvas.repaint();

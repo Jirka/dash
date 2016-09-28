@@ -3,6 +3,12 @@ package cz.vutbr.fit.dash.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Singleton class which provides access to event manager and property change listeners.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppController {
 	
 	private static DashAppController controller;
@@ -14,7 +20,7 @@ public class DashAppController {
 		return controller;
 	}
 	
-	private List<PropertyChangeListener> listeners;
+	private List<IPropertyChangeListener> listeners;
 	private boolean listenersDisabled;
 	private EventManager eventManager;
 	
@@ -23,16 +29,16 @@ public class DashAppController {
 	
 	public void init() {
 		eventManager = new EventManager(this);
-		listeners = new ArrayList<PropertyChangeListener>();
+		listeners = new ArrayList<IPropertyChangeListener>();
 	}
 	
-	public void addPropertyChangeListener(PropertyChangeListener listener) {
+	public void addPropertyChangeListener(IPropertyChangeListener listener) {
 		if(!listeners.contains(listener)) {
 			listeners.add(listener);
 		}
 	}
 	
-	public void removePropertyChangeListener(PropertyChangeListener toolBar) {
+	public void removePropertyChangeListener(IPropertyChangeListener toolBar) {
 		listeners.remove(toolBar);
 	}
 	
@@ -46,7 +52,7 @@ public class DashAppController {
 
 	public void firePropertyChange(PropertyChangeEvent propertyChangeEvent) {
 		if(!getListenersDisabled()) {
-			for (PropertyChangeListener propertyChangeListener : listeners) {
+			for (IPropertyChangeListener propertyChangeListener : listeners) {
 				propertyChangeListener.firePropertyChange(propertyChangeEvent);
 			}
 		}

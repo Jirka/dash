@@ -9,6 +9,10 @@ import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
 
+import cz.vutbr.fit.dash.controller.DashAppController;
+import cz.vutbr.fit.dash.controller.EventManager.EventKind;
+import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
+import cz.vutbr.fit.dash.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dash.view.DashAppView;
 import cz.vutbr.fit.dash.view.MenuBar;
 import cz.vutbr.fit.dash.view.ToolBar;
@@ -19,7 +23,7 @@ import cz.vutbr.fit.dash.view.ToolBar;
  * @author Jiri Hynek
  *
  */
-public class ZoomTool extends AbstractGUITool implements IGUITool {
+public class ZoomTool extends AbstractGUITool implements IGUITool, IPropertyChangeListener {
 	
 	// zoom
 	public static final double[] zoomField = { 0.125, 0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 8.0 };
@@ -43,6 +47,7 @@ public class ZoomTool extends AbstractGUITool implements IGUITool {
 		zoomAction = new ZoomAction();
 		btnsZoomIn = new ArrayList<>();
 		btnsZoomOut = new ArrayList<>();
+		DashAppController.getInstance().addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -59,6 +64,17 @@ public class ZoomTool extends AbstractGUITool implements IGUITool {
 		}
 		btnsZoomIn.add(toolbar.addButton(STR_ZOOM_IN, "/icons/Zoom in.png", zoomAction, 0));
 		btnsZoomOut.add(toolbar.addButton(STR_ZOOM_OUT, "/icons/Zoom out.png", zoomAction, 0));
+	}
+	
+	private void reset() {
+		enableButtons(btnsZoomIn, true);
+		enableButtons(btnsZoomOut, true);
+		zoomLevel = DEFAULT_ZOOM_LEVEL;
+		updateCanvasScaleRate();
+	}
+	
+	private void updateCanvasScaleRate() {
+		DashAppView.getInstance().getDashboardView().getCanvas().updateScaleRate(zoomField[zoomLevel]);
 	}
 	
 	/**
@@ -119,9 +135,12 @@ public class ZoomTool extends AbstractGUITool implements IGUITool {
 				}
 			}
 		}
-		
-		private void updateCanvasScaleRate() {
-			DashAppView.getInstance().getDashboardView().getSurface().updateScaleRate(zoomField[zoomLevel]);
+	}
+
+	@Override
+	public void firePropertyChange(PropertyChangeEvent e) {
+		if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+			reset();
 		}
 	}
 }

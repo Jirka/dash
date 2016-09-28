@@ -82,7 +82,7 @@ public class InsertTool extends AbstractCanvasTool {
 	public void mouseReleased(MouseEvent e) {
 		if(candidateElement != null && candidateElement.x2 != -1 && candidateElement.y2 != -1) {
 			// create new graphical element
-			DashAppController.getEventManager()._createGrapicalElement(
+			DashAppController.getEventManager().createGrapicalElement(
 					DashAppModel.getInstance().getSelectedDashboard(),
 					candidateElement.x(), candidateElement.y(), 
 					candidateElement.width(), candidateElement.height(), true);

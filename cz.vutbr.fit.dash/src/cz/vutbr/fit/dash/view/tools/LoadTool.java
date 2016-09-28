@@ -3,7 +3,6 @@ package cz.vutbr.fit.dash.view.tools;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
@@ -22,20 +21,30 @@ import cz.vutbr.fit.dash.view.ToolBar;
 import cz.vutbr.fit.dash.view.util.Dialogs;
 
 /**
- * File management support.
+ * Load dashboard support.
  * 
  * @author Jiri Hynek
  *
  */
-public class FileTool extends AbstractGUITool implements IGUITool {
+public class LoadTool extends AbstractGUITool implements IGUITool {
+	
+	NewFileAction newFileAction;
+	OpenFolderAction openFolderAction;
+	RefreshAction refreshAction;
+	
+	public LoadTool() {
+		newFileAction = new NewFileAction();
+		openFolderAction = new OpenFolderAction();
+		refreshAction = new RefreshAction();
+	}
 
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
-		menuBar.addItem(subMenu, "Open", new OpenFolderAction());
-		menuBar.addItem(subMenu, "Refresh", new LoadStoreAction(LoadStoreAction.REFRESH));
-		menuBar.addItem(subMenu, "Save", new LoadStoreAction(LoadStoreAction.SAVE));
-		menuBar.addItem(subMenu, "Save all", new LoadStoreAction(LoadStoreAction.SAVE_ALL));
+		menuBar.addItem(subMenu, "New", newFileAction);
+		menuBar.addSeparator(subMenu);
+		menuBar.addItem(subMenu, "Open folder", openFolderAction);
+		menuBar.addItem(subMenu, "Refresh", refreshAction);
 	}
 
 	@Override
@@ -43,13 +52,10 @@ public class FileTool extends AbstractGUITool implements IGUITool {
 		if (toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addButton("New", "/icons/Document.png", new NewFileAction(), 0);
+		toolbar.addButton("New", "/icons/Document.png", newFileAction, 0);
 		toolbar.addSeparator();
-		toolbar.addButton("Open files", "/icons/Open file.png", new OpenFolderAction(), 0);
-		toolbar.addButton("Refresh", "/icons/Refresh.png", new LoadStoreAction(LoadStoreAction.REFRESH), 0);
-		toolbar.addSeparator();
-		toolbar.addButton("Save", "/icons/Save.png", new LoadStoreAction(LoadStoreAction.SAVE), 0);
-		toolbar.addButton("Save all", "/icons/Save as.png", null, 0);
+		toolbar.addButton("Open folder", "/icons/Open file.png", openFolderAction, 0);
+		toolbar.addButton("Refresh", "/icons/Refresh.png", refreshAction, 0);
 	}
 
 	/**
@@ -116,7 +122,8 @@ public class FileTool extends AbstractGUITool implements IGUITool {
 
 			// file picker //
 			JFileChooser fc = new JFileChooser();
-			fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+			//fc.setCurrentDirectory(new File(System.getProperty("user.home")));
+			fc.setCurrentDirectory(new File(DashAppModel.getInstance().getFolderPath()));
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			fc.setAcceptAllFileFilterUsed(false);
 			if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -124,7 +131,7 @@ public class FileTool extends AbstractGUITool implements IGUITool {
 				if (file != null) {
 					String path = file.getAbsolutePath();
 					if (path != null) {
-						DashAppController.getEventManager()._updateFolderPath(path);
+						DashAppController.getEventManager().updateFolderPath(path);
 					}
 				}
 			}
@@ -132,48 +139,25 @@ public class FileTool extends AbstractGUITool implements IGUITool {
 	}
 
 	/**
-	 * Load/store action which handles save and load requests.
+	 * Refresh action which handles dashboard (re)load requests.
 	 * 
 	 * @author Jiri Hynek
 	 *
 	 */
-	public class LoadStoreAction extends AbstractAction {
+	public class RefreshAction extends AbstractAction {
 
 		/**
 		 * UID
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public static final int REFRESH = 0;
-		public static final int SAVE = 1;
-		public static final int SAVE_ALL = 2;
-
-		private int kind;
-
-		public LoadStoreAction(int kind) {
-			this.kind = kind;
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			if (selectedDashboard != null) {
-				switch (kind) {
-				case SAVE:
-					try {
-						DashAppController.getEventManager().saveDashboardToFile(selectedDashboard);
-					} catch (IOException e1) {
-						Dialogs.report("Unable to save dashboard file.");
-					}
-					break;
-				case REFRESH:
-					try {
-						DashAppController.getEventManager().reloadDashboardFromFile(selectedDashboard);
-					} catch (Exception e1) {
-						Dialogs.report("Unable to load dashboard file.");
-					}
-					break;
-				}
+			try {
+				DashAppController.getEventManager().reloadDashboardFromFile(selectedDashboard);
+			} catch (Exception e1) {
+				Dialogs.report("Unable to load dashboard file.");
 			}
 		}
 	}

@@ -15,7 +15,7 @@ import org.apache.batik.util.gui.xmleditor.XMLTextEditor;
 import cz.vutbr.fit.dash.controller.DashAppController;
 import cz.vutbr.fit.dash.controller.EventManager.EventKind;
 import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dash.controller.PropertyChangeListener;
+import cz.vutbr.fit.dash.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dash.model.DashAppModel;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.view.IComponent;
@@ -27,7 +27,7 @@ import cz.vutbr.fit.dash.view.SideBar;
  * @author Jiri Hynek
  *
  */
-public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, PropertyChangeListener {
+public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IPropertyChangeListener {
 	
 	/**
 	 * Main GUI component.
@@ -99,7 +99,7 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, Pr
 		if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED ||
 				EventKind.isModelChanged(e)) {
 			Dashboard selectedDasboard = DashAppModel.getInstance().getSelectedDashboard();
-			if(selectedDasboard != null) {
+			if(selectedDasboard != null && selectedDasboard == e.selectedDashboard) {
 				// this is one way how to update text editor
 				// workflow 1: change of model -> serialization -> xml change event -> proper editor text update
 				if(!currentlyTyping) {
@@ -174,7 +174,7 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, Pr
 			currentlyTyping = true;
 			try {
 				// update model
-				DashAppController.getEventManager()._updateDashboardXml(selectedDashboard, editor.getText(), true);
+				DashAppController.getEventManager().updateDashboardXml(selectedDashboard, editor.getText());
 				// successful deserialization
 				setEditorStatus(true);
 			} catch (Exception e) {

@@ -133,7 +133,7 @@ public class WandTool extends AbstractCanvasTool {
 		candidateElement.x2 = x2;
 		candidateElement.y1 = y1;
 		candidateElement.y2 = y2;
-		DashAppController.getEventManager()._createGrapicalElement(DashAppModel.getInstance().getSelectedDashboard(),
+		DashAppController.getEventManager().createGrapicalElement(DashAppModel.getInstance().getSelectedDashboard(),
 				candidateElement.x(), candidateElement.y(), 
 				candidateElement.width(), candidateElement.height(), true);
 		// release candidate element

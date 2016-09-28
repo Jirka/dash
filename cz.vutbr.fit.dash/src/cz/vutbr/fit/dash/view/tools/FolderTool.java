@@ -19,11 +19,10 @@ import javax.swing.text.Position.Bias;
 import cz.vutbr.fit.dash.controller.DashAppController;
 import cz.vutbr.fit.dash.controller.EventManager.EventKind;
 import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dash.controller.PropertyChangeListener;
+import cz.vutbr.fit.dash.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dash.model.DashAppModel;
 import cz.vutbr.fit.dash.model.Dashboard;
 import cz.vutbr.fit.dash.model.DashboardFile;
-import cz.vutbr.fit.dash.model.SerializedDashboard;
 import cz.vutbr.fit.dash.util.DashboardFileFilter;
 import cz.vutbr.fit.dash.view.IComponent;
 import cz.vutbr.fit.dash.view.SideBar;
@@ -34,7 +33,7 @@ import cz.vutbr.fit.dash.view.SideBar;
  * @author Jiri Hynek
  *
  */
-public class FolderTool extends AbstractGUITool implements IGUITool, IComponent, PropertyChangeListener {
+public class FolderTool extends AbstractGUITool implements IGUITool, IComponent, IPropertyChangeListener {
 	
 	private JScrollPane scrollPane;
 	private JList<DashboardFile> list;
@@ -113,6 +112,24 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			}
 		}
 	}
+	
+	/**
+	 * Returns selected dashboard file.
+	 * 
+	 * @return
+	 */
+	public DashboardFile getSelectedElement() {
+		return list.getSelectedValue();
+	}
+	
+	/**
+	 * Updates dashboard file selection.
+	 * 
+	 * @param dashboardFile
+	 */
+	public void setSelectedElement(DashboardFile dashboardFile) {
+		list.setSelectedValue(dashboardFile, false);
+	}
 
 	@Override
 	public JComponent getComponent() {
@@ -129,11 +146,11 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 				if(index >= 0) {
 					list.setSelectedIndex(index);
 				}
-			} else if(e.propertyKind == EventKind.IS_DIRTY) {
-				int index = list.getNextMatch(((SerializedDashboard) e.modelChange.newValue).getDashboard().getDashboardFile().toString(), 0, Bias.Forward);
-				if(index >= 0) {
+			} else if(e.propertyKind == EventKind.DASHBOARD_STATE_CHANGED) {
+				int index = list.getNextMatch(e.selectedDashboard.getDashboard().getDashboardFile().toString(), 0, Bias.Forward);
+				/*if(index >= 0) {
 					list.setSelectedIndex(index);
-				}
+				}*/
 				listModel.update(index);
 			}
 		}

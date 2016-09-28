@@ -43,7 +43,7 @@ public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 		StringBuffer buffer = new StringBuffer();
 		
 		if(dashboard != null) {
-			BufferedImage image = DashAppView.getInstance().getDashboardView().getSurface().getImage();
+			BufferedImage image = DashAppView.getInstance().getDashboardView().getCanvas().getImage();
 			if(image != null) {
 				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
 				Map<Integer, Integer> histogram = MatrixUtils.getColorHistogram(matrix);

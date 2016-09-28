@@ -20,6 +20,11 @@ import cz.vutbr.fit.dash.view.ToolBar;
  *
  */
 public class FullScreenTool extends AbstractGUITool implements IGUITool {
+	
+	private JFrame frame;
+	private Dimension frameSize;
+	private int splitPanePosition;
+	private ToolBar toolbar;
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
@@ -41,10 +46,6 @@ public class FullScreenTool extends AbstractGUITool implements IGUITool {
 		 * UID
 		 */
 		private static final long serialVersionUID = 8778318546851797316L;
-		private JFrame frame;
-		private int splitPanePosition;
-		private Dimension frameSize;
-		private ToolBar toolbar;
 
 		public FullScreenAction() {
 		}

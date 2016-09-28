@@ -13,13 +13,12 @@ import javax.swing.ButtonGroup;
 import javax.swing.JToggleButton;
 
 import cz.vutbr.fit.dash.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dash.controller.PropertyChangeListener;
 import cz.vutbr.fit.dash.view.Canvas;
 import cz.vutbr.fit.dash.view.ToolBar;
 import cz.vutbr.fit.dash.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dash.view.util.PaintUtil;
 
-public abstract class AbstractCanvasTool extends AbstractGUITool implements PropertyChangeListener, MouseListener, MouseMotionListener, KeyListener {
+public abstract class AbstractCanvasTool extends AbstractGUITool implements MouseListener, MouseMotionListener, KeyListener {
 	
 	protected Canvas canvas;
 	protected boolean requiresSeparator;
@@ -59,7 +58,6 @@ public abstract class AbstractCanvasTool extends AbstractGUITool implements Prop
         }
 	}
 	
-	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		// do nothing
 	}
