@@ -142,9 +142,13 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			if(e.propertyKind == EventKind.FOLDER_PATH_CHANGED) {
 				changeFolder((String) e.modelChange.newValue);
 			} else if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
-				int index = list.getNextMatch(((Dashboard) e.modelChange.newValue).getDashboardFile().toString(), 0, Bias.Forward);
-				if(index >= 0) {
-					list.setSelectedIndex(index);
+				if(e.modelChange.newValue != null) {
+					int index = list.getNextMatch(((Dashboard) e.modelChange.newValue).getDashboardFile().toString(), 0, Bias.Forward);
+					if(index >= 0) {
+						list.setSelectedIndex(index);
+					}
+				} else {
+					list.setSelectedIndex(-1);
 				}
 			} else if(e.propertyKind == EventKind.DASHBOARD_STATE_CHANGED) {
 				int index = list.getNextMatch(e.selectedDashboard.getDashboard().getDashboardFile().toString(), 0, Bias.Forward);

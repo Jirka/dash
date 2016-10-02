@@ -312,6 +312,7 @@ public class EventManager {
 		DashAppModel model = DashAppModel.getInstance();
 		String oldPath = model.getFolderPath();
 		if(!oldPath.equals(folderPath)) {
+			updateSelectedDashboard((Dashboard) null);
 			model.setFolderPath(folderPath);
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(oldPath, folderPath), null));
 			model.getDashboards().clear(); // folder is changed, all cached dashboards can be released

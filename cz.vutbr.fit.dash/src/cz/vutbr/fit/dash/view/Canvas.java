@@ -357,7 +357,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-		if(selectedDashboard != null && selectedDashboard == e.selectedDashboard) {
+		if(selectedDashboard == e.selectedDashboard) {
 			// another dashboard is selected
 			if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
 				resetSelections();
