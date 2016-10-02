@@ -14,4 +14,6 @@ public interface IViewConfiguration {
 
 	int getWidth();
 
+	String getDefaultWorkspacePath();
+
 }

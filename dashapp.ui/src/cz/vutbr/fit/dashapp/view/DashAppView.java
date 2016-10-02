@@ -76,7 +76,7 @@ public class DashAppView {
 	 * @wbp.parser.entryPoint
 	 */
 	public void launchApplication(IViewConfiguration viewConfiguration) {
-		this.viewConfiguration = viewConfiguration;
+		this.viewConfiguration = viewConfiguration;		
 		List<IGUITool> plugins = viewConfiguration.getGUITools();
 		
 		// creates new Frame //

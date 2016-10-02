@@ -27,8 +27,8 @@ public class DashAppModel {
 		dashboards = new ArrayList<Dashboard>();
 		//selectedDashboard = new Dashboard(this, null);
 		
-		setFolderPath(getSettings().getDefaultWorkspacePath());
-		//setFolderPath(System.getProperty("user.home"));
+		//setFolderPath(getSettings().getDefaultWorkspacePath());
+		setFolderPath(System.getProperty("user.home"));
 	}
 	
 	public Settings getSettings() {

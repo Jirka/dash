@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.swing.ButtonGroup;
 
+import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
@@ -49,12 +50,20 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	 */
 	public static final String APP_NAME = "Dashboard analyzer";
 	
+	/**
+	 * default project path
+	 */
+	public static final String DEFAULT_WORKSPACE_PATH = System.getProperty("user.home");
+	
 	public BasicViewConfiguration() {
+		// set workspace path
+		DashAppModel.getInstance().setFolderPath(getDefaultWorkspacePath());
 		// initialize GUI tools
 		initTools();
 	}
 	
-	private void initTools() {
+	protected void initTools() {
+		
 		guiTools = new ArrayList<>();;
 		// basic UI tools
 		guiTools.add(new LoadTool());
@@ -109,6 +118,11 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	 */
 	public String getAppName() {
 		return APP_NAME;
+	}
+	
+	@Override
+	public String getDefaultWorkspacePath() {
+		return DEFAULT_WORKSPACE_PATH;
 	}
 
 }
