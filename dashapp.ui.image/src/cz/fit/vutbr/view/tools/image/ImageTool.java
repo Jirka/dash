@@ -1,4 +1,4 @@
-package cz.fit.vutbr.view.tools;
+package cz.fit.vutbr.view.tools.image;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
