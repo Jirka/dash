@@ -70,6 +70,10 @@ public class DashboardFile {
 		this.name = name.substring(0, dotPosition);
 	}
 	
+	public String getFileName() {
+		return name;
+	}
+	
 	public Dashboard getDashboard() {
 		return dashboard;
 	}
@@ -95,7 +99,7 @@ public class DashboardFile {
 	 * @throws IOException
 	 */
 	public String readXMLFile() throws IOException {
-		if(xmlFile.exists() && xmlFile.canRead()) {
+		if(xmlFile != null && xmlFile.exists() && xmlFile.canRead()) {
 			BufferedReader br = new BufferedReader(new FileReader(xmlFile));
 		    try {
 		        StringBuilder sb = new StringBuilder();
@@ -116,7 +120,10 @@ public class DashboardFile {
 	
 	public void updateXMLFile(String xml) throws IOException {
 		cachedXMLFile = xml;
-		if(xmlFile == null && !xmlFile.exists()) {
+		if(xmlFile == null) {
+			xmlFile = getXmlFile();
+		}
+		if(!xmlFile.exists()) {
 			xmlFile.createNewFile();
 		}
 		FileOutputStream out = new FileOutputStream(xmlFile);

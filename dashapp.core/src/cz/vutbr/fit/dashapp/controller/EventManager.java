@@ -1,5 +1,6 @@
 package cz.vutbr.fit.dashapp.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -9,6 +10,7 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.model.SerializedDashboard;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent.Change;
 
@@ -82,6 +84,14 @@ public class EventManager {
 		if(!oldXML.equals(xml)) {
 			// try to deserialize XML (test if valid)
 			Dashboard deserializedXML = XMLUtils.deserialize(xml);
+			// description is empty -> set image default dimension
+			if(xml == SerializedDashboard.EMPTY_XML) {
+				BufferedImage image = dashboard.getImage();
+				if(image != null) {
+					deserializedXML.width = image.getWidth();
+					deserializedXML.height = image.getHeight();
+				}
+			}
 			if(deserializedXML != null) {
 				// update XML
 				dashboard.getSerializedDashboard().setXml(xml);

@@ -49,25 +49,25 @@ public class GraphicalElement {
 	/**
 	 * relative x position of graphical element
 	 */
-	@Element
+	@Element(required=false)
 	public int x;
 	
 	/**
 	 * relative y position of graphical element
 	 */
-	@Element
+	@Element(required=false)
 	public int y;
 	
 	/**
 	 * width of graphical element
 	 */
-	@Element
+	@Element(required=false)
 	public int width;
 	
 	/**
 	 * height of hraphical element
 	 */
-	@Element
+	@Element(required=false)
 	public int height;
 	
 	/**
