@@ -1,5 +1,7 @@
 package cz.vutbr.fit.dashapp.view.tools;
 
+import java.awt.event.WindowEvent;
+
 import cz.vutbr.fit.dashapp.view.Canvas;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.SideBar;
@@ -21,6 +23,11 @@ public class AbstractGUITool implements IGUITool {
 
 	@Override
 	public void providePopupItems(Canvas canvas) {
+	}
+
+	@Override
+	public boolean windowsClosing(WindowEvent e) {
+		return false;
 	}
 
 }

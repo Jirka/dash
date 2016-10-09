@@ -1,5 +1,7 @@
 package cz.vutbr.fit.dashapp.view.tools;
 
+import java.awt.event.WindowEvent;
+
 import cz.vutbr.fit.dashapp.view.Canvas;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.SideBar;
@@ -14,5 +16,7 @@ public interface IGUITool {
 	void provideSidebarItems(SideBar sideBar);
 
 	void providePopupItems(Canvas canvas);
+
+	boolean windowsClosing(WindowEvent e);
 
 }

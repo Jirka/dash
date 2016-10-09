@@ -3,6 +3,8 @@ package cz.vutbr.fit.dashapp.view;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -70,17 +72,24 @@ public class DashAppView {
 	 * split pane between dashboard editor and views
 	 */
 	private JSplitPane splitPane;
+
+	/**
+	 * close event
+	 */
+	private WindowCloseEvent closeEvent;
 	
 	/**
 	 * Method launches GUI.
 	 * @wbp.parser.entryPoint
 	 */
 	public void launchApplication(IViewConfiguration viewConfiguration) {
-		this.viewConfiguration = viewConfiguration;		
+		this.viewConfiguration = viewConfiguration;
 		List<IGUITool> plugins = viewConfiguration.getGUITools();
+		this.closeEvent = new WindowCloseEvent(plugins);
 		
 		// creates new Frame //
 		frame = new JFrame(viewConfiguration.getAppName());
+		frame.addWindowListener(closeEvent);
 		
 		// set position (in the middle of screen) //
 		Toolkit toolkit = frame.getToolkit();
@@ -113,7 +122,7 @@ public class DashAppView {
 		frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 		
 		// complete top level frame //
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.setVisible(true);
         
         // needs to be set after frame is created
@@ -162,5 +171,32 @@ public class DashAppView {
 	 */
 	public JSplitPane getSplitPane() {
 		return splitPane;
+	}
+	
+	public WindowCloseEvent getCloseEvent() {
+		return closeEvent;
+	}
+	
+	public static class WindowCloseEvent extends WindowAdapter {
+		
+		private List<IGUITool> plugins;
+
+		public WindowCloseEvent(List<IGUITool> plugins) {
+			this.plugins = plugins;
+		}
+		
+		@Override
+		public void windowClosing(WindowEvent e) {
+			boolean disableCloseAction = false;
+			for (IGUITool plugin : plugins) {
+				disableCloseAction = disableCloseAction || plugin.windowsClosing(e);
+			}
+			if(!disableCloseAction) {
+				super.windowClosing(e);
+				System.out.println("cau");
+				System.exit(0);
+			}
+			
+		}
 	}
 }

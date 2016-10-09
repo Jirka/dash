@@ -1,6 +1,7 @@
 package cz.vutbr.fit.dashapp.view;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -23,7 +24,7 @@ public class MenuBar implements IComponent {
 	/**
 	 * Main GUI component
 	 */
-	private JMenuBar menuBar;
+	protected JMenuBar menuBar;
 	
 	@Override
     public JComponent getComponent() {
@@ -104,7 +105,8 @@ public class MenuBar implements IComponent {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.exit(0);
+			DashAppView view = DashAppView.getInstance();
+			view.getCloseEvent().windowClosing(new WindowEvent(view.getFrame(), WindowEvent.WINDOW_CLOSING));
 		}
 	}
 }

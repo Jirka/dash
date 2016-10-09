@@ -1,6 +1,7 @@
 package cz.vutbr.fit.dashapp.view.tools;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
@@ -163,6 +165,26 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 				enableButtons(btnsSave, false);
 			}
 		}
+	}
+	
+	@Override
+	public boolean windowsClosing(WindowEvent e) {
+		List<Dashboard> dashboards = DashAppModel.getInstance().getDashboards();
+		List<Dashboard> unsavedDashboards = new ArrayList<>(); 
+		for (Dashboard dashboard : dashboards) {
+			if(dashboard.getSerializedDashboard().isDirty()) {
+				unsavedDashboards.add(dashboard);
+			}
+		}
+		if(!unsavedDashboards.isEmpty()) {
+			int result = Dialogs.YesNoCancel("There are several unsaved dashboards. Do you want to save them?");
+			if(result == JOptionPane.YES_OPTION) {
+				saveAllAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			} else if(result == JOptionPane.CANCEL_OPTION) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
