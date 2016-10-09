@@ -38,7 +38,7 @@ public class BoundTool extends SelectTool {
 
 	@Override
 	protected String getImage() {
-		return "/icons/Billboard.png";
+		return "/icons/Monitor.png";
 	}
 	
 	/**

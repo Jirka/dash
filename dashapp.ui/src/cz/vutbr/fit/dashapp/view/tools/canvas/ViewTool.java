@@ -39,7 +39,7 @@ public class ViewTool extends AbstractCanvasTool {
 
 	@Override
 	protected String getImage() {
-		return "/icons/Monitor.png";
+		return "/icons/Billboard.png";
 	}
 	
 	@Override
