@@ -8,6 +8,13 @@ import cz.vutbr.fit.dashapp.view.SideBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
 public class AbstractGUITool implements IGUITool {
+	
+	protected Canvas canvas;
+
+	@Override
+	public void init(Canvas canvas) {
+		this.canvas = canvas;
+	}
 
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {

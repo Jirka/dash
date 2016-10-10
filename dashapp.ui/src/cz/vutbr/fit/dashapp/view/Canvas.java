@@ -26,6 +26,7 @@ import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.AbstractCanvasTool;
 
@@ -68,6 +69,12 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	 * Image representing dashboard raster.
 	 */
 	private BufferedImage image;
+
+	/**
+	 * Prevent image update.
+	 * It can be used by some image filter which can be explicitly applied.
+	 */
+	private boolean externalImageUpdateLocked;
 	
 	/**
 	 * Returns dashboard raster image.
@@ -83,9 +90,51 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	 * 
 	 * @param image
 	 */
-	public void updateImage(BufferedImage image) {
-		this.image = image;
-		repaint();
+	public void updateImage(BufferedImage image, boolean force, boolean lock) {
+		if(!externalImageUpdateLocked || force) {
+			this.image = image;
+			repaint();
+			externalImageUpdateLocked = lock;
+		}
+	}
+	
+	/**
+	 * gray scale mode
+	 */
+	private boolean grayScale;
+	
+	/**
+	 * Updates image according to grayScale mode
+	 * if external image update is not locked.
+	 */
+	public void setGrayScale(boolean grayScale) {
+		if(this.grayScale != grayScale) {
+			this.grayScale = grayScale;
+			if(!externalImageUpdateLocked && grayScaleToolEnabled) {
+				Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
+				if(selectedDashboard != null) {
+					BufferedImage image = selectedDashboard.getImage();
+					if(image != null) {
+						if(grayScale) {
+							convertToGrayScale(image, selectedDashboard);
+						}
+						updateImage(image, false, false);
+					}
+				}
+			}
+		}
+	}
+	
+	private void convertToGrayScale(BufferedImage image, Dashboard dashboard) {
+		int[][] matrix = MatrixUtils.printBufferedImage(image);
+		MatrixUtils.grayScale(matrix, false, false);
+		MatrixUtils.updateBufferedImage(image, matrix);
+	}
+	
+	private boolean grayScaleToolEnabled;
+	
+	public void setGrayScaleToolEnabled(boolean grayScaleToolEnabled) {
+		this.grayScaleToolEnabled = grayScaleToolEnabled;
 	}
 	
 	/**
@@ -213,11 +262,18 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		super(true);
 		initVariables(0, 0);
 		initCanvasTools(tools);
+		initTools(tools);
 		initPopup(tools);
 		initListeners();
 		setAutoscrolls(true);
 	}
 	
+	private void initTools(List<IGUITool> tools) {
+		for (IGUITool tool : tools) {
+			tool.init(this);
+		}
+	}
+
 	/**
 	 * Initializes variables (this is done only at start of application)
 	 * 
@@ -228,6 +284,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		resetVariables(width, height);
 		this.attachSize = 0;
 		this.scaleRate = 1.0;
+		this.grayScaleToolEnabled = false;
 	}
 	
 	/**
@@ -241,6 +298,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		this.width = width;
 		this.height = height;
 		this.canvasTools = new ArrayList<>();
+		this.externalImageUpdateLocked = false;
 		//this.listOfObjects.clear();
 		
 		selectedElement = null;
@@ -311,10 +369,9 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 			resetVariables(0, 0);
 		} else {
 			image = dashboard.getImage();
-			// TODO
-			//if(widgetActionKind != DrawActionKind.VIEW) {
-				//MatrixUtils.convertBufferedImageToRGB(image, dashboard);
-			//}
+			if(grayScale && grayScaleToolEnabled) {
+				convertToGrayScale(image, dashboard);
+			}
 			int width, height;
 			
 			// get serialized dashboard width and height

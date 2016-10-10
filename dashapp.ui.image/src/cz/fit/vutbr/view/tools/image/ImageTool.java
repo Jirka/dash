@@ -110,7 +110,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 			if(selectedDashboard != null) {
 				if(kind == RESET) {
 					BufferedImage image = selectedDashboard.getImage();
-					surface.updateImage(image);
+					surface.updateImage(image, true, true);
 				} else {
 					BufferedImage image = surface.getImage();
 					if(image != null) {
@@ -120,22 +120,22 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							int t = askForInteger("Select t", "Threshold option", 6);
 							MatrixUtils.adaptiveThreshold(matrix, false, s, t, false);
 							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == ADAPTIVE2) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
 							MatrixUtils.adaptiveThreshold(matrix, true, s, t, false);
 							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == GRAY_SCALE) {
 							MatrixUtils.grayScale(matrix, false, false);
 							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == POSTERIZE) {
 							int range = askForInteger("color bit width", "Posterization option", 4);
 							MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, range)), false);
 							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == HSB_SATURATION) {
 							ColorChannel[][] matrixHSB = MatrixUtils.RGBtoHSB(matrix);
 							MatrixUtils.normalizeColorChannel(matrixHSB, matrix, ColorChannelType.SATURATION);
@@ -143,7 +143,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							MatrixUtils.grayScale(matrix, true, false);
 							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == LCH_SATURATION) {
 							ColorChannel[][] matrixLCH = MatrixUtils.RGBtoLCH(matrix);
 							MatrixUtils.normalizeColorChannel(matrixLCH, matrix, ColorChannelType.SATURATION);
@@ -151,7 +151,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							MatrixUtils.grayScale(matrix, true, false);
 							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
-							surface.updateImage(image);
+							surface.updateImage(image, true, true);
 						} else if(kind == HISTOGRAM) {
 							MatrixUtils.grayScale(matrix, true, false);
 							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);

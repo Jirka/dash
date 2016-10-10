@@ -57,10 +57,9 @@ public class SelectTool extends ViewTool {
 	
 	@Override
 	protected void toolSelected(ActionEvent e) {
-		// TODO
-		//new ImageAction(ImageAction.GRAY_SCALE).actionPerformed(null);
 		canvas.setSelectedElement(null);
 		candidateElement = null;
+		canvas.setGrayScale(true);
 		canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 		canvas.repaint();
 	}

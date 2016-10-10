@@ -55,9 +55,8 @@ public class BoundTool extends SelectTool {
 	
 	@Override
 	protected void toolSelected(ActionEvent e) {
-		// TODO
-		//new ImageAction(ImageAction.GRAY_SCALE).actionPerformed(null);
 		reset();
+		canvas.setGrayScale(true);
 		canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 		canvas.repaint();
 	}

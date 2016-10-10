@@ -9,6 +9,8 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
 
 public interface IGUITool {
 	
+	void init(Canvas canvas);
+	
 	void provideMenuItems(MenuBar menuBar);
 
 	void provideToolbarItems(ToolBar toolbar);

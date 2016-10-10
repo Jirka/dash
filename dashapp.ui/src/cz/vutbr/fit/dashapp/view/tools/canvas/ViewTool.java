@@ -44,8 +44,7 @@ public class ViewTool extends AbstractCanvasTool {
 	
 	@Override
 	protected void toolSelected(ActionEvent e) {
-		// TODO
-		//new ImageAction(ImageAction.RESET).actionPerformed(null);
+		canvas.setGrayScale(false);
 		canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 		canvas.repaint();
 	}

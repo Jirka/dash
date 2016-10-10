@@ -11,6 +11,7 @@ import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
 import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
 import cz.vutbr.fit.dashapp.view.tools.GETypeTool;
+import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
 import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 import cz.vutbr.fit.dashapp.view.tools.LoadTool;
@@ -85,6 +86,8 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		
 		guiTools.add(new AttachTool());
 		guiTools.add(new GETypeTool());
+		
+		guiTools.add(new GrayScaleTool());
 	}
 
 	/**

@@ -54,8 +54,7 @@ public class WandTool extends AbstractCanvasTool {
 	
 	@Override
 	protected void toolSelected(ActionEvent e) {
-		// TODO
-		//new ImageAction(ImageAction.GRAY_SCALE).actionPerformed(null);
+		canvas.setGrayScale(false);
 		canvas.updateCursor(Cursor.CROSSHAIR_CURSOR);
 		canvas.repaint();
 	}

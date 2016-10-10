@@ -20,7 +20,6 @@ import cz.vutbr.fit.dashapp.view.util.PaintUtil;
 
 public abstract class AbstractCanvasTool extends AbstractGUITool implements MouseListener, MouseMotionListener, KeyListener {
 	
-	protected Canvas canvas;
 	protected boolean requiresSeparator;
 	protected boolean isDefault;
 	protected ButtonGroup buttonGroup;
@@ -37,7 +36,7 @@ public abstract class AbstractCanvasTool extends AbstractGUITool implements Mous
 	}
 	
 	public void init(Canvas canvas) {
-		this.canvas = canvas;
+		super.init(canvas);
 		if(isDefault) {
 			canvas.setActiveCanvasTool(this);
 		}
@@ -79,14 +78,6 @@ public abstract class AbstractCanvasTool extends AbstractGUITool implements Mous
 		public void actionPerformed(ActionEvent e) {
 			canvas.setActiveCanvasTool(AbstractCanvasTool.this);
 			toolSelected(e);
-			/*ImageAction imageAction;
-			DashAppModel.getInstance().setWidgetAction(kind);
-			if(kind == DrawActionKind.VIEW) {
-				imageAction = new ImageAction(ImageAction.RESET);
-			} else {
-				imageAction = new ImageAction(ImageAction.GRAY_SCALE);
-			}
-			imageAction.actionPerformed(null);*/
 		}
 	}
 	

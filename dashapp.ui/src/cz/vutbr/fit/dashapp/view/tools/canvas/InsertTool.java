@@ -51,8 +51,7 @@ public class InsertTool extends AbstractCanvasTool {
 	
 	@Override
 	protected void toolSelected(ActionEvent e) {
-		// TODO
-		//new ImageAction(ImageAction.GRAY_SCALE).actionPerformed(null);
+		canvas.setGrayScale(true);
 		canvas.updateCursor(Cursor.CROSSHAIR_CURSOR);
 		canvas.repaint();
 	}
