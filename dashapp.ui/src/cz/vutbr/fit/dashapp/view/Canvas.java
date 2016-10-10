@@ -210,6 +210,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	private static final long serialVersionUID = 3338976302390224035L;
 	
 	public Canvas(List<IGUITool> tools) {
+		super(true);
 		initVariables(0, 0);
 		initCanvasTools(tools);
 		initPopup(tools);
@@ -226,6 +227,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	private void initVariables(int width, int height) {
 		resetVariables(width, height);
 		this.attachSize = 0;
+		this.scaleRate = 1.0;
 	}
 	
 	/**
@@ -238,7 +240,6 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	private void resetVariables(int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.scaleRate = 1.0;
 		this.canvasTools = new ArrayList<>();
 		//this.listOfObjects.clear();
 		
