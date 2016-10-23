@@ -154,9 +154,9 @@ public class SelectTool extends ViewTool {
 				// repaint canvas
 				canvas.repaint();
 			}
+		} else {
+			super.mouseDragged(e);
 		}
-		
-		super.mouseDragged(e);
 	}
 
 	@Override

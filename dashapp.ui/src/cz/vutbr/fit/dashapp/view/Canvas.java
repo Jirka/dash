@@ -432,7 +432,9 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		activeCanvasTool.mouseClicked(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseClicked(e);
+		}
 	}
 
 	@Override
@@ -442,46 +444,68 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 			requestFocus();
 		}
 		
-		activeCanvasTool.mousePressed(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mousePressed(e);
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		activeCanvasTool.mouseReleased(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseReleased(e);
+		}
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent e) {
-		activeCanvasTool.mouseEntered(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseEntered(e);
+		}
 	}
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		activeCanvasTool.mouseExited(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseExited(e);
+		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		activeCanvasTool.mouseDragged(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseDragged(e);
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		activeCanvasTool.mouseMoved(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.mouseMoved(e);
+		}
 	}
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
-		activeCanvasTool.keyTyped(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.keyTyped(e);
+		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		activeCanvasTool.keyPressed(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.keyPressed(e);
+		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		activeCanvasTool.keyReleased(e);
+		if(isSelectedDashboard()) {
+			activeCanvasTool.keyReleased(e);
+		}
+	}
+	
+	private boolean isSelectedDashboard() {
+		return DashAppModel.getInstance().getSelectedDashboard() != null;
 	}
 }
