@@ -54,6 +54,11 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	public static final String APP_NAME = "Dashboard analyzer";
 	
 	/**
+	 * version
+	 */
+	public static final String VERSION = "rel-master";
+	
+	/**
 	 * default project path
 	 */
 	public static final String DEFAULT_WORKSPACE_PATH = System.getProperty("user.home");
@@ -125,6 +130,11 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	 */
 	public String getAppName() {
 		return APP_NAME;
+	}
+	
+	@Override
+	public String getVersion() {
+		return VERSION;
 	}
 	
 	@Override

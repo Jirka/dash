@@ -16,4 +16,6 @@ public interface IViewConfiguration {
 
 	String getDefaultWorkspacePath();
 
+	String getVersion();
+
 }

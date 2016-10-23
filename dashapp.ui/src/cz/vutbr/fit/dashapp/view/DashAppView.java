@@ -88,7 +88,7 @@ public class DashAppView {
 		this.closeEvent = new WindowCloseEvent(plugins);
 		
 		// creates new Frame //
-		frame = new JFrame(viewConfiguration.getAppName());
+		frame = new JFrame(viewConfiguration.getAppName() + " (" + viewConfiguration.getVersion() + ")");
 		frame.addWindowListener(closeEvent);
 		
 		// set position (in the middle of screen) //
