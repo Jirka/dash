@@ -3,6 +3,7 @@ package cz.vutbr.fit.dashapp.view.tools;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 
@@ -19,15 +20,19 @@ import cz.vutbr.fit.dashapp.view.util.ViewUtils;
 public class AttachTool extends AbstractGUITool implements IGUITool {
 	
 	public static final int ATTACH_TOLERANCE = 4;
+	
+	protected AbstractButton btn;
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
 		if(toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addToggleButton("View Image", "/icons/Open lock.png",
-        		new AttachAction(new ImageIcon(ViewUtils.class.getResource("/icons/Lock.png")),
-        						new ImageIcon(ViewUtils.class.getResource("/icons/Open lock.png"))), 0);
+		btn = toolbar.addToggleButton("Enable attach function", "/icons/magnet_off.png",
+        		new AttachAction(new ImageIcon(ViewUtils.class.getResource("/icons/magnet_on.png")),
+        						new ImageIcon(ViewUtils.class.getResource("/icons/magnet_off.png")),
+        						"Disable attach function",
+        						"Enable attach function"), 0);
 	}
 	
 	/**
@@ -45,13 +50,17 @@ public class AttachTool extends AbstractGUITool implements IGUITool {
 		
 		private ImageIcon pressedIcon;
 		private ImageIcon releasedIcon;
+		private String pressedToolTip;
+		private String releasedToolTip;
 
 		public AttachAction() {
 		}
 		
-		public AttachAction(ImageIcon pressedIcon, ImageIcon releasedIcon) {
+		public AttachAction(ImageIcon pressedIcon, ImageIcon releasedIcon, String pressedToolTip, String releasedToolTip) {
 			this.pressedIcon = pressedIcon;
 			this.releasedIcon = releasedIcon;
+			this.pressedToolTip = pressedToolTip;
+			this.releasedToolTip = releasedToolTip;
 		}
 
 		@Override
@@ -62,10 +71,16 @@ public class AttachTool extends AbstractGUITool implements IGUITool {
 					if(pressedIcon != null) {
 						toggleButton.setIcon(pressedIcon);
 					}
+					if(pressedToolTip != null) {
+						toggleButton.setToolTipText(pressedToolTip);
+					}
 					updateCanvasAttachRate();
 				} else {
 					if(releasedIcon != null) {
 						toggleButton.setIcon(releasedIcon);
+					}
+					if(releasedToolTip != null) {
+						toggleButton.setToolTipText(releasedToolTip);
 					}
 					updateCanvasAttachRate();
 				}
@@ -73,7 +88,7 @@ public class AttachTool extends AbstractGUITool implements IGUITool {
 		}
 		
 		private void updateCanvasAttachRate() {
-			DashAppView.getInstance().getDashboardView().getCanvas().updateAttachSize(enabled ? ATTACH_TOLERANCE : 0);
+			DashAppView.getInstance().getDashboardView().getCanvas().updateAttachSize(btn.isSelected() ? ATTACH_TOLERANCE : 0);
 		}
 	}
 
