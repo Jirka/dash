@@ -59,12 +59,12 @@ public class CanvasUtils {
 				}
 			}
 		}
-		if (result < parentElement.absoluteX()) {
+		/*if (result < parentElement.absoluteX()) {
 			result = parentElement.absoluteX();
 		}
 		if (result > parentElement.absoluteX() + parentElement.width) {
 			result = parentElement.absoluteX() + surfaceWidth;
-		}
+		}*/
 		return result;
 	}
 
@@ -94,13 +94,65 @@ public class CanvasUtils {
 				}
 			}
 		}
-		if (result < parentElement.absoluteY()) {
+		/*if (result < parentElement.absoluteY()) {
 			result = parentElement.absoluteY();
 		}
 		if (result > parentElement.absoluteY() + parentElement.height) {
 			result = parentElement.absoluteY() + surfaceHeight;
-		}
+		}*/
 		return result;
+	}
+	
+	public static void cropCandidateElement(WorkingCopy candidateElement, int width, int height, boolean keepSize) {
+		// normalize
+		if(candidateElement.x2 < candidateElement.x1) {
+			int tmp = candidateElement.x1;
+			candidateElement.x1 = candidateElement.x2;
+			candidateElement.x2 = tmp;
+		}
+		
+		if(candidateElement.y2 < candidateElement.y1) {
+			int tmp = candidateElement.y1;
+			candidateElement.y1 = candidateElement.y2;
+			candidateElement.y2 = tmp;
+		}
+		
+		// crop
+		if (candidateElement.x1 < 0) {
+			if(keepSize) {
+				candidateElement.x2 = candidateElement.x2-candidateElement.x1;
+			}
+			candidateElement.x1 = 0;
+		} else if(candidateElement.x1 > width && !keepSize) {
+			candidateElement.x1 = width;
+		}
+		
+		if (candidateElement.y1 < 0) {
+			if(keepSize) {
+				candidateElement.y2 = candidateElement.y2-candidateElement.y1;
+			}
+			candidateElement.y1 = 0;
+		} else if(candidateElement.y1 > height && !keepSize) {
+			candidateElement.y1 = height;
+		}
+		
+		if (candidateElement.x2 > width) {
+			if(keepSize) {
+				candidateElement.x1 = candidateElement.x1-(candidateElement.x2-width);
+			}
+			candidateElement.x2 = width;
+		} else if(candidateElement.x2 < 0 && !keepSize) {
+			candidateElement.x2 = 0;
+		}
+		
+		if(candidateElement.y2() > height) {
+			if(keepSize) {
+				candidateElement.y1 = candidateElement.y1-(candidateElement.y2-height);
+			}
+			candidateElement.y2 = height;
+		} else if(candidateElement.y2 < 0 && !keepSize) {
+			candidateElement.y2 = 0;
+		}
 	}
 
 	public static void updatePosition(GraphicalElement parentElement, List<GraphicalElement> elements,

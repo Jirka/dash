@@ -121,12 +121,22 @@ public class SelectTool extends ViewTool {
 			// selected element could have been moved or resized
 			WorkingCopy candidateElementBackup = candidateElement; // candidate element selection will be cleared by property change event
 			GraphicalElement selectedElementBackup = canvas.selectedElement;
-			DashAppController.getEventManager().updateGraphicalElement(canvas.getSelectedElement(),
-					candidateElement.x(), candidateElement.y(), candidateElement.width(), candidateElement.height(), true);
+			CanvasUtils.cropCandidateElement(candidateElementBackup, canvas.width, canvas.height, canvas.getCursor().getType() == Cursor.HAND_CURSOR);
+			if(candidateElement.width() > 2 && candidateElement.height() > 2) {
+				DashAppController.getEventManager().updateGraphicalElement(canvas.getSelectedElement(),
+						candidateElement.x(), candidateElement.y(), candidateElement.width(), candidateElement.height(), true);
+				// candidate element selection will be lost by property change events
+			} else {
+				// no change is made
+				candidateElementBackup.restore(selectedElementBackup.absoluteX(), selectedElementBackup.absoluteY(),
+						selectedElementBackup.absoluteX()+selectedElementBackup.width,
+						selectedElementBackup.absoluteY()+selectedElementBackup.height);
+			}
 			// element is still selected but no operation is active
 			canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 			candidateElement = candidateElementBackup; // restore candidate element selection
 			canvas.selectedElement = selectedElementBackup;
+			canvas.repaint();
 		}
 	}
 

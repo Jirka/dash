@@ -75,16 +75,21 @@ public class InsertTool extends AbstractCanvasTool {
 			y = CanvasUtils.getPreferredY(dashboard, elements, y, null, null, attachSize, canvas.height);
 		}
 		candidateElement = new WorkingCopy(x, y);
+		candidateElement.x2 = x;
+		candidateElement.y2 = y;
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		if(candidateElement != null && candidateElement.x2 != -1 && candidateElement.y2 != -1) {
+			CanvasUtils.cropCandidateElement(candidateElement, canvas.width, canvas.height, false);
 			// create new graphical element
-			DashAppController.getEventManager().createGrapicalElement(
-					DashAppModel.getInstance().getSelectedDashboard(),
-					candidateElement.x(), candidateElement.y(), 
-					candidateElement.width(), candidateElement.height(), true);
+			if(candidateElement.width() > 2 && candidateElement.height() > 2) {
+				DashAppController.getEventManager().createGrapicalElement(
+						DashAppModel.getInstance().getSelectedDashboard(),
+						candidateElement.x(), candidateElement.y(), 
+						candidateElement.width(), candidateElement.height(), true);
+			}
 			// release candidate element
 			candidateElement = null;
 			// draw as a basic graphical element (not as a candidate element)
