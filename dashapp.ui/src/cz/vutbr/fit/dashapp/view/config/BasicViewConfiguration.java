@@ -1,11 +1,13 @@
 package cz.vutbr.fit.dashapp.view.config;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.model.DashAppModel;
+import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
@@ -65,7 +67,7 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	
 	public BasicViewConfiguration() {
 		// set workspace path
-		DashAppModel.getInstance().setFolderPath(getDefaultWorkspacePath());
+		DashAppModel.getInstance().setWorkspaceFolder(new WorkspaceFolder(new File(getDefaultWorkspacePath())));
 		// initialize GUI tools
 		initTools();
 	}

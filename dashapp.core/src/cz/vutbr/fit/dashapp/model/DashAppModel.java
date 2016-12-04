@@ -1,5 +1,6 @@
 package cz.vutbr.fit.dashapp.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class DashAppModel {
 		return model;
 	}
 	
-	private String folderPath = "";
+	private WorkspaceFolder folder;
 	private Dashboard selectedDashboard = null;
 	private List<Dashboard> dashboards;
 	private Settings settings;
@@ -28,7 +29,7 @@ public class DashAppModel {
 		//selectedDashboard = new Dashboard(this, null);
 		
 		//setFolderPath(getSettings().getDefaultWorkspacePath());
-		setFolderPath(System.getProperty("user.home"));
+		setWorkspaceFolder(new WorkspaceFolder(new File(System.getProperty("user.home"))));
 	}
 	
 	public Settings getSettings() {
@@ -66,12 +67,12 @@ public class DashAppModel {
 		this.selectedDashboard = selectedDashboard;
 	}
 	
-	public String getFolderPath() {
-		return folderPath;
+	public WorkspaceFolder getWorkspaceFolder() {
+		return this.folder;
 	}
 
-	public void setFolderPath(String folderPath) {
-		this.folderPath = folderPath;
+	public void setWorkspaceFolder(WorkspaceFolder folder) {
+		this.folder = folder;
 	}
 
 }

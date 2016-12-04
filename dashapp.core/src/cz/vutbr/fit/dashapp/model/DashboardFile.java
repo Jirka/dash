@@ -13,7 +13,7 @@ import java.io.IOException;
  * @author Jiri Hynek
  *
  */
-public class DashboardFile {
+public class DashboardFile implements IWorkspaceFile {
 
 	private File imageFile;
 	private File xmlFile;
@@ -52,7 +52,7 @@ public class DashboardFile {
 
 	public File getXmlFile() {
 		if(xmlFile == null) {
-			xmlFile = new File(DashAppModel.getInstance().getFolderPath()+File.separator+name+".xml");
+			xmlFile = new File(DashAppModel.getInstance().getWorkspaceFolder()+File.separator+name+".xml");
 		}
 		return xmlFile;
 	}

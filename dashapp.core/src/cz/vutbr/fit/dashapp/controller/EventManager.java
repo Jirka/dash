@@ -8,6 +8,7 @@ import java.util.List;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.SerializedDashboard;
@@ -314,17 +315,18 @@ public class EventManager {
 	 * Updates dashboards folder path.
 	 * fires folder path property change event.
 	 * 
-	 * @param folderPath
+	 * @param folder
 	 */
-	public void updateFolderPath(String folderPath) {
-		assert folderPath == null;
+	public void updateWorkspaceFolder(WorkspaceFolder folder) {
+		assert folder == null;
 		
 		DashAppModel model = DashAppModel.getInstance();
-		String oldPath = model.getFolderPath();
-		if(!oldPath.equals(folderPath)) {
+		WorkspaceFolder oldFolder = model.getWorkspaceFolder();
+		if(!oldFolder.equals(folder)) {
 			updateSelectedDashboard((Dashboard) null);
-			model.setFolderPath(folderPath);
-			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(oldPath, folderPath), null));
+			model.getDashboards().clear();
+			model.setWorkspaceFolder(folder);
+			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(oldFolder, folder), null));
 			model.getDashboards().clear(); // folder is changed, all cached dashboards can be released
 		}
 	}
@@ -398,8 +400,8 @@ public class EventManager {
 	 */
 	public boolean createEmptyDashboard(int width, int height, String name) {
 		DashAppModel model = DashAppModel.getInstance();
-		String folderPath = model.getFolderPath();
-		File xmlFile = new File(folderPath + File.separator + name + ".xml");
+		WorkspaceFolder folder = model.getWorkspaceFolder();
+		File xmlFile = new File(folder.getPath() + File.separator + name + ".xml");
 		if(!xmlFile.exists()) {
 			Dashboard dashboard = new Dashboard(model, new DashboardFile(xmlFile));
 			dashboard.setDimension(0, 0, width, height);

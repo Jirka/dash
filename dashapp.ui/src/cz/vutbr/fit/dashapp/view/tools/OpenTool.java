@@ -9,6 +9,7 @@ import javax.swing.JMenu;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
+import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
@@ -59,7 +60,7 @@ public class OpenTool extends AbstractGUITool implements IGUITool {
 			// file picker //
 			JFileChooser fc = new JFileChooser();
 			//fc.setCurrentDirectory(new File(System.getProperty("user.home")));
-			fc.setCurrentDirectory(new File(DashAppModel.getInstance().getFolderPath()));
+			fc.setCurrentDirectory(DashAppModel.getInstance().getWorkspaceFolder().getFile());
 			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			fc.setAcceptAllFileFilterUsed(false);
 			if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -67,7 +68,7 @@ public class OpenTool extends AbstractGUITool implements IGUITool {
 				if (file != null) {
 					String path = file.getAbsolutePath();
 					if (path != null) {
-						DashAppController.getEventManager().updateFolderPath(path);
+						DashAppController.getEventManager().updateWorkspaceFolder(new WorkspaceFolder(new File(path)));
 					}
 				}
 			}

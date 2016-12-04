@@ -158,8 +158,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							new Histogram(histogram).openWindow();
 						} else if(kind == RASTER_ANALYSIS || kind == WIDGET_ANALYSIS) {
 							DashAppModel model = DashAppModel.getInstance();
-							String path = model.getFolderPath();
-							File folder = new File(path);
+							File folder = model.getWorkspaceFolder().getFile();
 							if(folder.exists() && folder.isDirectory()) {
 								File[] files = folder.listFiles(new DashboardFileFilter());
 								Arrays.sort(files);
