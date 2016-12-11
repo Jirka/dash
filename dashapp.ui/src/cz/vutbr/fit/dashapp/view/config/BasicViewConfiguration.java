@@ -67,7 +67,8 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	
 	public BasicViewConfiguration() {
 		// set workspace path
-		DashAppModel.getInstance().setWorkspaceFolder(new WorkspaceFolder(new File(getDefaultWorkspacePath())));
+		DashAppModel model = DashAppModel.getInstance();
+		model.setWorkspaceFolder(new WorkspaceFolder(model, new File(getDefaultWorkspacePath())));
 		// initialize GUI tools
 		initTools();
 	}

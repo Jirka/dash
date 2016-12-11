@@ -16,8 +16,8 @@ public class DashAppModel {
 	}
 	
 	private WorkspaceFolder folder;
-	private Dashboard selectedDashboard = null;
-	private List<Dashboard> dashboards;
+	private IWorkspaceFile selectedFile = null;
+	private List<DashboardFile> openedDashboardFiles;
 	private Settings settings;
 	
 	public DashAppModel() {
@@ -25,46 +25,46 @@ public class DashAppModel {
 	
 	public void initModel() {
 		settings = new Settings();
-		dashboards = new ArrayList<Dashboard>();
+		openedDashboardFiles = new ArrayList<DashboardFile>();
 		//selectedDashboard = new Dashboard(this, null);
 		
 		//setFolderPath(getSettings().getDefaultWorkspacePath());
-		setWorkspaceFolder(new WorkspaceFolder(new File(System.getProperty("user.home"))));
+		setWorkspaceFolder(new WorkspaceFolder(this, new File(System.getProperty("user.home"))));
 	}
 	
 	public Settings getSettings() {
 		return settings;
 	}
 	
-	public List<Dashboard> getDashboards() {
-		return dashboards;
+	public List<DashboardFile> getOpenedDashboardFiles() {
+		return openedDashboardFiles;
 	}
 	
-	public void addDashboard(Dashboard dashboard) {
-		dashboards.add(dashboard);
+	public void setDashboardFileOpened(DashboardFile dashboardFile) {
+		openedDashboardFiles.add(dashboardFile);
 	}
 	
-	public void removeDashboard(Dashboard dashboard) {
-		dashboards.remove(dashboard);
+	public void setDashboardFileClosed(DashboardFile dashboardFile) {
+		openedDashboardFiles.remove(dashboardFile);
 	}
 	
-	public Dashboard getDashboard(DashboardFile dashboardFile) {
+	public DashboardFile getOpenedDashboardFile(DashboardFile dashboardFile) {
 		if(dashboardFile != null) {
-			for (Dashboard dashboard : dashboards) {
-				if(dashboard.getDashboardFile().equals(dashboardFile)) {
-					return dashboard;
+			for (DashboardFile openedDashboardFile : openedDashboardFiles) {
+				if(dashboardFile.equals(openedDashboardFile)) {
+					return openedDashboardFile;
 				}
 			}
 		}
 		return null;
 	}
 	
-	public Dashboard getSelectedDashboard() {
-		return selectedDashboard;
+	public IWorkspaceFile getSelectedFile() {
+		return selectedFile;
 	}
 	
-	public void setSelectedDashboard(Dashboard selectedDashboard) {
-		this.selectedDashboard = selectedDashboard;
+	public void setSelectedFile(IWorkspaceFile selectedWorkspaceFile) {
+		this.selectedFile = selectedWorkspaceFile;
 	}
 	
 	public WorkspaceFolder getWorkspaceFolder() {

@@ -3,7 +3,7 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.eval.metric.BackgroundShare;
 import cz.vutbr.fit.dashapp.eval.metric.IntensitiesCount;
@@ -12,8 +12,8 @@ public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 	
 	private final DecimalFormat df = new DecimalFormat("#.#####");
 
-	public GrayscaleAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public GrayscaleAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override
@@ -41,8 +41,8 @@ public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 	public String analyse() {
 		StringBuffer buffer = new StringBuffer();
 		
-		if(dashboard != null) {
-			BufferedImage image = dashboard.getImage();
+		if(dashboardFile != null) {
+			BufferedImage image = dashboardFile.getImage();
 			if(image != null) {
 				buffer.append("====== GRAYSCALE ANALYSIS ======\n");
 				buffer.append("  -> gray scale\n");

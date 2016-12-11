@@ -11,7 +11,6 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
@@ -87,7 +86,7 @@ public class SelectTool extends ViewTool {
 		int y = canvas.unscale(e.getY());
 		
 		// try to locate existing element
-		GraphicalElement selectedElement = CanvasUtils.findGraphicalElement(DashAppModel.getInstance().getSelectedDashboard().getChildren(GEType.ALL_TYPES), x, y);
+		GraphicalElement selectedElement = CanvasUtils.findGraphicalElement(canvas.getDashboard().getChildren(GEType.ALL_TYPES), x, y);
 		
 		// select found element
 		if(selectedElement != null) {
@@ -154,7 +153,7 @@ public class SelectTool extends ViewTool {
 			// calculate change of mouse position
 			if(dx != 0 || dy != 0) {
 				// calculate and update selected element position (move and resize action) and size (resize action)
-				Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+				Dashboard dashboard = canvas.getDashboard();
 				CanvasUtils.updatePosition(dashboard, dashboard.getChildren(GEType.ALL_TYPES), canvas.getSelectedElement(),
 								candidateElement, dx, dy, helpAttachPoint, canvas.getCursor().getType(),
 								canvas.getAttachSize(), canvas.width, canvas.height);
@@ -215,7 +214,7 @@ public class SelectTool extends ViewTool {
 
 	@Override
 	public void paintComponent(Graphics2D g) {
-		Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+		Dashboard dashboard = canvas.getDashboard();
 		
 		// graphical elements
 		paintUtil.paintGraphicalElements(g, dashboard, canvas.getSelectedElement());

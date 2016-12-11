@@ -7,8 +7,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 
 import cz.fit.vutbr.view.util.Histogram;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.Canvas;
 import cz.vutbr.fit.dashapp.view.DashAppView;
@@ -38,7 +38,7 @@ public class HistogramTool extends AbstractGUITool implements IGUITool {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
+			Dashboard selectedDashboard = DashAppUtils.getSelectedDashboard();
 			if(selectedDashboard != null) {
 				Canvas canvas = DashAppView.getInstance().getDashboardView().getCanvas();
 				BufferedImage image = canvas.getImage();

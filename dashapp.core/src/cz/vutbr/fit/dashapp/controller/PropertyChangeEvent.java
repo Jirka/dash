@@ -1,6 +1,6 @@
 package cz.vutbr.fit.dashapp.controller;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 
 /**
@@ -11,15 +11,15 @@ import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
  */
 public class PropertyChangeEvent {
 	
-	public PropertyChangeEvent(EventKind propertyKind, Dashboard selectedDashboard, Change oldValue, Change newValue) {
+	public PropertyChangeEvent(EventKind propertyKind, IWorkspaceFile selectedFile, Change oldValue, Change newValue) {
 		this.propertyKind = propertyKind;
-		this.selectedDashboard = selectedDashboard;
+		this.selectedFile = selectedFile;
 		this.modelChange = oldValue;
 		this.xmlChange = newValue;
 	}
 	
 	public final EventKind propertyKind;
-	public final Dashboard selectedDashboard;
+	public final IWorkspaceFile selectedFile;
 	public final Change modelChange;
 	public final Change xmlChange;
 	

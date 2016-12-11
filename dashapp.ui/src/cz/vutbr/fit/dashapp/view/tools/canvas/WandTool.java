@@ -11,7 +11,6 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
@@ -76,7 +75,7 @@ public class WandTool extends AbstractCanvasTool {
 		// attach enabled
 		int attachSize = canvas.getAttachSize();
 		if(canvas.getAttachSize() > 0) {
-			Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+			Dashboard dashboard = canvas.getDashboard();
 			List<GraphicalElement> elements = dashboard.getChildren(GEType.ALL_TYPES);
 			x = CanvasUtils.getPreferredX(dashboard, elements, x, null, null, attachSize, canvas.width);
 			y = CanvasUtils.getPreferredY(dashboard, elements, y, null, null, attachSize, canvas.height);
@@ -87,8 +86,8 @@ public class WandTool extends AbstractCanvasTool {
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO
-		Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
-		BufferedImage image = DashAppModel.getInstance().getSelectedDashboard().getImage();
+		Dashboard dashboard = canvas.getDashboard();
+		BufferedImage image = canvas.getDashboardFile().getImage();
 		int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
 		MatrixUtils.grayScale(matrix, true, false);
 		int refValue = matrix[candidateElement.x1][candidateElement.y1];
@@ -132,7 +131,7 @@ public class WandTool extends AbstractCanvasTool {
 		candidateElement.x2 = x2;
 		candidateElement.y1 = y1;
 		candidateElement.y2 = y2;
-		DashAppController.getEventManager().createGrapicalElement(DashAppModel.getInstance().getSelectedDashboard(),
+		DashAppController.getEventManager().createGrapicalElement(canvas.getDashboard(),
 				candidateElement.x(), candidateElement.y(), 
 				candidateElement.width(), candidateElement.height(), true);
 		// release candidate element
@@ -141,7 +140,7 @@ public class WandTool extends AbstractCanvasTool {
 
 	@Override
 	public void paintComponent(Graphics2D g) {
-		Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+		Dashboard dashboard = canvas.getDashboard();
 		
 		// graphical elements
 		paintUtil.paintGraphicalElements(g, dashboard, canvas.selectedElement);

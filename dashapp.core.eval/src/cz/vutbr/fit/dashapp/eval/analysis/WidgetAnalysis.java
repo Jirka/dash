@@ -2,15 +2,13 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 
 import java.text.DecimalFormat;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.eval.metric.Cohesion;
 import cz.vutbr.fit.dashapp.eval.metric.Density;
 import cz.vutbr.fit.dashapp.eval.metric.Economy;
 import cz.vutbr.fit.dashapp.eval.metric.Equilibrium;
 import cz.vutbr.fit.dashapp.eval.metric.Homogenity;
-import cz.vutbr.fit.dashapp.eval.metric.KimBalance;
-import cz.vutbr.fit.dashapp.eval.metric.KimSymmetry;
 import cz.vutbr.fit.dashapp.eval.metric.NgoBalance;
 import cz.vutbr.fit.dashapp.eval.metric.NgoSymmetry;
 import cz.vutbr.fit.dashapp.eval.metric.Proportion;
@@ -21,8 +19,8 @@ import cz.vutbr.fit.dashapp.eval.metric.Unity;
 
 public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 
-	public WidgetAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public WidgetAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override

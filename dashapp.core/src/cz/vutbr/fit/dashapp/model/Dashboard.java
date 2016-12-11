@@ -1,19 +1,13 @@
 package cz.vutbr.fit.dashapp.model;
 
 import java.awt.Point;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
-
 import org.simpleframework.xml.Root;
 
-import cz.vutbr.fit.dashapp.Logger;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 
 /**
@@ -29,16 +23,6 @@ public class Dashboard extends GraphicalElement {
 	 * dashboard physical representation (image or structural description)
 	 */
 	private DashboardFile dashboardFile;
-	
-	/**
-	 * actual serialized representation (unsaved structural description - working copy)
-	 */
-	private SerializedDashboard serializedDashboard;
-	
-	/**
-	 * model definition
-	 */
-	private DashAppModel model;
 	
 	/**
 	 * flag which specifies whether dashboard has already been initialized
@@ -58,10 +42,8 @@ public class Dashboard extends GraphicalElement {
 	 * @param model
 	 * @param dashboardFile
 	 */
-	public Dashboard(DashAppModel model, DashboardFile dashboardFile) {
-		setModel(model);
+	public Dashboard(DashboardFile dashboardFile) {
 		setDashboardFile(dashboardFile);
-		serializedDashboard = new SerializedDashboard(this);
 		// graphical element
 		setParent(this);
 		sizeInitialized = false;
@@ -84,22 +66,6 @@ public class Dashboard extends GraphicalElement {
 	public boolean isSizeInitialized() {
 		return sizeInitialized;
 	}
-	
-	/**
-	 * 
-	 * @return model
-	 */
-	public DashAppModel getModel() {
-		return model;
-	}
-
-	/**
-	 * 
-	 * @param model
-	 */
-	public void setModel(DashAppModel model) {
-		this.model = model;
-	}
 
 	/**
 	 * Returns dashboard file which represents
@@ -120,35 +86,6 @@ public class Dashboard extends GraphicalElement {
 	public void setDashboardFile(DashboardFile dashboardFile) {
 		this.dashboardFile = dashboardFile;
 		this.dashboardFile.setDashboard(this);
-	}
-	
-	/**
-	 * Returns actual serialized representation
-	 * (unsaved structural description - working copy)
-	 * 
-	 * @return serialized dashboard
-	 */
-	public SerializedDashboard getSerializedDashboard() {
-		return serializedDashboard;
-	}
-	
-	/**
-	 * Returns raster representation of dashboard if exists
-	 * 
-	 * @return image
-	 */
-	public BufferedImage getImage() {
-		BufferedImage image = null;
-		File file = getDashboard().getDashboardFile().getImageFile();
-		if(file != null && file.exists() && file.canRead()) {
-			try {
-		        image = ImageIO.read(file);
-	        } catch (IOException e) {
-	        	Logger.logError("Unable to open file" + file.getAbsolutePath() + ".", e);
-	        }
-		}
-		
-		return image;
 	}
 	
 	@Override

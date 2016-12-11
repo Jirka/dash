@@ -4,9 +4,8 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
@@ -27,8 +26,8 @@ import cz.vutbr.fit.dashapp.util.MatrixUtils.LCH;
 
 public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 
-	public ComplexWidgetAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public ComplexWidgetAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override
@@ -62,7 +61,7 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 			appendValue(buffer, df, new Area(dashboard, new GEType[] { GEType.BUTTON, GEType.HEADER, GEType.TOOLBAR, GEType.DECORATION } ).measure(), 2, false);
 			appendValue(buffer, df, new Area(dashboard, new GEType[] { GEType.BUTTON, GEType.DECORATION, GEType.HEADER, GEType.TOOLBAR, GEType.LABEL } ).measure(), 1, false);
 			
-			BufferedImage image = dashboard.getImage();
+			BufferedImage image = dashboardFile.getImage();
 			if(image != null) {
 				List<GraphicalElement> elements = dashboard.getChildren(chartType);
 				List<Double> hsbSaturation = new ArrayList<>();

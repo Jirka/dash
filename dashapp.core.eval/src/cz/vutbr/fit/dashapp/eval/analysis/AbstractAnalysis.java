@@ -3,14 +3,25 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 import java.text.DecimalFormat;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 
 public abstract class AbstractAnalysis implements IAnalysis {
 	
 	protected Dashboard dashboard;
+	protected DashboardFile dashboardFile;
 
-	public AbstractAnalysis(Dashboard dashboard) {
-		this.dashboard = dashboard;
+	public AbstractAnalysis(DashboardFile dashboardFile) {
+		this.dashboardFile = dashboardFile;
+		// TODO temporary solution
+		getDashboard();
+	}
+	
+	public Dashboard getDashboard() {
+		if(dashboard == null) {
+			dashboardFile.getDashboard(true);
+		}
+		return dashboard;
 	}
 
 	protected void formatMetric(StringBuffer buffer, IMetric metric, DecimalFormat df) {

@@ -1,10 +1,16 @@
 package cz.vutbr.fit.dashapp.model;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import cz.vutbr.fit.dashapp.Logger;
+import cz.vutbr.fit.dashapp.util.XMLUtils;
 
 /**
  * This class represents dashboard source file
@@ -13,21 +19,31 @@ import java.io.IOException;
  * @author Jiri Hynek
  *
  */
-public class DashboardFile implements IWorkspaceFile {
+public class DashboardFile extends WorkspaceFile implements IWorkspaceFile {
 
 	private File imageFile;
 	private File xmlFile;
 	private String name;
 	private Dashboard dashboard;
 	private String cachedXMLFile;
+	
+	/**
+	 * actual serialized representation (unsaved structural description - working copy)
+	 */
+	private SerializedDashboard serializedDashboard;
 
-	public DashboardFile(File imageFile, File xmlFile) {
+	public DashboardFile(DashAppModel model, File imageFile, File xmlFile) {
+		super(model);
 		setImageFile(imageFile);
 		setXmlFile(xmlFile);
+		serializedDashboard = new SerializedDashboard();
 		cachedXMLFile = null;
 	}
 
-	public DashboardFile(File file) {
+	public DashboardFile(DashAppModel model, File file) {
+		super(model);
+		serializedDashboard = new SerializedDashboard();
+		cachedXMLFile = null;
 		setFile(file);
 	}
 
@@ -48,6 +64,25 @@ public class DashboardFile implements IWorkspaceFile {
 		if (name == null) {
 			setName(imageFile);
 		}
+	}
+	
+	/**
+	 * Returns raster representation of dashboard if exists
+	 * 
+	 * @return image
+	 */
+	public BufferedImage getImage() {
+		BufferedImage image = null;
+		File file = getImageFile();
+		if(file != null && file.exists() && file.canRead()) {
+			try {
+		        image = ImageIO.read(file);
+	        } catch (IOException e) {
+	        	Logger.logError("Unable to open file" + file.getAbsolutePath() + ".", e);
+	        }
+		}
+		
+		return image;
 	}
 
 	public File getXmlFile() {
@@ -74,7 +109,36 @@ public class DashboardFile implements IWorkspaceFile {
 		return name;
 	}
 	
-	public Dashboard getDashboard() {
+	public void reloadDashboard() {
+		dashboard = new Dashboard(this);
+		try {
+			String xml = readXMLFile();
+			if(xml != null) {
+				// try to deserialize XML (test if valid)
+				Dashboard deserializedXML = XMLUtils.deserialize(xml);
+				// description is empty -> set image default dimension
+				if(xml == SerializedDashboard.EMPTY_XML) {
+					BufferedImage image = getImage();
+					if(image != null) {
+						deserializedXML.width = image.getWidth();
+						deserializedXML.height = image.getHeight();
+					}
+				} else {
+					dashboard = new Dashboard(this);
+					dashboard.setDimension(deserializedXML.x, deserializedXML.y, deserializedXML.width, deserializedXML.height);
+					dashboard.setChildren(deserializedXML.getChildren());
+				}
+				serializedDashboard.setXml(xml);
+			}
+		} catch (IOException e) {
+			dashboard = null;
+		}
+	}
+	
+	public Dashboard getDashboard(boolean forceDashboardLoad) {
+		if(dashboard == null && forceDashboardLoad) {
+			reloadDashboard();
+		}
 		return dashboard;
 	}
 
@@ -90,6 +154,16 @@ public class DashboardFile implements IWorkspaceFile {
 	@Override
 	public boolean equals(Object obj) {
 		return toString().equals(obj.toString());
+	}
+	
+	/**
+	 * Returns actual serialized representation
+	 * (unsaved structural description - working copy)
+	 * 
+	 * @return serialized dashboard
+	 */
+	public SerializedDashboard getSerializedDashboard() {
+		return serializedDashboard;
 	}
 	
 	/**
@@ -127,7 +201,7 @@ public class DashboardFile implements IWorkspaceFile {
 			xmlFile.createNewFile();
 		}
 		FileOutputStream out = new FileOutputStream(xmlFile);
-		out.write(dashboard.getSerializedDashboard().getXml().getBytes());
+		out.write(getSerializedDashboard().getXml().getBytes());
 		out.close();
 	}
 

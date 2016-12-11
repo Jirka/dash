@@ -4,15 +4,15 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Map;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 
 public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 	
 	private final DecimalFormat df = new DecimalFormat("#.#####");
 
-	public ColorAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public ColorAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 	public String analyse() {
 		StringBuffer buffer = new StringBuffer();
 		
-		if(dashboard != null) {
-			BufferedImage image = dashboard.getImage();
+		if(dashboardFile != null) {
+			BufferedImage image = dashboardFile.getImage();
 			if(image != null) {
 				buffer.append("====== COLOR ANALYSIS ======\n");
 				buffer.append("  -> posterization\n");

@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.util;
+package cz.vutbr.fit.dashapp.util;
 
 import java.io.File;
 import java.io.FileFilter;

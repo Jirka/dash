@@ -2,9 +2,8 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
-import java.util.Map;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
 import cz.vutbr.fit.dashapp.eval.metric.BackgroundShare;
@@ -19,8 +18,8 @@ import cz.vutbr.fit.dashapp.util.MatrixUtils.LCH;
 
 public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis {
 
-	public ComplexRasterAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public ComplexRasterAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override
@@ -39,8 +38,8 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 		// BW 1		% black	balance	H balance	V balance	symmetry	H balance	V balance
 		StringBuffer buffer = new StringBuffer();
 		
-		if(dashboard != null) {
-			BufferedImage image = dashboard.getImage();
+		if(dashboardFile != null) {
+			BufferedImage image = dashboardFile.getImage();
 			if(image != null) {
 				DecimalFormat df = new DecimalFormat("#.#####");
 				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);

@@ -10,7 +10,6 @@ import java.util.List;
 import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
@@ -69,7 +68,7 @@ public class InsertTool extends AbstractCanvasTool {
 		// attach enabled
 		int attachSize = canvas.getAttachSize();
 		if(canvas.getAttachSize() > 0) {
-			Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+			Dashboard dashboard = canvas.getDashboard();
 			List<GraphicalElement> elements = dashboard.getChildren(GEType.ALL_TYPES);
 			x = CanvasUtils.getPreferredX(dashboard, elements, x, null, null, attachSize, canvas.width);
 			y = CanvasUtils.getPreferredY(dashboard, elements, y, null, null, attachSize, canvas.height);
@@ -86,7 +85,7 @@ public class InsertTool extends AbstractCanvasTool {
 			// create new graphical element
 			if(candidateElement.width() > 2 && candidateElement.height() > 2) {
 				DashAppController.getEventManager().createGrapicalElement(
-						DashAppModel.getInstance().getSelectedDashboard(),
+						canvas.getDashboard(),
 						candidateElement.x(), candidateElement.y(), 
 						candidateElement.width(), candidateElement.height(), true);
 			}
@@ -108,7 +107,7 @@ public class InsertTool extends AbstractCanvasTool {
 			// calculate and update candidate element size (consider border of existing elements if required)
 			int attachSize = canvas.getAttachSize();
 			if(canvas.getAttachSize() > 0) {
-				Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+				Dashboard dashboard = canvas.getDashboard();
 				List<GraphicalElement> elements = dashboard.getChildren(GEType.ALL_TYPES);
 				candidateElement.x2 = CanvasUtils.getPreferredX(dashboard, elements, x, null, null, attachSize, canvas.width);
 				candidateElement.y2 = CanvasUtils.getPreferredY(dashboard, elements, y, null, null, attachSize, canvas.height);
@@ -132,7 +131,7 @@ public class InsertTool extends AbstractCanvasTool {
 
 	@Override
 	public void paintComponent(Graphics2D g) {
-		Dashboard dashboard = DashAppModel.getInstance().getSelectedDashboard();
+		Dashboard dashboard = canvas.getDashboard();
 		
 		// graphical elements
 		paintUtil.paintGraphicalElements(g, dashboard, null);

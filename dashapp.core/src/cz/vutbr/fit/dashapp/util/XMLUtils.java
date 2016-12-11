@@ -6,6 +6,7 @@ import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 
 /**
  * 
@@ -13,6 +14,10 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
  *
  */
 public class XMLUtils {
+	
+	public static String serialize(DashboardFile dashboardFile) {
+		return serialize(dashboardFile.getDashboard(false));
+	}
 	
 	/**
 	 * 

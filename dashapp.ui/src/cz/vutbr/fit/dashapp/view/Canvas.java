@@ -25,7 +25,9 @@ import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.AbstractCanvasTool;
@@ -111,12 +113,12 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		if(this.grayScale != grayScale) {
 			this.grayScale = grayScale;
 			if(!externalImageUpdateLocked && grayScaleToolEnabled) {
-				Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-				if(selectedDashboard != null) {
-					BufferedImage image = selectedDashboard.getImage();
+				IWorkspaceFile selectedWorkspaceFile = getDashboardFile();
+				if(selectedWorkspaceFile != null && selectedWorkspaceFile instanceof DashboardFile) {
+					BufferedImage image = ((DashboardFile) selectedWorkspaceFile).getImage();
 					if(image != null) {
 						if(grayScale) {
-							convertToGrayScale(image, selectedDashboard);
+							convertToGrayScale(image);
 						}
 						updateImage(image, false, false);
 					}
@@ -125,7 +127,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		}
 	}
 	
-	private void convertToGrayScale(BufferedImage image, Dashboard dashboard) {
+	private void convertToGrayScale(BufferedImage image) {
 		int[][] matrix = MatrixUtils.printBufferedImage(image);
 		MatrixUtils.grayScale(matrix, false, false);
 		MatrixUtils.updateBufferedImage(image, matrix);
@@ -252,6 +254,39 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	public void setSelectedElement(GraphicalElement selectedElement) {
 		this.selectedElement = selectedElement;
 	}
+	
+	/**
+	 * Actually presented workspace file
+	 */
+	protected DashboardFile dashboardFile;
+	
+	protected Dashboard dashboard;
+	
+	/**
+	 * Sets workspace file.
+	 * 
+	 * @param workspaceFile
+	 */
+	private void updateDashboardFile(IWorkspaceFile workspaceFile) {
+		if(workspaceFile instanceof DashboardFile) {
+			this.dashboardFile = (DashboardFile) workspaceFile;
+			this.dashboard = this.dashboardFile.getDashboard(false);
+		} else {
+			this.dashboardFile = null;
+		}
+	}
+	
+	/**
+	 * 
+	 * @return actually presented workspace file.
+	 */
+	public DashboardFile getDashboardFile() {
+		return dashboardFile;
+	}
+	
+	public Dashboard getDashboard() {
+		return dashboard;
+	}
 
 	/**
 	 * UID
@@ -363,14 +398,15 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	 * 
 	 * @param file
 	 */
-	public void openDashboardImage(Dashboard dashboard) {
-		if(dashboard == null) {
-			image = null;
-			resetVariables(0, 0);
-		} else {
-			image = dashboard.getImage();
-			if(grayScale && grayScaleToolEnabled) {
-				convertToGrayScale(image, dashboard);
+	public void openDashboardImage(IWorkspaceFile workspaceFile) {
+		updateDashboardFile(workspaceFile);
+		if(workspaceFile != null && workspaceFile instanceof DashboardFile) {
+			DashboardFile dashboardFile = (DashboardFile) workspaceFile;
+			image = dashboardFile.getImage();
+			if(image != null) {
+				if(grayScale && grayScaleToolEnabled) {
+					convertToGrayScale(image);
+				}
 			}
 			int width, height;
 			
@@ -388,6 +424,9 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	        
 			// initialize canvas variables
 	        resetVariables(width, height);
+		} else {
+			image = null;
+			resetVariables(0, 0);
 		}
     }
 	
@@ -414,13 +453,13 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
-		Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-		if(selectedDashboard == e.selectedDashboard) {
+		IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
+		if(selectedFile == e.selectedFile) {
 			// another dashboard is selected
-			if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+			if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
 				resetSelections();
-				Dashboard dashboard = (Dashboard) e.modelChange.newValue;
-				openDashboardImage(dashboard);
+				IWorkspaceFile workspaceFile = (IWorkspaceFile) e.modelChange.newValue;
+				openDashboardImage(workspaceFile);
 			} else if(EventKind.isModelChanged(e)) {
 				resetSelections();
 			}
@@ -506,6 +545,6 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	}
 	
 	private boolean isSelectedDashboard() {
-		return DashAppModel.getInstance().getSelectedDashboard() != null;
+		return dashboardFile != null;
 	}
 }

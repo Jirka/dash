@@ -10,6 +10,7 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.SerializedDashboard;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
@@ -46,7 +47,7 @@ public class EventManager {
 	 */
 	public static enum EventKind {
 		FOLDER_PATH_CHANGED,
-		DASHBOARD_SELECTION_CHANGED,
+		FILE_SELECTION_CHANGED,
 		XML_CHANGED,
 		GRAPHICAL_ELEMENT_CHANGED,
 		GRAPHICAL_ELEMENT_CREATED,
@@ -75,19 +76,19 @@ public class EventManager {
 	 * Method updates dashboard XML and dashboard model if specified XML is valid.
 	 * Fires XML property change event if change is made.
 	 * 
-	 * @param dashboard
+	 * @param dashboardFile
 	 * @param xml
 	 */
-	public void updateDashboardXml(Dashboard dashboard, String xml) {
+	public void updateDashboardXml(DashboardFile dashboardFile, String xml) {
 		assert xml == null;
 		// compare the new and old versions
-		String oldXML = dashboard.getSerializedDashboard().getXml();
+		String oldXML = dashboardFile.getSerializedDashboard().getXml();
 		if(!oldXML.equals(xml)) {
 			// try to deserialize XML (test if valid)
 			Dashboard deserializedXML = XMLUtils.deserialize(xml);
 			// description is empty -> set image default dimension
 			if(xml == SerializedDashboard.EMPTY_XML) {
-				BufferedImage image = dashboard.getImage();
+				BufferedImage image = dashboardFile.getImage();
 				if(image != null) {
 					deserializedXML.width = image.getWidth();
 					deserializedXML.height = image.getHeight();
@@ -95,14 +96,15 @@ public class EventManager {
 			}
 			if(deserializedXML != null) {
 				// update XML
-				dashboard.getSerializedDashboard().setXml(xml);
+				dashboardFile.getSerializedDashboard().setXml(xml);
 				// update model (deserialize XML)
+				Dashboard dashboard = dashboardFile.getDashboard(false);
 				dashboard.setDimension(deserializedXML.x, deserializedXML.y, deserializedXML.width, deserializedXML.height);
 				dashboard.setChildren(deserializedXML.getChildren());
 				// fire change
-				controller.firePropertyChange(new PropertyChangeEvent(EventKind.XML_CHANGED, dashboard, null, new Change(oldXML, xml)));
+				controller.firePropertyChange(new PropertyChangeEvent(EventKind.XML_CHANGED, dashboardFile, null, new Change(oldXML, xml)));
 				// updates dashboard state
-				updateDashboardState(dashboard);
+				updateDashboardFileState(dashboardFile);
 			}			
 		}
 	}
@@ -126,14 +128,14 @@ public class EventManager {
 		// if change has been made, XML needs to be updated and change event needs to be fired 
 		if(copy != null) {
 			// update dashboard serialized definition (serialization problem should not occur)
-			Dashboard dashboard = ge.getDashboard();
-			String oldXML = dashboard.getSerializedDashboard().getXml();
-			String newXML = XMLUtils.serialize(dashboard);
-			dashboard.getSerializedDashboard().setXml(newXML);
+			DashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
+			String oldXML = dashboardFile.getSerializedDashboard().getXml();
+			String newXML = XMLUtils.serialize(ge.getDashboard());
+			dashboardFile.getSerializedDashboard().setXml(newXML);
 			// fire property change
-			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, dashboard, new Change(copy, ge), new Change(oldXML, newXML)));
+			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, dashboardFile, new Change(copy, ge), new Change(oldXML, newXML)));
 			// updates dashboard state
-			updateDashboardState(dashboard);
+			updateDashboardFileState(dashboardFile);
 		}
 	}
 	
@@ -210,14 +212,14 @@ public class EventManager {
 			GraphicalElement copy = ge.copy();
 			ge.type = type;
 			// update dashboard serialized definition (serialization problem should not occur)
-			Dashboard dashboard = ge.getDashboard();
-			String oldXML = dashboard.getSerializedDashboard().getXml();
-			String newXML = XMLUtils.serialize(dashboard);
-			dashboard.getSerializedDashboard().setXml(newXML);
+			DashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
+			String oldXML = dashboardFile.getSerializedDashboard().getXml();
+			String newXML = XMLUtils.serialize(dashboardFile);
+			dashboardFile.getSerializedDashboard().setXml(newXML);
 			// fire property change
-			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, dashboard, new Change(copy, ge), new Change(oldXML, newXML)));
+			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, dashboardFile, new Change(copy, ge), new Change(oldXML, newXML)));
 			// updates dashboard state
-			updateDashboardState(dashboard);
+			updateDashboardFileState(dashboardFile);
 		}
 	}
 	
@@ -234,15 +236,15 @@ public class EventManager {
 			// delete from parent
 			parent.deleteChildGE(selectedElement);
 			// update dashboard serialized definition (serialization problem should not occur)
-			Dashboard dashboard = parent.getDashboard();
-			String oldXML = dashboard.getSerializedDashboard().getXml();
-			String newXML = XMLUtils.serialize(dashboard);
-			dashboard.getSerializedDashboard().setXml(newXML);
+			DashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
+			String oldXML = dashboardFile.getSerializedDashboard().getXml();
+			String newXML = XMLUtils.serialize(dashboardFile);
+			dashboardFile.getSerializedDashboard().setXml(newXML);
 			// fire property change
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_DELETED, 
-					dashboard, new Change(selectedElement, parent), new Change(oldXML, newXML)));
+					dashboardFile, new Change(selectedElement, parent), new Change(oldXML, newXML)));
 			// updates dashboard state
-			updateDashboardState(dashboard);
+			updateDashboardFileState(dashboardFile);
 		}		
 	}
 	
@@ -268,15 +270,15 @@ public class EventManager {
 		// add to parent
 		parent.addChildGE(graphicalElement);
 		// update dashboard serialized definition (serialization problem should not occur)
-		Dashboard dashboard = parent.getDashboard();
-		String oldXML = dashboard.getSerializedDashboard().getXml();
-		String newXML = XMLUtils.serialize(dashboard);
-		dashboard.getSerializedDashboard().setXml(newXML);
+		DashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
+		String oldXML = dashboardFile.getSerializedDashboard().getXml();
+		String newXML = XMLUtils.serialize(dashboardFile);
+		dashboardFile.getSerializedDashboard().setXml(newXML);
 		// fire property changed
 		controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, 
-				dashboard, new Change(null, graphicalElement), new Change(oldXML, newXML)));
+				dashboardFile, new Change(null, graphicalElement), new Change(oldXML, newXML)));
 		// updates dashboard state
-		updateDashboardState(dashboard);
+		updateDashboardFileState(dashboardFile);
 		
 		return graphicalElement;
 	}
@@ -285,14 +287,14 @@ public class EventManager {
 	 * Updates dashboard state.
 	 * If state is changed dahboard state property change is fired.
 	 * 
-	 * @param dashboard
+	 * @param dashboardFile
 	 */
-	public void updateDashboardState(Dashboard dashboard) {
-		boolean shouldBeDirty = !dashboard.getSerializedDashboard().getXml().equals(dashboard.getDashboardFile().getXML());
-		if(dashboard.getSerializedDashboard().isDirty() != shouldBeDirty) {
-			dashboard.getSerializedDashboard().setDirty(shouldBeDirty);
+	public void updateDashboardFileState(DashboardFile dashboardFile) {
+		boolean shouldBeDirty = !dashboardFile.getSerializedDashboard().getXml().equals(dashboardFile.getXML());
+		if(dashboardFile.getSerializedDashboard().isDirty() != shouldBeDirty) {
+			dashboardFile.getSerializedDashboard().setDirty(shouldBeDirty);
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.DASHBOARD_STATE_CHANGED, 
-					dashboard, new Change(!shouldBeDirty, shouldBeDirty), null));
+					dashboardFile, new Change(!shouldBeDirty, shouldBeDirty), null));
 		}
 	}
 	
@@ -300,14 +302,23 @@ public class EventManager {
 	 * Change dashboard selection.
 	 * Fires selection property change event.
 	 * 
-	 * @param dashboard
+	 * @param workspaceFile
 	 */
-	public void updateSelectedDashboard(Dashboard dashboard) {
+	public void updateSelectedWorkspaceFile(IWorkspaceFile workspaceFile) {
 		DashAppModel model = DashAppModel.getInstance();
-		Dashboard oldDashboard = model.getSelectedDashboard();
-		if(oldDashboard != dashboard) {
-			model.setSelectedDashboard(dashboard);
-			controller.firePropertyChange(new PropertyChangeEvent(EventKind.DASHBOARD_SELECTION_CHANGED, dashboard, new Change(oldDashboard, dashboard), null));
+		IWorkspaceFile oldFile = model.getSelectedFile();
+		if(oldFile != workspaceFile) {
+			model.setSelectedFile(workspaceFile);
+			if(workspaceFile instanceof DashboardFile) {
+				DashboardFile dashboardFile = (DashboardFile) workspaceFile;
+				if(model.getOpenedDashboardFile(dashboardFile) == null) {
+					model.setDashboardFileOpened(dashboardFile);
+					if(dashboardFile.getDashboard(false) == null) {
+						dashboardFile.reloadDashboard();
+					}
+				}
+			}
+			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FILE_SELECTION_CHANGED, workspaceFile, new Change(oldFile, workspaceFile), null));
 		}
 	}
 	
@@ -323,11 +334,11 @@ public class EventManager {
 		DashAppModel model = DashAppModel.getInstance();
 		WorkspaceFolder oldFolder = model.getWorkspaceFolder();
 		if(!oldFolder.equals(folder)) {
-			updateSelectedDashboard((Dashboard) null);
-			model.getDashboards().clear();
+			updateSelectedWorkspaceFile(null);
+			model.getOpenedDashboardFiles().clear();
 			model.setWorkspaceFolder(folder);
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(oldFolder, folder), null));
-			model.getDashboards().clear(); // folder is changed, all cached dashboards can be released
+			model.getOpenedDashboardFiles().clear(); // folder is changed, all cached dashboards can be released
 		}
 	}
 	
@@ -335,13 +346,13 @@ public class EventManager {
 	 * Takes dashboard and reload it from file if dashboard file exists.
 	 * It can fire XML property change event.
 	 * 
-	 * @param dashboard
+	 * @param dashboardFile
 	 * @throws Exception
 	 */
-	public void reloadDashboardFromFile(Dashboard dashboard) throws Exception {
-		String xml = dashboard.getDashboardFile().readXMLFile();
+	public void reloadDashboardFromFile(DashboardFile dashboardFile) throws Exception {
+		String xml = dashboardFile.readXMLFile();
 		if(xml != null) {
-			updateDashboardXml(dashboard, xml);
+			updateDashboardXml(dashboardFile, xml);
 		}
 	}
 	
@@ -349,44 +360,13 @@ public class EventManager {
 	 * Takes dashboard and save it to file.
 	 * Dashboard state property change can be fired. 
 	 * 
-	 * @param dashboard
+	 * @param dashboardFile
 	 * @throws IOException
 	 */
-	public void saveDashboardToFile(Dashboard dashboard) throws IOException {
-		dashboard.getDashboardFile().updateXMLFile(dashboard.getSerializedDashboard().getXml());
+	public void saveDashboardToFile(DashboardFile dashboardFile) throws IOException {
+		dashboardFile.updateXMLFile(dashboardFile.getSerializedDashboard().getXml());
 		// updates dashboard state
-		updateDashboardState(dashboard);
-	}
-	
-	/**
-	 * Change dashboard selection according to DashboardFile definition.
-	 * Dashboard selection property change event is fired.
-	 * 
-	 * @param dashboardFile
-	 */
-	public void updateSelectedDashboard(DashboardFile dashboardFile) {
-		// find dashboard for selected dashboard definition
-		DashAppModel model = DashAppModel.getInstance();
-		Dashboard dashboard = model.getDashboard(dashboardFile);
-		
-		// if dashboard has not been opened yet it needs to be created
-		if(dashboard == null && dashboardFile != null) {
-			// create new dashboard for selected dashboard file definition
-			dashboard = new Dashboard(model, dashboardFile);
-			try {
-				// dashboard is initialized, not changed
-				controller.setListenersDisabled(true);
-				reloadDashboardFromFile(dashboard);
-			} catch (Exception e) {
-				System.err.println("Unable to load dashboard " + dashboardFile.toString()); 
-			} finally {
-				controller.setListenersDisabled(false);
-			}
-			// add to model
-			model.addDashboard(dashboard);
-		}
-		
-		updateSelectedDashboard(dashboard);
+		updateDashboardFileState(dashboardFile);
 	}
 
 	/**
@@ -403,17 +383,17 @@ public class EventManager {
 		WorkspaceFolder folder = model.getWorkspaceFolder();
 		File xmlFile = new File(folder.getPath() + File.separator + name + ".xml");
 		if(!xmlFile.exists()) {
-			Dashboard dashboard = new Dashboard(model, new DashboardFile(xmlFile));
-			dashboard.setDimension(0, 0, width, height);
+			DashboardFile dashboardFile = new DashboardFile(model, xmlFile);
+			dashboardFile.getDashboard(true).setDimension(0, 0, width, height);
 			try {
 				// serialize
-				dashboard.getSerializedDashboard().setXml(XMLUtils.serialize(dashboard));
+				dashboardFile.getSerializedDashboard().setXml(XMLUtils.serialize(dashboardFile));
 				// save
-				saveDashboardToFile(dashboard);
+				saveDashboardToFile(dashboardFile);
 				// add to model
-				model.addDashboard(dashboard);
+				model.setDashboardFileOpened(dashboardFile);
 				// update selection
-				updateSelectedDashboard(dashboard);
+				updateSelectedWorkspaceFile(dashboardFile);
 			} catch (IOException e) {
 				return false;
 			} catch (Exception e) {

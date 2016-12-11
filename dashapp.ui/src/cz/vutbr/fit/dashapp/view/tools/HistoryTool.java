@@ -16,9 +16,10 @@ import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.model.SerializedDashboard;
+import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
@@ -30,7 +31,7 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
  */
 public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyChangeListener {
 	
-	protected Map<Dashboard, History> historyCache;
+	protected Map<IWorkspaceFile, History> historyCache;
 	protected int HISTORY_LIMIT = 20;
 	
 	protected boolean userBrowsingHistory;
@@ -39,7 +40,7 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 	private List<AbstractButton> btnsRedo;
 	
 	public HistoryTool() {
-		historyCache = new HashMap<Dashboard, History>();
+		historyCache = new HashMap<IWorkspaceFile, History>();
 		userBrowsingHistory = false;
 		btnsUndo = new ArrayList<>();
 		btnsRedo = new ArrayList<>();
@@ -102,11 +103,11 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 		}
 	}
 	
-	private History getHistory(Dashboard selectedDashboard) {
-		History history = historyCache.get(selectedDashboard);
+	private History getHistory(IWorkspaceFile dashboardFile) {
+		History history = historyCache.get(dashboardFile);
 		if(history == null) {
 			history = new History(HISTORY_LIMIT);
-			historyCache.put(selectedDashboard, history);
+			historyCache.put(dashboardFile, history);
 		}
 		return history;
 	}
@@ -140,17 +141,19 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 		 * Undo action.
 		 */
 		public void undo() {
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			History history = getHistory(selectedDashboard);
-			if(history != null) {
-				SerializedDashboard sd = selectedDashboard.getSerializedDashboard();
-				userBrowsingHistory = true;
-				try {
-					DashAppController.getEventManager().updateDashboardXml(selectedDashboard, history.undo(sd.getXml()));
-				} finally {
-					userBrowsingHistory = false;
+			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+			if(selectedDashboardFile != null) {
+				History history = getHistory(selectedDashboardFile);
+				if(history != null) {
+					SerializedDashboard sd = (selectedDashboardFile).getSerializedDashboard();
+					userBrowsingHistory = true;
+					try {
+						DashAppController.getEventManager().updateDashboardXml(selectedDashboardFile, history.undo(sd.getXml()));
+					} finally {
+						userBrowsingHistory = false;
+					}
+					updateButtons(history);
 				}
-				updateButtons(history);
 			}
 		}
 
@@ -158,17 +161,19 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 		 * Redo action.
 		 */
 		public void redo() {
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			History history = getHistory(selectedDashboard);
-			if(history != null) {
-				SerializedDashboard sd = selectedDashboard.getSerializedDashboard();
-				userBrowsingHistory = true;
-				try {
-					DashAppController.getEventManager().updateDashboardXml(selectedDashboard, history.redo(sd.getXml()));
-				} finally {
-					userBrowsingHistory = false;
+			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+			if(selectedDashboardFile != null) {
+				History history = getHistory(selectedDashboardFile);
+				if(history != null) {
+					SerializedDashboard sd = selectedDashboardFile.getSerializedDashboard();
+					userBrowsingHistory = true;
+					try {
+						DashAppController.getEventManager().updateDashboardXml(selectedDashboardFile, history.redo(sd.getXml()));
+					} finally {
+						userBrowsingHistory = false;
+					}
+					updateButtons(history);
 				}
-				updateButtons(history);
 			}
 		}
 	}
@@ -229,15 +234,15 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		if(!userBrowsingHistory && EventKind.isModelChanged(e) && e.xmlChange != null) {
-			Dashboard updatedDashboard = e.selectedDashboard;
-			History history = getHistory(updatedDashboard);
+			IWorkspaceFile updatedFile = e.selectedFile;
+			History history = getHistory(updatedFile);
 			history.save((String) e.xmlChange.oldValue);
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			if(selectedDashboard != null && selectedDashboard == updatedDashboard) {
+			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+			if(selectedDashboardFile != null && selectedDashboardFile == updatedFile) {
 				updateButtons(history);
 			}
-		} else if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
-			updateButtons(getHistory(e.selectedDashboard));
+		} else if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
+			updateButtons(getHistory(e.selectedFile));
 		}
 	}
 

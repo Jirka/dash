@@ -6,7 +6,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.util.Arrays;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -25,14 +24,11 @@ import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.view.IComponent;
 import cz.vutbr.fit.dashapp.view.SideBar;
-import cz.vutbr.fit.dashapp.view.util.DashboardFileFilter;
-import cz.vutbr.fit.dashapp.view.util.FolderFilter;
 
 /**
  * View which contains list of dashboard files stored in particular folder.
@@ -92,7 +88,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 							}
 						}
 						propertyChangeDiasbled = true;
-						DashAppController.getEventManager().updateSelectedDashboard(selectedDashboardFile);
+						DashAppController.getEventManager().updateSelectedWorkspaceFile(selectedDashboardFile);
 						propertyChangeDiasbled = false;
 						previousIndex = index;
 					}
@@ -168,30 +164,11 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 		File folderFile = folder.getFile();
 		if(folderFile.exists() && folderFile.isDirectory()) {
 			// parent folder
-			listModel.addElement(new WorkspaceFolder(folderFile.getParentFile()));
-			// folder files
-			File[] subFolders = folderFile.listFiles(new FolderFilter());
-			if(subFolders != null) {
-				Arrays.sort(subFolders);
-				for (File subFolder : subFolders) {
-					listModel.addElement(new WorkspaceFolder(subFolder));
-				}
-			}
-			// dashboard files
-			File[] files = folderFile.listFiles(new DashboardFileFilter());
-			if(files != null) {
-				Arrays.sort(files);
-				for (File file : files) {
-					String name = file.getName();
-					int dotPosition = name.lastIndexOf('.');
-					name = name.substring(0, dotPosition);
-					DashboardFile dashboardFile = findWorkspaceFile(name, DashboardFile.class);
-					if(dashboardFile != null) {
-						dashboardFile.setFile(file);
-					} else {
-						listModel.addElement(new DashboardFile(file));
-					}
-				}
+			listModel.addElement(new WorkspaceFolder(folder.getModel(), folderFile.getParentFile()));
+			// folder and dashboard files
+			IWorkspaceFile[] children = folder.getChildren();
+			for (IWorkspaceFile child : children) {
+				listModel.addElement(child);
 			}
 		}
 	}
@@ -234,9 +211,9 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 					}
 				}
 				list.setSelectedIndex(i);
-			} else if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+			} else if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
 				if(e.modelChange.newValue != null) {
-					int index = list.getNextMatch(((Dashboard) e.modelChange.newValue).getDashboardFile().toString(), 0, Bias.Forward);
+					int index = list.getNextMatch(((DashboardFile) e.modelChange.newValue).toString(), 0, Bias.Forward);
 					if(index >= 0) {
 						list.setSelectedIndex(index);
 					}
@@ -244,7 +221,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 					list.setSelectedIndex(-1);
 				}
 			} else if(e.propertyKind == EventKind.DASHBOARD_STATE_CHANGED) {
-				int index = list.getNextMatch(e.selectedDashboard.getDashboard().getDashboardFile().toString(), 0, Bias.Forward);
+				int index = list.getNextMatch(e.selectedFile.toString(), 0, Bias.Forward);
 				/*if(index >= 0) {
 					list.setSelectedIndex(index);
 				}*/
@@ -266,14 +243,14 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 		return -1;
 	}
 	
-	@SuppressWarnings("unchecked")
+	/*@SuppressWarnings("unchecked")
 	private <T extends IWorkspaceFile> T findWorkspaceFile(String name, Class<T> type) {
 		int i = findWorkspaceFileIndex(name, type);
 		if(i >= 0) {
 			return (T) listModel.get(i);
 		}
 		return null;
-	}
+	}*/
 	
 	private static class CellRenderrer extends DefaultListCellRenderer {
 		
@@ -290,13 +267,10 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			if(value instanceof DashboardFile) {
 				setIcon(iconDashboard);
-				Dashboard dashboard = ((DashboardFile) value).getDashboard();
-				if(dashboard != null) {
-					if(dashboard.getSerializedDashboard().isDirty()) {
-						setText("* " + value.toString());
-					} else {
-						setText(value.toString());
-					}
+				if(((DashboardFile) value).getSerializedDashboard().isDirty()) {
+					setText("* " + value.toString());
+				} else {
+					setText(value.toString());
 				}
 			} else if(value instanceof WorkspaceFolder) {
 				setIcon(iconFolder);

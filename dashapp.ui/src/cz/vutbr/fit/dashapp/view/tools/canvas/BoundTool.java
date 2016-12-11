@@ -11,7 +11,6 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils.WorkingCopy;
 
@@ -45,7 +44,7 @@ public class BoundTool extends SelectTool {
 	 * Reset selection (dashboard is always selected).
 	 */
 	protected void reset() {
-		Dashboard selectedElement = DashAppModel.getInstance().getSelectedDashboard();
+		Dashboard selectedElement = canvas.getDashboard();
 		canvas.setSelectedElement(selectedElement);
 		if(selectedElement != null) {
 			candidateElement = new WorkingCopy(selectedElement.absoluteX(), selectedElement.absoluteY(),
@@ -64,7 +63,7 @@ public class BoundTool extends SelectTool {
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		if(e.propertyKind == EventKind.GRAPHICAL_ELEMENT_CHANGED
-				|| e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
+				|| e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
 			reset();
 		}
 	}

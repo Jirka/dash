@@ -17,7 +17,8 @@ import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.view.IComponent;
 import cz.vutbr.fit.dashapp.view.SideBar;
 
@@ -96,14 +97,14 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
-		if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED ||
+		if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED ||
 				EventKind.isModelChanged(e)) {
-			Dashboard selectedDasboard = DashAppModel.getInstance().getSelectedDashboard();
-			if(selectedDasboard != null && selectedDasboard == e.selectedDashboard) {
+			IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
+			if(selectedFile != null && selectedFile instanceof DashboardFile && selectedFile == e.selectedFile) {
 				// this is one way how to update text editor
 				// workflow 1: change of model -> serialization -> xml change event -> proper editor text update
 				if(!currentlyTyping) {
-					updateEditor(selectedDasboard);
+					updateEditor((DashboardFile) selectedFile);
 				}
 				// else - workflow 2: text input -> proper editor text update -> change of serialized XML -> model change event
 			}
@@ -115,7 +116,7 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 	 * 
 	 * @param selectedDashboard
 	 */
-	public void updateEditor(Dashboard selectedDashboard) {
+	public void updateEditor(DashboardFile selectedDashboard) {
 		String xml = selectedDashboard.getSerializedDashboard().getXml();
 		String oldXml = editor.getText();
 		boolean sameXML = oldXml.equals(xml);
@@ -156,10 +157,10 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource() == timer) {
 				timer.stop();
-				Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-				if(selectedDashboard != null) {
+				IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
+				if(selectedFile != null && selectedFile instanceof DashboardFile) {
 					// update serialized dashboard
-					updateModel(selectedDashboard);
+					updateModel((DashboardFile) selectedFile);
 				}
 			}
 		}
@@ -169,7 +170,7 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 		 * 
 		 * @param selectedDashboard
 		 */
-		public void updateModel(Dashboard selectedDashboard) {
+		public void updateModel(DashboardFile selectedDashboard) {
 			// text changed -> deserialize -> update model -> model event
 			currentlyTyping = true;
 			try {

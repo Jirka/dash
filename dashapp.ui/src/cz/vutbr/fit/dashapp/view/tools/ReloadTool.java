@@ -6,8 +6,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.util.Dialogs;
@@ -55,11 +55,13 @@ public class ReloadTool extends AbstractGUITool implements IGUITool {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-			try {
-				DashAppController.getEventManager().reloadDashboardFromFile(selectedDashboard);
-			} catch (Exception e1) {
-				Dialogs.report("Unable to load dashboard file.");
+			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+			if(selectedDashboardFile != null) {
+				try {
+					DashAppController.getEventManager().reloadDashboardFromFile(selectedDashboardFile);
+				} catch (Exception e1) {
+					Dialogs.report("Unable to load dashboard file.");
+				}
 			}
 		}
 	}

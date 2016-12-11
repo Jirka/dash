@@ -2,19 +2,16 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
-import java.util.HashMap;
 import java.util.Map;
 
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
-import cz.vutbr.fit.dashapp.eval.metric.BackgroundShare;
-import cz.vutbr.fit.dashapp.eval.metric.IntensitiesCount;
 
 public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 
-	public ActualAnalysis(Dashboard dashboard) {
-		super(dashboard);
+	public ActualAnalysis(DashboardFile dashboardFile) {
+		super(dashboardFile);
 	}
 
 	@Override

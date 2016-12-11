@@ -16,7 +16,9 @@ import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.controller.IPropertyChangeListener;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
+import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.util.Dialogs;
@@ -105,35 +107,35 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 			
 				switch (kind) {
 				case SAVE:
-					Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
-					if (selectedDashboard != null) {
+					DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+					if (selectedDashboardFile != null) {
 						try {
-							DashAppController.getEventManager().saveDashboardToFile(selectedDashboard);
+							DashAppController.getEventManager().saveDashboardToFile(selectedDashboardFile);
 							
 						} catch (IOException e1) {
-							Dialogs.report("Unable to save dashboard file " + selectedDashboard.getDashboardFile().toString() + ".");
+							Dialogs.report("Unable to save dashboard file " + selectedDashboardFile.toString() + ".");
 						}
 					}
 					break;
 				case SAVE_ALL:
-					List<Dashboard> dashboards = DashAppModel.getInstance().getDashboards();
-					List<Dashboard> unsucessfullySavedDashboards = new ArrayList<>(); 
-					for (Dashboard dashboard : dashboards) {
-						if(dashboard.getSerializedDashboard().isDirty()) {
+					List<DashboardFile> dashboards = DashAppModel.getInstance().getOpenedDashboardFiles();
+					List<DashboardFile> unsucessfullySavedDashboards = new ArrayList<>(); 
+					for (DashboardFile dashboardFile : dashboards) {
+						if(dashboardFile.getSerializedDashboard().isDirty()) {
 							try {
-								DashAppController.getEventManager().saveDashboardToFile(dashboard);
+								DashAppController.getEventManager().saveDashboardToFile(dashboardFile);
 							} catch (Exception e1) {
-								unsucessfullySavedDashboards.add(dashboard);
+								unsucessfullySavedDashboards.add(dashboardFile);
 							}
 						}
 					}
 					if(!unsucessfullySavedDashboards.isEmpty()) {
 						StringBuffer sb = new StringBuffer();
-						for (Dashboard dashboard : unsucessfullySavedDashboards) {
+						for (DashboardFile dashboardFile : unsucessfullySavedDashboards) {
 							if(sb.length() > 0) {
 								sb.append("\n ");
 							}
-							sb.append(dashboard.getSerializedDashboard().toString());
+							sb.append(dashboardFile.getSerializedDashboard().toString());
 						}
 						Dialogs.report("Unable to save dashboard files: " + sb.toString() + ".");
 					}
@@ -145,22 +147,22 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		if(e.propertyKind == EventKind.DASHBOARD_STATE_CHANGED) {
-			if(e.selectedDashboard == DashAppModel.getInstance().getSelectedDashboard()) {
+			if(e.selectedFile == DashAppUtils.getSelectedDashboardFile()) {
 				enableButtons(btnsSave, (boolean) e.modelChange.newValue);
 			}
-			List<Dashboard> dashboards = DashAppModel.getInstance().getDashboards();
+			List<DashboardFile> dashboards = DashAppModel.getInstance().getOpenedDashboardFiles();
 			boolean existsDirty = false;
-			for (Dashboard dashboard : dashboards) {
-				if(dashboard.getSerializedDashboard().isDirty()) {
+			for (DashboardFile dashboardFile : dashboards) {
+				if(dashboardFile.getSerializedDashboard().isDirty()) {
 					existsDirty = true;
 					break;
 				}
 			}
 			enableButtons(btnsSaveAll, existsDirty);
-		} else if(e.propertyKind == EventKind.DASHBOARD_SELECTION_CHANGED) {
-			Dashboard selectedDashboard = (Dashboard) e.modelChange.newValue;
-			if(selectedDashboard != null) {
-				enableButtons(btnsSave, selectedDashboard.getSerializedDashboard().isDirty());
+		} else if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
+			IWorkspaceFile selectedFile = (IWorkspaceFile) e.modelChange.newValue;
+			if(selectedFile != null && selectedFile instanceof DashboardFile) {
+				enableButtons(btnsSave, ((DashboardFile) selectedFile).getSerializedDashboard().isDirty());
 			} else {
 				enableButtons(btnsSave, false);
 			}
@@ -169,11 +171,11 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 	
 	@Override
 	public boolean windowsClosing(WindowEvent e) {
-		List<Dashboard> dashboards = DashAppModel.getInstance().getDashboards();
-		List<Dashboard> unsavedDashboards = new ArrayList<>(); 
-		for (Dashboard dashboard : dashboards) {
-			if(dashboard.getSerializedDashboard().isDirty()) {
-				unsavedDashboards.add(dashboard);
+		List<DashboardFile> dashboards = DashAppModel.getInstance().getOpenedDashboardFiles();
+		List<DashboardFile> unsavedDashboards = new ArrayList<>(); 
+		for (DashboardFile dashboardFile : dashboards) {
+			if(dashboardFile.getSerializedDashboard().isDirty()) {
+				unsavedDashboards.add(dashboardFile);
 			}
 		}
 		if(!unsavedDashboards.isEmpty()) {

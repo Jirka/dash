@@ -22,6 +22,8 @@ import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.util.DashAppUtils;
+import cz.vutbr.fit.dashapp.util.DashboardFileFilter;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel;
 import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
@@ -29,7 +31,6 @@ import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
-import cz.vutbr.fit.dashapp.view.util.DashboardFileFilter;
 import cz.vutbr.fit.dashapp.view.Canvas;
 
 public class ImageTool extends AbstractGUITool implements IGUITool {
@@ -105,41 +106,42 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 		public void actionPerformed(ActionEvent e) {
 			
 			Canvas surface = DashAppView.getInstance().getDashboardView().getCanvas();
-			Dashboard selectedDashboard = DashAppModel.getInstance().getSelectedDashboard();
+			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
 			
-			if(selectedDashboard != null) {
+			if(selectedDashboardFile != null) {
 				if(kind == RESET) {
-					BufferedImage image = selectedDashboard.getImage();
+					BufferedImage image = selectedDashboardFile.getImage();
 					surface.updateImage(image, true, true);
 				} else {
 					BufferedImage image = surface.getImage();
+					Dashboard dashboard = selectedDashboardFile.getDashboard(false);
 					if(image != null) {
-						int[][] matrix = MatrixUtils.printBufferedImage(image, selectedDashboard);
+						int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
 						if(kind == ADAPTIVE1) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
 							MatrixUtils.adaptiveThreshold(matrix, false, s, t, false);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == ADAPTIVE2) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
 							MatrixUtils.adaptiveThreshold(matrix, true, s, t, false);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == GRAY_SCALE) {
 							MatrixUtils.grayScale(matrix, false, false);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == POSTERIZE) {
 							int range = askForInteger("color bit width", "Posterization option", 4);
 							MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, range)), false);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == HSB_SATURATION) {
 							ColorChannel[][] matrixHSB = MatrixUtils.RGBtoHSB(matrix);
 							MatrixUtils.normalizeColorChannel(matrixHSB, matrix, ColorChannelType.SATURATION);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							MatrixUtils.grayScale(matrix, true, false);
 							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
@@ -147,7 +149,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 						} else if(kind == LCH_SATURATION) {
 							ColorChannel[][] matrixLCH = MatrixUtils.RGBtoLCH(matrix);
 							MatrixUtils.normalizeColorChannel(matrixLCH, matrix, ColorChannelType.SATURATION);
-							MatrixUtils.updateBufferedImage(image, matrix, selectedDashboard);
+							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
 							MatrixUtils.grayScale(matrix, true, false);
 							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
@@ -172,18 +174,16 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 										if(previousDashboardFile != null && previousDashboardFile.toString().equals(name)) {
 											previousDashboardFile.setFile(file);
 										} else {
-											previousDashboardFile = new DashboardFile(file);
+											previousDashboardFile = new DashboardFile(model, file);
 											dashboardFiles.add(previousDashboardFile);
 										}
 									}
 									DashAppController controller = DashAppController.getInstance();
 									try {
-										Dashboard dashboard;
 										DashAppController.getInstance().setListenersDisabled(true);
 										String report = "";
 										for (DashboardFile dashboardFile : dashboardFiles) {
-											dashboard = new Dashboard(model, dashboardFile);
-											DashAppController.getEventManager().reloadDashboardFromFile(dashboard);
+											dashboard = dashboardFile.getDashboard(true);
 											//report += new ActualAnalysis(selectedDashboard).analyse();
 											System.out.println("Analysing " + dashboardFile.toString() + "...");
 											report += dashboardFile.toString()+ "\t\t";
