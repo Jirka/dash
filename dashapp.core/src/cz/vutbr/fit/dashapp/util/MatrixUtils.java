@@ -3,6 +3,7 @@ package cz.vutbr.fit.dashapp.util;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -200,7 +201,8 @@ public class MatrixUtils {
 		if(clear) {
 			initMattrix(matrix, false);
 		}
-		for(GraphicalElement graphicalElement : dashboard.getChildren(types)) {
+		List<GraphicalElement> graphicalElements = dashboard.getChildren(types);
+		for(GraphicalElement graphicalElement : graphicalElements) {
 			printGraphicalElement(matrix, graphicalElement);
 		}
 	}

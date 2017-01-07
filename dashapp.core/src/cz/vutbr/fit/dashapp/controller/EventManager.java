@@ -322,18 +322,22 @@ public class EventManager {
 		}
 	}
 	
+	public void refreshFolder() {
+		updateWorkspaceFolder(DashAppModel.getInstance().getWorkspaceFolder(), true);
+	}
+	
 	/**
 	 * Updates dashboards folder path.
 	 * fires folder path property change event.
 	 * 
 	 * @param folder
 	 */
-	public void updateWorkspaceFolder(WorkspaceFolder folder) {
+	public void updateWorkspaceFolder(WorkspaceFolder folder, boolean forceReload) {
 		assert folder == null;
 		
 		DashAppModel model = DashAppModel.getInstance();
 		WorkspaceFolder oldFolder = model.getWorkspaceFolder();
-		if(!oldFolder.equals(folder)) {
+		if(!oldFolder.equals(folder) || forceReload) {
 			updateSelectedWorkspaceFile(null);
 			model.getOpenedDashboardFiles().clear();
 			model.setWorkspaceFolder(folder);

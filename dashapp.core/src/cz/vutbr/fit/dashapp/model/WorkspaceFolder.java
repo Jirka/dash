@@ -24,6 +24,11 @@ public class WorkspaceFolder extends WorkspaceFile implements IWorkspaceFile {
 	}
 	
 	@Override
+	public String getFileName() {
+		return folderFile.getName();
+	}
+	
+	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof WorkspaceFolder) {
 			((WorkspaceFolder) obj).getFile();
@@ -45,8 +50,20 @@ public class WorkspaceFolder extends WorkspaceFile implements IWorkspaceFile {
 		return getPath();
 	}
 	
-	public IWorkspaceFile[] getChildren() {
-		if(this.children == null) {
+	@SuppressWarnings("unchecked")
+	public <T extends IWorkspaceFile> List<T> getChildren(Class<T> type, String regex, boolean forceRefresh) {
+		List<T> filteredDashboardFiles = new LinkedList<>();
+		IWorkspaceFile[] children = getChildren(forceRefresh);
+		for (IWorkspaceFile file : children) {
+			if(type.isInstance(file) && (regex == null || file.getFileName().matches(regex))) {
+				filteredDashboardFiles.add((T) file);
+			}
+		}
+		return filteredDashboardFiles;
+	}
+	
+	public IWorkspaceFile[] getChildren(boolean forceRefresh) {
+		if(this.children == null || forceRefresh) {
 			if(this.folderFile != null && this.folderFile.exists()) {
 				// folder files
 				File[] subFolders = folderFile.listFiles(new FolderFilter());

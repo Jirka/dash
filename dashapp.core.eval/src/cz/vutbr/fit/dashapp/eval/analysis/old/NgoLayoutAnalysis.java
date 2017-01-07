@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.eval.analysis;
+package cz.vutbr.fit.dashapp.eval.analysis.old;
 
 import java.awt.Point;
 import java.util.HashSet;

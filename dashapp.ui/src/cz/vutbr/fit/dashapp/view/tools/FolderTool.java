@@ -112,13 +112,13 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			public void keyPressed(KeyEvent e) {
 				int keyCode = e.getKeyCode();
 				if(keyCode == KeyEvent.VK_BACK_SPACE) {
-					DashAppController.getEventManager().updateWorkspaceFolder((WorkspaceFolder) listModel.get(0));
+					DashAppController.getEventManager().updateWorkspaceFolder((WorkspaceFolder) listModel.get(0), false);
 				} else if(keyCode == KeyEvent.VK_ENTER) {
 					int selectedIndex = list.getSelectedIndex();
 					if(selectedIndex >= 0) {
 						IWorkspaceFile selectedSource = listModel.get(list.getSelectedIndex());
 						if(selectedSource instanceof WorkspaceFolder) {
-							DashAppController.getEventManager().updateWorkspaceFolder(((WorkspaceFolder) selectedSource));
+							DashAppController.getEventManager().updateWorkspaceFolder(((WorkspaceFolder) selectedSource), false);
 						}
 					}
 				}
@@ -152,7 +152,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 				if(e.getClickCount() == 2) {
 					IWorkspaceFile selectedSource = listModel.get(list.getSelectedIndex());
 					if(selectedSource instanceof WorkspaceFolder) {
-						DashAppController.getEventManager().updateWorkspaceFolder(((WorkspaceFolder) selectedSource));
+						DashAppController.getEventManager().updateWorkspaceFolder(((WorkspaceFolder) selectedSource), false);
 					}
 				}
 			}
@@ -166,7 +166,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			// parent folder
 			listModel.addElement(new WorkspaceFolder(folder.getModel(), folderFile.getParentFile()));
 			// folder and dashboard files
-			IWorkspaceFile[] children = folder.getChildren();
+			IWorkspaceFile[] children = folder.getChildren(true);
 			for (IWorkspaceFile child : children) {
 				listModel.addElement(child);
 			}

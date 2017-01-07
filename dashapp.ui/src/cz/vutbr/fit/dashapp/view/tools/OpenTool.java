@@ -69,7 +69,7 @@ public class OpenTool extends AbstractGUITool implements IGUITool {
 					String path = file.getAbsolutePath();
 					if (path != null) {
 						DashAppController.getEventManager().
-						updateWorkspaceFolder(new WorkspaceFolder(DashAppModel.getInstance(), new File(path)));
+						updateWorkspaceFolder(new WorkspaceFolder(DashAppModel.getInstance(), new File(path)), true);
 					}
 				}
 			}

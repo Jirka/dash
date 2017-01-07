@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.eval.analysis;
+package cz.vutbr.fit.dashapp.eval.analysis.old;
 
 public interface IAnalysis {
 	

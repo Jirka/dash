@@ -1,5 +1,8 @@
 package cz.vutbr.fit.dashapp.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
@@ -21,6 +24,14 @@ public class DashAppUtils {
 			return (DashboardFile) selectedFile;
 		}
 		return null;
+	}
+	
+	public static List<Dashboard> getDashboards(List<DashboardFile> dashboardFiles) {
+		List<Dashboard> dashboards = new LinkedList<>();
+		for (DashboardFile dashboardFile : dashboardFiles) {
+			dashboards.add(dashboardFile.getDashboard(true));
+		}
+		return dashboards;
 	}
 
 }
