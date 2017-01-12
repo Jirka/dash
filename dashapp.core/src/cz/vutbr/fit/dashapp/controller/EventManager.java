@@ -176,7 +176,7 @@ public class EventManager {
 	 */
 	private GraphicalElement updateGEDimension(GraphicalElement ge, int x, int y, int width, int height, boolean convertToRelative) {
 		GraphicalElement copy = null;
-		if(convertToRelative) {
+		if(convertToRelative && ge.getParent() != ge) {
 			x = ge.getParent().toRelativeX(x);
 			y = ge.getParent().toRelativeY(y);
 		}

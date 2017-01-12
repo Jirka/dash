@@ -9,8 +9,6 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.ButtonGroup;
 
-import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
-import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils.WorkingCopy;
 
@@ -40,6 +38,11 @@ public class BoundTool extends SelectTool {
 		return "/icons/Monitor.png";
 	}
 	
+	@Override
+	public void resetSelections() {
+		reset();
+	}
+	
 	/**
 	 * Reset selection (dashboard is always selected).
 	 */
@@ -59,14 +62,6 @@ public class BoundTool extends SelectTool {
 		canvas.updateCursor(Cursor.DEFAULT_CURSOR);
 		canvas.repaint();
 	}
-
-	@Override
-	public void firePropertyChange(PropertyChangeEvent e) {
-		if(e.propertyKind == EventKind.GRAPHICAL_ELEMENT_CHANGED
-				|| e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
-			reset();
-		}
-	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -77,6 +72,8 @@ public class BoundTool extends SelectTool {
 	public void mousePressed(MouseEvent e) {
 		// store actual position 
 		previousPoint = new Point(e.getX(), e.getY());
+		// initialize help point used by attaching to borders
+		helpAttachPoint = new Point(0, 0);
 		canvas.repaint();
 	}
 

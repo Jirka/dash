@@ -344,7 +344,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	}
 	
 	public void resetSelections() {
-		selectedElement = null;
+		//selectedElement = null;
 		activeCanvasTool.resetSelections();
 	}
 	
@@ -457,9 +457,9 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		if(selectedFile == e.selectedFile) {
 			// another dashboard is selected
 			if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
-				resetSelections();
 				IWorkspaceFile workspaceFile = (IWorkspaceFile) e.modelChange.newValue;
 				openDashboardImage(workspaceFile);
+				resetSelections();
 			} else if(EventKind.isModelChanged(e)) {
 				resetSelections();
 			}

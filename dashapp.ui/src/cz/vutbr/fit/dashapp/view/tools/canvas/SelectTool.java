@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
@@ -37,7 +36,7 @@ public class SelectTool extends ViewTool {
 	/**
 	 * TODO
 	 */
-	private Point helpAttachPoint;
+	protected Point helpAttachPoint;
 
 	@Override
 	protected String getLabel() {
@@ -65,11 +64,8 @@ public class SelectTool extends ViewTool {
 	
 	@Override
 	public void resetSelections() {
+		canvas.setSelectedElement(null);
 		candidateElement = null;
-	}
-
-	@Override
-	public void firePropertyChange(PropertyChangeEvent e) {
 	}
 
 	@Override

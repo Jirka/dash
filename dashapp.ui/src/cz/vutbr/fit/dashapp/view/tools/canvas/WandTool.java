@@ -60,6 +60,7 @@ public class WandTool extends AbstractCanvasTool {
 	
 	@Override
 	public void resetSelections() {
+		canvas.setSelectedElement(null);
 		candidateElement = null;
 	}
 

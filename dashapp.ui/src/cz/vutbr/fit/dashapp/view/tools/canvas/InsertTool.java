@@ -57,6 +57,7 @@ public class InsertTool extends AbstractCanvasTool {
 	
 	@Override
 	public void resetSelections() {
+		canvas.setSelectedElement(null);
 		candidateElement = null;
 	}
 
