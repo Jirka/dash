@@ -71,7 +71,7 @@ public class BoundTool extends SelectTool {
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// store actual position 
-		previousPoint = new Point(e.getX(), e.getY());
+		previousPoint = new Point(canvas.unscale(e.getX()), canvas.unscale(e.getY()));
 		// initialize help point used by attaching to borders
 		helpAttachPoint = new Point(0, 0);
 		canvas.repaint();
