@@ -117,7 +117,7 @@ public class DashboardFile extends WorkspaceFile implements IWorkspaceFile {
 				// try to deserialize XML (test if valid)
 				Dashboard deserializedXML = XMLUtils.deserialize(xml);
 				// description is empty -> set image default dimension
-				if(xml == SerializedDashboard.EMPTY_XML) {
+				if(xml.startsWith(SerializedDashboard.EMPTY_XML)) {
 					BufferedImage image = getImage();
 					if(image != null) {
 						deserializedXML.width = image.getWidth();
