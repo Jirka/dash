@@ -42,7 +42,7 @@ public class FileUtils {
 	}
 	
 	public static void saveTextFile(String output, String folderPath, String fileName) {
-		File outputFile = createFile(folderPath, fileName, ".txt");
+		File outputFile = createFile(folderPath, fileName, "txt");
 		try {
 			FileOutputStream out = new FileOutputStream(outputFile);
 			out.write(output.getBytes());

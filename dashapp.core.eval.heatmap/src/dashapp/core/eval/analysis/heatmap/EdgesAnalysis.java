@@ -1,6 +1,7 @@
 package dashapp.core.eval.analysis.heatmap;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.image.GrayMatrix;
@@ -32,7 +33,7 @@ public class EdgesAnalysis extends AbstractAnalysis implements PixelCalculator {
 	}
 
 	@Override
-	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder) {
+	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
 		// do nothing
 	}
 

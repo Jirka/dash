@@ -74,21 +74,21 @@ public class OldAnalysisTool extends AbstractGUITool implements IGUITool {
 			IAnalysis analysis = null;
 			String report = "";
 			if(kind == ACTUAL_ANALYSIS) {
-				analysis = new ActualAnalysis(selectedDashboardFile);
+				analysis = new ActualAnalysis();
 			} else if(kind == THRESHOLD_ANALYSIS) {
-				analysis = new RasterAnalysis(selectedDashboardFile);
+				analysis = new RasterAnalysis();
 			} else if(kind == COLOR_ANALYSIS) {
-				analysis = new ColorAnalysis(selectedDashboardFile);
+				analysis = new ColorAnalysis();
 			} else if(kind == GRAYSCALE_ANALYSIS) {
-				analysis = new GrayscaleAnalysis(selectedDashboardFile);
+				analysis = new GrayscaleAnalysis();
 			} else if(kind == WIDGET_ANALYSIS) {
-				analysis = new WidgetAnalysis(selectedDashboardFile);
+				analysis = new WidgetAnalysis();
 			} else if(kind == COLORFULNESS_ANALYSIS) {
-				analysis = new ColorfulnessAnalysis(selectedDashboardFile);
+				analysis = new ColorfulnessAnalysis();
 			}
 			
 			if(analysis != null) {
-				report = analysis.analyse();
+				report = analysis.analyze(selectedDashboardFile);
 				JFrame frame = new JFrame(analysis.getName());
 				
 				Toolkit toolkit = frame.getToolkit();

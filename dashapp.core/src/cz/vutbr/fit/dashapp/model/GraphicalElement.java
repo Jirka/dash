@@ -1,5 +1,6 @@
 package cz.vutbr.fit.dashapp.model;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -301,6 +302,30 @@ public class GraphicalElement {
 		
 		return Math.min(dx, width)
 				* Math.min(dy, height);
+	}
+	
+	/**
+	 * Returns area which lays in specific rectangle.
+	 * 
+	 * @param q
+	 * @return area of dashboard quadrant.
+	 */
+	public int area(Rectangle cropRectangle) {
+		int absoluteX1 = absoluteX();
+		int absoluteY1 = absoluteY();
+		int absoluteX2 = absoluteX1 + width;
+		int absoluteY2 = absoluteY1 + height;
+		int x1 = Math.min(Math.max(cropRectangle.x, absoluteX()), absoluteX2);
+		int x2 = Math.min(Math.max(cropRectangle.x+cropRectangle.width, absoluteX()), absoluteX2);
+		int y1 = Math.min(Math.max(cropRectangle.y, absoluteY()), absoluteY2);
+		int y2 = Math.min(Math.max(cropRectangle.y+cropRectangle.height, absoluteY()), absoluteY2);
+		
+		int area = (x2-x1)*(y2-y1);
+		if(area < 0) {
+			area = 0;
+		}
+		
+		return area;
 	}
 	
 	/**

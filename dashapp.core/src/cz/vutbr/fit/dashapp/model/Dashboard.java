@@ -1,6 +1,7 @@
 package cz.vutbr.fit.dashapp.model;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -115,7 +116,7 @@ public class Dashboard extends GraphicalElement {
 		return false;
 	}
 	
-	public boolean[][] getMattrix(GEType[] types) {
+	public boolean[][] getBooleanMatrix(GEType[] types) {
 		boolean[][] mattrix = new boolean[width][height];
 		MatrixUtils.printDashboard(mattrix, this, true, types);
 		return mattrix;
@@ -235,5 +236,58 @@ public class Dashboard extends GraphicalElement {
 			}
 		}
 		return listY.size();
+	}
+	
+	public Dashboard copy(Rectangle cr, int tolerance) {
+		Dashboard d = new Dashboard();
+		d.setParent(d);
+		d.setDimension(cr.x, cr.y, cr.width, cr.height);
+		
+		// copy and update children
+		List<GraphicalElement> children = getChildren();
+		if(children != null) {
+			for (GraphicalElement childGE : children) {
+				GraphicalElement childGECopy = childGE.copy();
+				// update GE relative position
+				childGECopy.setDimension(d.toRelativeX(childGE.absoluteX()), d.toRelativeY(childGE.absoluteY()), childGE.width, childGE.height);
+				// crop size
+				int x1 = Math.max(0, Math.min(d.width, childGECopy.x()));
+				int x2 = Math.max(0, Math.min(d.width, childGECopy.x2()));
+				int y1 = Math.max(0, Math.min(d.height, childGECopy.y()));
+				int y2 = Math.max(0, Math.min(d.height, childGECopy.y2()));
+				childGECopy.setDimension(x1, y1, x2-x1, y2-y1);
+				// evaluate size
+				if(childGECopy.width > tolerance && childGECopy.height > tolerance && (double) childGECopy.area()/childGE.area() > 0.25) {
+					// add to the new dashboard
+					d.addChildGE(childGECopy);
+				}
+			}
+		}
+		
+		return d;
+	}
+	
+	public Dashboard filter(Rectangle cr, int tolerance) {
+		Dashboard d = new Dashboard();
+		d.setParent(d);
+		d.setDimension(x, y, width, height);
+		
+		List<GraphicalElement> children = getChildren();
+		for (GraphicalElement childGE : children) {
+			// calculate used size
+			int x1 = Math.max(cr.x, Math.min(cr.x+cr.width, childGE.x()));
+			int x2 = Math.max(cr.x, Math.min(cr.x+cr.width, childGE.x2()));
+			int y1 = Math.max(cr.y, Math.min(cr.y+cr.height, childGE.y()));
+			int y2 = Math.max(cr.y, Math.min(cr.y+cr.height, childGE.y2()));
+			int w = x2-x1;
+			int h = y2-y1;
+			// evaluate size
+			if(w > tolerance && h > tolerance && (double) childGE.area(cr)/childGE.area() > 0.25) {
+				// add to the new dashboard
+				d.addChildGE(childGE.copy());
+			}
+		}
+		
+		return d;
 	}
 }

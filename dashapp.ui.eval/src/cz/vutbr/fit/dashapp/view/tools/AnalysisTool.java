@@ -122,34 +122,38 @@ public class AnalysisTool extends AbstractGUITool implements IGUITool {
 		
         @Override
         public Void doInBackground() {
-        	DashAppModel model = DashAppModel.getInstance();
-			WorkspaceFolder workspaceFolder = model.getWorkspaceFolder();
-			List<WorkspaceFolder> dashboardGroups = workspaceFolder.getChildren(WorkspaceFolder.class, folderRegex.isEmpty() ? ".*" : folderRegex, true);
-			int progress = 0;
-			double folderCount = dashboardGroups.size()+1;
-			setProgress(1);
-			
-			for (WorkspaceFolder dashboardFolder : dashboardGroups) {
-				message = "folder " + dashboardFolder.getFileName();
-				DashboardCollection actDashboards = new DashboardCollection(DashAppUtils.getDashboards(dashboardFolder.getChildren(DashboardFile.class, fileRegex, true)));
-				this.analysis.processFolder(dashboardFolder, actDashboards);
-				progress++;
-				setProgress((int) (progress/folderCount*100));
-				System.out.println(dashboardFolder.toString());
-				if(isCancelled()) {
-					return null;
-				}
+        	try {
+        		DashAppModel model = DashAppModel.getInstance();
+    			WorkspaceFolder workspaceFolder = model.getWorkspaceFolder();
+    			List<WorkspaceFolder> dashboardGroups = workspaceFolder.getChildren(WorkspaceFolder.class, folderRegex.isEmpty() ? ".*" : folderRegex, true);
+    			int progress = 0;
+    			double folderCount = dashboardGroups.size()+1;
+    			setProgress(1);
+    			
+    			for (WorkspaceFolder dashboardFolder : dashboardGroups) {
+    				message = "folder " + dashboardFolder.getFileName();
+    				DashboardCollection actDashboards = new DashboardCollection(DashAppUtils.getDashboards(dashboardFolder.getChildren(DashboardFile.class, fileRegex, true)));
+    				this.analysis.processFolder(dashboardFolder, actDashboards);
+    				progress++;
+    				setProgress((int) (progress/folderCount*100));
+    				System.out.println(dashboardFolder.toString());
+    				if(isCancelled()) {
+    					return null;
+    				}
+    			}
+    			message = "finishing...";
+    			this.analysis.sumarizeFolders(workspaceFolder, dashboardGroups);
+    			setProgress(100);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			message = "finishing...";
-			this.analysis.sumarizeFolders(workspaceFolder);
-			DashAppController.getEventManager().refreshFolder();
-			setProgress(100);
 			
             return null;
         }
 
         @Override
         public void done() {
+        	DashAppController.getEventManager().refreshFolder();
         	System.out.println("heatmap");
         }
 

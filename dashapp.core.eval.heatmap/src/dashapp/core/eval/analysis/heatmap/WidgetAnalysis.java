@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Vector;
 
@@ -13,7 +14,7 @@ import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyCalculator;
+import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyNormalization;
 import cz.vutbr.fit.dashapp.image.GrayMatrix.PixelCalculator;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
@@ -27,11 +28,11 @@ public class WidgetAnalysis extends AbstractAnalysis implements PixelCalculator 
 	public static final String FILE = "_widget";
 	
 	private int actDashboardsCount;
-	EntrophyCalculator entrophyCalculator;
+	EntrophyNormalization entrophyCalculator;
 	
-	int actHeatMean;
-	int actInversedEntrophyMean;
-	int actThreshlod;
+	double actHeatMean;
+	double actInversedEntrophyMean;
+	double actThreshlod;
 	
 	@Override
 	public String getLabel() {
@@ -42,21 +43,23 @@ public class WidgetAnalysis extends AbstractAnalysis implements PixelCalculator 
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
 		this.actDashboardsCount = actDashboards.length;
 		int[][] heatMatrix = actDashboards.printDashboards(null);
-		actHeatMean = GrayMatrix.meanValue(heatMatrix);
-		int[][] entrophyMatrix = GrayMatrix.update(heatMatrix, new EntrophyCalculator(actDashboardsCount), true);
+		int[][] meanMatrix = GrayMatrix.normalize(heatMatrix, actDashboards.length, true);
+		actHeatMean = GrayMatrix.meanValue(meanMatrix);
+		int[][] entrophyMatrix = GrayMatrix.update(heatMatrix, new EntrophyNormalization(actDashboardsCount), true);
 		actInversedEntrophyMean = GrayMatrix.WHITE-GrayMatrix.meanValue(entrophyMatrix);
+		System.out.println(actInversedEntrophyMean);
 		actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
 		int[][] thresholdMatrix = GrayMatrix.update(heatMatrix, this, false);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, thresholdMatrix);
 		Dashboard dashboard = generateDashboard(thresholdMatrix, image);
-		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_w");
-		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_w");
-		//FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_e");
-		//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_e");
+		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_t");
+		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_t");
+		FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_t");
+		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_t");
 	}
 
 	@Override
-	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder) {
+	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
 		// do nothing
 	}
 	

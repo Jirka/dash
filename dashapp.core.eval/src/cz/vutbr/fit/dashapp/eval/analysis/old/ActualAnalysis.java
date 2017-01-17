@@ -4,15 +4,12 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 
 public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
-
-	public ActualAnalysis(DashboardFile dashboardFile) {
-		super(dashboardFile);
-	}
 
 	@Override
 	public String getName() {
@@ -36,9 +33,10 @@ public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 	}
 
 	@Override
-	public String analyse() {
+	public String analyze(DashboardFile dashboardFile) {
 		StringBuffer buffer = new StringBuffer();
 		
+		Dashboard dashboard = dashboardFile.getDashboard(true);
 		if(dashboard != null) {
 			BufferedImage image = DashAppView.getInstance().getDashboardView().getCanvas().getImage();
 			if(image != null) {

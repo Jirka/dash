@@ -1,6 +1,9 @@
 package cz.vutbr.fit.dashapp.image;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+
+import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
 
 public class GrayMatrix {
 	
@@ -27,7 +30,7 @@ public class GrayMatrix {
 	 * @return
 	 */
 	public static int toGray(double probabilty) {
-		return 255-(int)(probabilty*255);
+		return WHITE-(int)(probabilty*WHITE);
 	}
 	
 	/**
@@ -162,18 +165,36 @@ public class GrayMatrix {
 		int calculateValue(int value);
 	};
 	
-	public static class EntrophyCalculator implements PixelCalculator {
+	public static class EntrophyNormalization implements PixelCalculator {
 		
 		private int maxValue;
 
-		public EntrophyCalculator(int maxValue) {
-			this.maxValue = maxValue;
+		public EntrophyNormalization(int normalizationValue) {
+			this.maxValue = normalizationValue;
 		}
 		
 		@Override
 		public int calculateValue(int value) {
 			double probabilty = (double) value/this.maxValue;
 			return toGray(MathUtils.entrophy(probabilty));
+		}
+	}
+	
+	public static class ThresholdNormalization implements PixelCalculator {
+		
+		private int normalizationValue;
+		private double threshold;
+		
+		public ThresholdNormalization(double threshold, int normalizationValue) {
+			this.threshold = threshold;
+			this.normalizationValue = normalizationValue;
+		}
+
+		@Override
+		public int calculateValue(int value) {
+			double probability = (double) value/normalizationValue;
+			probability = probability > threshold ? 1.0 : 0.0;
+			return GrayMatrix.toGray(probability);
 		}
 	}
 	
@@ -198,20 +219,181 @@ public class GrayMatrix {
 		return updatedMatrix;
 	}
 
-	public static int meanValue(int[][] matrix) {
+	public static double meanValue(int[][] matrix) {
 		double mean = 0;
+		
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		int size = mW*mH;
+		
+		if(size > 0) {
+			for (int i = 0; i < mW; i++) {
+				for (int j = 0; j < mH; j++) {
+					mean += matrix[i][j];
+				}
+			}
+			
+			mean = mean/(size);
+		}
+		
+		return mean;
+	}
+	
+	public static double varianceValue(int[][] matrix, double mean) {
+		double variance = 0.0;
+		
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		int size = mW*mH;
+		
+		if(size > 0) {
+			int act;
+			for (int i = 0; i < mW; i++) {
+				for (int j = 0; j < mH; j++) {
+					act = matrix[i][j];
+					variance += (mean-act)*(mean-act);
+				}
+			}
+			variance = variance/(mW*mH);
+		}
+		
+		return variance;
+	}
+	
+	public static int minValue(int[][] matrix) {
+		int min = Integer.MAX_VALUE;
+		
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int act;
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				act = matrix[i][j];
+				if(min > act) {
+					min = act;
+				}
+			}
+		}
+		
+		return min;
+	}
+	
+	public static int maxValue(int[][] matrix) {
+		int max = Integer.MIN_VALUE;
+		
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int act;
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				act = matrix[i][j];
+				if(max < act) {
+					max = act;
+				}
+			}
+		}
+		
+		return max;
+	}
+	
+	public static double stdevValue(int[][] matrix, double variance) {
+		return Math.sqrt(variance);
+	}
+	
+	public static MeanSatistics meanStatistics(int[][] matrix) {
+		MeanSatistics statistics = new MeanSatistics();
+		statistics.mean = meanValue(matrix);
+		statistics.variance = varianceValue(matrix, statistics.mean);
+		statistics.stdev = stdevValue(matrix, statistics.variance);
+		statistics.min = minValue(matrix);
+		statistics.max = maxValue(matrix);
+		return statistics;
+	}
+
+	public static int[][] compareMatrices(int[][] matrix, int[][] matrix2) {
+		int mW_max = Math.max(matrix.length, matrix2.length);
+		int mH_max = Math.max(matrix[0].length, matrix2[0].length);
+		int mW_min = Math.max(matrix.length, matrix2.length);
+		int mH_min = Math.max(matrix[0].length, matrix2[0].length);
+		
+		int[][] cmpMatrix = new int[mW_max][mH_max];
+		
+		for (int i = 0; i < mW_min; i++) {
+			for (int j = 0; j < mH_min; j++) {
+				cmpMatrix[i][j] = WHITE-Math.abs(matrix[i][j]-matrix2[i][j]);
+			}
+			// finish according to max height
+			for (int j = mH_min; j < mH_max; j++) {
+				cmpMatrix[i][j] = BLACK;
+			}
+		}
+		// finish according to max width
+		for (int i = mW_min; i < mW_max; i++) {
+			for (int j = 0; j < mH_min; j++) {
+				cmpMatrix[i][j] = BLACK;
+			}
+		}
+		
+		return cmpMatrix;
+	}
+	
+	public static void clearMatrix(int[][] matrix, int color) {
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrix[i][j] = color;
+			}
+		}
+	}
+
+	public static int getColorCount(int[][] matrix, int color) {
+		int count = 0;
 		
 		int mW = matrix.length;
 		int mH = matrix[0].length;
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
-				mean += matrix[i][j];
+				if(matrix[i][j] == color) {
+					count++;
+				}
 			}
 		}
 		
-		mean = mean/(mW*mH);
-		
-		return (int) mean;
+		return count;
 	}
+
+	public static int[][] cropMatrix(int[][] matrix, Rectangle cropRectangle) {
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int x1 = Math.min(cropRectangle.x, mW);
+		int x2 = Math.min(cropRectangle.x+cropRectangle.width, mW);
+		int y1 = Math.min(cropRectangle.y, mH);
+		int y2 = Math.min(cropRectangle.y+cropRectangle.height, mH);
+		
+		int cW = x2-x1; 
+		int cH = y2-y1;
+		
+		if(cW <= 0 && cH <= 0) {
+			return new int[0][0];
+		}
+		
+		int[][] cropMatrix = new int[cW][cH];
+		
+		for (int ci = 0, i = cropRectangle.x; ci < cW; ci++, i++) {
+			for (int cj = 0, j = cropRectangle.y; cj < cH; cj++, j++) {
+				cropMatrix[ci][cj] = matrix[i][j];
+			}
+		}
+		
+		return cropMatrix;
+	}
+	
+	
+	
 }

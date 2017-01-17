@@ -3,17 +3,14 @@ package cz.vutbr.fit.dashapp.eval.analysis.old;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.BlackDensity;
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.eval.metric.RasterBalance;
-import cz.vutbr.fit.dashapp.eval.metric.RasterSymmetry;
-import cz.vutbr.fit.dashapp.eval.metric.ThresholdDensity;
 
 public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
-
-	public RasterAnalysis(DashboardFile dashboardFile) {
-		super(dashboardFile);
-	}
 
 	@Override
 	public String getName() {
@@ -21,7 +18,7 @@ public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
 	}
 
 	@Override
-	public String analyse() {
+	public String analyze(DashboardFile dashboardFile) {
 		StringBuffer buffer = new StringBuffer();
 		
 		if(dashboardFile != null) {
@@ -34,20 +31,21 @@ public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
 				
 				buffer.append("===== ADAPTIVE THRESHOLD =====\n");
 				
+				Dashboard dashboard = dashboardFile.getDashboard(true);
 				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
 				MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, false);
 				MatrixUtils.grayScale(matrix, true, false);
-				formatMetric(buffer, new ThresholdDensity(dashboard, matrix), df);
-				formatMetric(buffer, new RasterBalance(dashboard, matrix), df);
-				formatMetric(buffer, new RasterSymmetry(dashboard, matrix), df);
+				formatMetric(buffer, new BlackDensity().measureGrayMatrix(matrix), df);
+				formatMetric(buffer, new GrayBalance().measureGrayMatrix(matrix), df);
+				formatMetric(buffer, new GraySymmetry().measureGrayMatrix(matrix), df);
 				buffer.append("\n");
 				
 				buffer.append("===== GRAYSCALE =====\n");
 				
 				matrix = MatrixUtils.printBufferedImage(image, dashboard);
 				MatrixUtils.grayScale(matrix, true, false);
-				formatMetric(buffer, new RasterBalance(dashboard, matrix), df);
-				formatMetric(buffer, new RasterSymmetry(dashboard, matrix), df);
+				formatMetric(buffer, new GrayBalance().measureGrayMatrix(matrix), df);
+				formatMetric(buffer, new GraySymmetry().measureGrayMatrix(matrix), df);
 			}
 		}
 		

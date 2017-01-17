@@ -74,4 +74,8 @@ public class DashboardCollection {
 		return matrix;
 	}
 
+	public int size() {
+		return this.width*this.height;
+	}
+
 }

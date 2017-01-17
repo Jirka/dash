@@ -2,26 +2,23 @@ package cz.vutbr.fit.dashapp.eval.analysis.old;
 
 import java.text.DecimalFormat;
 
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoBalance;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoCohesion;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoDensity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoEconomy;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoEquilibrium;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoHomogenity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSequence;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSimplicity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSymmetry;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoUnity;
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.eval.metric.Cohesion;
-import cz.vutbr.fit.dashapp.eval.metric.Density;
-import cz.vutbr.fit.dashapp.eval.metric.Economy;
-import cz.vutbr.fit.dashapp.eval.metric.Equilibrium;
-import cz.vutbr.fit.dashapp.eval.metric.Homogenity;
-import cz.vutbr.fit.dashapp.eval.metric.NgoBalance;
-import cz.vutbr.fit.dashapp.eval.metric.NgoSymmetry;
-import cz.vutbr.fit.dashapp.eval.metric.Proportion;
-import cz.vutbr.fit.dashapp.eval.metric.Regularity;
-import cz.vutbr.fit.dashapp.eval.metric.Sequence;
-import cz.vutbr.fit.dashapp.eval.metric.Simplicity;
-import cz.vutbr.fit.dashapp.eval.metric.Unity;
 
 public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
-
-	public WidgetAnalysis(DashboardFile dashboardFile) {
-		super(dashboardFile);
-	}
 
 	@Override
 	public String getName() {
@@ -29,27 +26,27 @@ public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 	}
 
 	@Override
-	public String analyse() {
-		
+	public String analyze(DashboardFile dashboardFile) {
 		StringBuffer buffer = new StringBuffer();
 		
+		Dashboard dashboard = dashboardFile.getDashboard(true);
 		if(dashboard != null) {
 			DecimalFormat df = new DecimalFormat("#.#####");
 			
-			formatMetric(buffer, new NgoBalance(dashboard, GEType.ALL_TYPES, "Balance"), df);
-			//formatMetric(buffer, new KimBalance(dashboard), df);
-			formatMetric(buffer, new Equilibrium(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new NgoSymmetry(dashboard, GEType.ALL_TYPES, "Symmetry"), df);
-			//formatMetric(buffer, new KimSymmetry(dashboard), df);
-			formatMetric(buffer, new Sequence(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Cohesion(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Unity(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Proportion(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Simplicity(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Density(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Regularity(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Economy(dashboard, GEType.ALL_TYPES), df);
-			formatMetric(buffer, new Homogenity(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoBalance().measure(dashboard, GEType.ALL_TYPES), df);
+			//formatMetric(buffer, new KimBalance().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoEquilibrium().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoSymmetry().measure(dashboard, GEType.ALL_TYPES), df);
+			//formatMetric(buffer, new KimSymmetry().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoSequence().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoCohesion().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoUnity().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoProportion().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoSimplicity().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoDensity().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoRegularity().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoEconomy().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoHomogenity().measure(dashboard, GEType.ALL_TYPES), df);
 		}
 		
 		return buffer.toString();

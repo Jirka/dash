@@ -4,16 +4,13 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
 
 public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 	
 	private final DecimalFormat df = new DecimalFormat("#.#####");
-
-	public ColorAnalysis(DashboardFile dashboardFile) {
-		super(dashboardFile);
-	}
 
 	@Override
 	public String getName() {
@@ -36,7 +33,7 @@ public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 		return max;
 	}
 	
-	private void analyseImage(StringBuffer buffer, BufferedImage image, int bit) {
+	private void analyzeImage(StringBuffer buffer, BufferedImage image, Dashboard dashboard, int bit) {
 		int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
 		MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, bit)), false);
 		Map<Integer, Integer> histogram = MatrixUtils.getColorHistogram(matrix);
@@ -67,7 +64,7 @@ public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 	}
 
 	@Override
-	public String analyse() {
+	public String analyze(DashboardFile dashboardFile) {
 		StringBuffer buffer = new StringBuffer();
 		
 		if(dashboardFile != null) {
@@ -77,12 +74,13 @@ public class ColorAnalysis extends AbstractAnalysis implements IAnalysis {
 				buffer.append("  -> posterization\n");
 				buffer.append("\n");
 				
-				analyseImage(buffer, image, 8);
-				analyseImage(buffer, image, 7);
-				analyseImage(buffer, image, 6);
-				analyseImage(buffer, image, 5);
-				analyseImage(buffer, image, 4);
-				analyseImage(buffer, image, 3);
+				Dashboard dashboard = dashboardFile.getDashboard(true);
+				analyzeImage(buffer, image, dashboard, 8);
+				analyzeImage(buffer, image, dashboard, 7);
+				analyzeImage(buffer, image, dashboard, 6);
+				analyzeImage(buffer, image, dashboard, 5);
+				analyzeImage(buffer, image, dashboard, 4);
+				analyzeImage(buffer, image, dashboard, 3);
 			}
 		}
 		

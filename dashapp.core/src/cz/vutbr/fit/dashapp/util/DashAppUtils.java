@@ -34,4 +34,8 @@ public class DashAppUtils {
 		return dashboards;
 	}
 
+	public static DashboardCollection makeDashboardCollection(List<DashboardFile> dashboardFiles) {
+		return new DashboardCollection(getDashboards(dashboardFiles));
+	}
+
 }

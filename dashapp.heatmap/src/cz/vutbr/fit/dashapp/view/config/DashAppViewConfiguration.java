@@ -25,11 +25,13 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
+import dashapp.core.eval.analysis.heatmap.CompareAnalysis;
 import dashapp.core.eval.analysis.heatmap.EdgesAnalysis;
 import dashapp.core.eval.analysis.heatmap.EntrophyAnalysis;
 import dashapp.core.eval.analysis.heatmap.HeatMapAnalysis;
 import dashapp.core.eval.analysis.heatmap.ThresholdAnalysis;
 import dashapp.core.eval.analysis.heatmap.WidgetAnalysis;
+import dashapp.core.eval.analysis.heatmap.WidgetMetricAnalysis;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
@@ -78,6 +80,8 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		heatmapActions.add(new ThresholdAnalysis());
 		heatmapActions.add(new EdgesAnalysis());
 		heatmapActions.add(new WidgetAnalysis());
+		heatmapActions.add(new CompareAnalysis());
+		heatmapActions.add(new WidgetMetricAnalysis());
 		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysis[heatmapActions.size()])));
 	}
 	

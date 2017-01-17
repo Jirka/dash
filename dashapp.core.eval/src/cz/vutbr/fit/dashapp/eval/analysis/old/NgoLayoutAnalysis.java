@@ -5,17 +5,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
+import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
 public class NgoLayoutAnalysis implements IAnalysis {
 	
 	public static final String NAME = "Ngo Layout Analyses";
-	private Dashboard dashboard;
-	
-	public NgoLayoutAnalysis(Dashboard dashboard) {
-		this.dashboard = dashboard;
-	}
 
 	public String getName() {
 		return NAME;
@@ -540,7 +536,8 @@ public class NgoLayoutAnalysis implements IAnalysis {
 		return W/W_max;
 	}
 
-	public String analyse() {
+	public String analyze(DashboardFile dashboardFile) {
+		Dashboard dashboard = dashboardFile.getDashboard(true);
 		StringBuffer buffer = new StringBuffer();
 		
 		buffer.append("===== BALANCE =====\n\n");
