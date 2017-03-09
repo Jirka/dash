@@ -3,8 +3,6 @@ package cz.vutbr.fit.dashapp.image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
-
 public class GrayMatrix {
 	
 	public static final int BLACK = 0;
@@ -198,6 +196,20 @@ public class GrayMatrix {
 		}
 	}
 	
+	public static class ThresholdCalculator implements PixelCalculator {
+		
+		private int threshold;
+		
+		public ThresholdCalculator(int threshold) {
+			this.threshold = threshold;
+		}
+
+		@Override
+		public int calculateValue(int value) {
+			return value > threshold ? WHITE : BLACK;
+		}
+	}
+	
 	public static int[][] update(int[][] matrix, PixelCalculator calculator, boolean createNew) {
 		int mW = matrix.length;
 		int mH = matrix[0].length;
@@ -217,99 +229,6 @@ public class GrayMatrix {
 			e.printStackTrace();
 		}
 		return updatedMatrix;
-	}
-
-	public static double meanValue(int[][] matrix) {
-		double mean = 0;
-		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		int size = mW*mH;
-		
-		if(size > 0) {
-			for (int i = 0; i < mW; i++) {
-				for (int j = 0; j < mH; j++) {
-					mean += matrix[i][j];
-				}
-			}
-			
-			mean = mean/(size);
-		}
-		
-		return mean;
-	}
-	
-	public static double varianceValue(int[][] matrix, double mean) {
-		double variance = 0.0;
-		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		int size = mW*mH;
-		
-		if(size > 0) {
-			int act;
-			for (int i = 0; i < mW; i++) {
-				for (int j = 0; j < mH; j++) {
-					act = matrix[i][j];
-					variance += (mean-act)*(mean-act);
-				}
-			}
-			variance = variance/(mW*mH);
-		}
-		
-		return variance;
-	}
-	
-	public static int minValue(int[][] matrix) {
-		int min = Integer.MAX_VALUE;
-		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		
-		int act;
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				act = matrix[i][j];
-				if(min > act) {
-					min = act;
-				}
-			}
-		}
-		
-		return min;
-	}
-	
-	public static int maxValue(int[][] matrix) {
-		int max = Integer.MIN_VALUE;
-		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		
-		int act;
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				act = matrix[i][j];
-				if(max < act) {
-					max = act;
-				}
-			}
-		}
-		
-		return max;
-	}
-	
-	public static double stdevValue(int[][] matrix, double variance) {
-		return Math.sqrt(variance);
-	}
-	
-	public static MeanSatistics meanStatistics(int[][] matrix) {
-		MeanSatistics statistics = new MeanSatistics();
-		statistics.mean = meanValue(matrix);
-		statistics.variance = varianceValue(matrix, statistics.mean);
-		statistics.stdev = stdevValue(matrix, statistics.variance);
-		statistics.min = minValue(matrix);
-		statistics.max = maxValue(matrix);
-		return statistics;
 	}
 
 	public static int[][] compareMatrices(int[][] matrix, int[][] matrix2) {

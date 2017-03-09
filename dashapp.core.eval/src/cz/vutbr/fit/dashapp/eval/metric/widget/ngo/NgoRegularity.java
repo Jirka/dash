@@ -1,8 +1,8 @@
 package cz.vutbr.fit.dashapp.eval.metric.widget.ngo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
@@ -15,7 +15,7 @@ public class NgoRegularity extends AbstractWidgetMetric {
 	
 	private int computeNumberOfSpacings(Dashboard dashboard, GEType[] types, int dimension) {
 		int n = dashboard.n(types);
-		if(dashboard.n(types) > 0) {
+		if(n > 0) {
 			int[] points = new int[n];
 			int i = 0;
 			for (GraphicalElement graphicalElement : dashboard.getChildren(types)) {
@@ -26,7 +26,7 @@ public class NgoRegularity extends AbstractWidgetMetric {
 			
 			int prev = points[0];
 			int d;
-			List<Integer> distances = new ArrayList<>();
+			Set<Integer> distances = new HashSet<>();
 			for(i = 1; i < n; i++) {
 				if(points[i] != prev) {
 					d = points[i] - prev;
@@ -47,14 +47,15 @@ public class NgoRegularity extends AbstractWidgetMetric {
 		double RM_alignment, RM_spacing;
 		int n_spacing = computeNumberOfSpacings(dashboard, types, Constants.X) + computeNumberOfSpacings(dashboard, types, Constants.Y);//4; // TODO
 		//int n_spacing = 16; // TODO
+		int n = dashboard.n(types);
 		
-		if(dashboard.n(types) == 1) {
+		if(n == 1) {
 			RM_alignment = RM_spacing = 1;
 		} else {
-			RM_alignment = 1-(((double) dashboard.getVAP(types)+dashboard.getHAP(types))/(2*dashboard.n(types)));
-			RM_spacing = 1-(((double) n_spacing-1)/(2*(dashboard.n(types)-1)));
-			System.out.println(RM_alignment);
-			System.out.println(RM_spacing);
+			RM_alignment = 1-(((double) dashboard.getVAP(types)+dashboard.getHAP(types))/(2*n));
+			RM_spacing = 1-(((double) n_spacing-1)/(2*(n-1)));
+			//System.out.println(RM_alignment);
+			//System.out.println(RM_spacing);
 		}
 		
 		/*double x = 0.37500;

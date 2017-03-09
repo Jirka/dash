@@ -43,13 +43,17 @@ public class DashboardCollection {
 	}
 	
 	public int[][] printDashboards(GEType[] types) {
+		return printDashboards(types, false);
+	}
+	
+	public int[][] printDashboards(GEType[] types, boolean excludeBorders) {
 		// init matrix
 		int[][] matrix = new int[width][height];
 		
 		// print dashboards
 		for (Dashboard dashboard : dashboards) {
 			boolean[][] dashboardMatrix = new boolean[dashboard.width][dashboard.height];
-			MatrixUtils.printDashboard(dashboardMatrix, dashboard, true, types);
+			MatrixUtils.printDashboard(dashboardMatrix, dashboard, true, types, excludeBorders);
 			for(int i = 0; i < dashboard.width; i++) {
 				for(int j = 0; j < dashboard.height; j++) {
 					if(dashboardMatrix[i][j]) {

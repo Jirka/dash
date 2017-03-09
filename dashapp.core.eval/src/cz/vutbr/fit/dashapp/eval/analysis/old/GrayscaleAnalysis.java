@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
+import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
@@ -20,7 +21,7 @@ public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 	
 	private void analyzeImage(StringBuffer buffer, BufferedImage image, Dashboard dashboard, int bit) {
 		int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
-		MatrixUtils.grayScale(matrix, false, false);
+		ColorMatrix.toGrayScale(matrix, false, false);
 		if(bit != 8) {
 			MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, bit)), false);
 		}

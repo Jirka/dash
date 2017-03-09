@@ -7,6 +7,7 @@ import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
+import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
@@ -66,7 +67,7 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 				appendValue(buffer, df, colorShare.measure(matrix, 4), 2, false);
 				
 				// Gray
-				int matrixGray[][] = MatrixUtils.grayScale(matrix, false, true);
+				int matrixGray[][] = ColorMatrix.toGrayScale(matrix, false, true);
 				// 8 bit
 				int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(matrixGray, true);
 				int histogram[] = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
@@ -84,7 +85,7 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixGrayValue), 1, true);
 				
 				// BW
-				int matrixBW[][] = MatrixUtils.grayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+				int matrixBW[][] = ColorMatrix.toGrayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
 				appendValue(buffer, df, (new BlackDensity()).measureGrayMatrix(matrixBW), 2, false);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixBW), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixBW), 1, true);

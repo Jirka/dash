@@ -22,7 +22,7 @@ import cz.vutbr.fit.dashapp.util.FileUtils;
 public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculator {
 	
 	private static final String LABEL = "Entrophy Analysis";
-	private static final String FILE = "_enthropy";
+	private static final String FILE = "_enthropy_log";
 	
 	Map<String, MeanSatistics> meanValues;
 	Map<String, MeanSatistics> meanValuesCrop;
@@ -42,20 +42,23 @@ public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculato
 	@Override
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
 		this.actDashboardsCount = actDashboards.length;
-		int[][] heatMap = actDashboards.printDashboards(null);
+		int[][] heatMap = actDashboards.printDashboards(null, true);
 		GrayMatrix.update(heatMap, new EntrophyNormalization(actDashboardsCount), false);
-		MeanSatistics meanValue = GrayMatrix.meanStatistics(heatMap);
+		MeanSatistics meanValue = MathUtils.meanStatistics(heatMap);
 		meanValues.put(actWorkspaceFolder.getFileName(), meanValue);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, heatMap);
 		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE);
 		
-		DashboardCollection cropDashboard = DashAppUtils.makeDashboardCollection(actWorkspaceFolder.getChildren(DashboardFile.class, actWorkspaceFolder.getFileName() + "-crop", false));
+		DashboardCollection cropDashboard = DashAppUtils.makeDashboardCollection(
+				actWorkspaceFolder.getChildren(
+						DashboardFile.class, actWorkspaceFolder.getFileName().substring(1) + "-crop", false
+				));
 		if(cropDashboard.length == 1) {
 			Dashboard dashboard = cropDashboard.dashboards[0];
 			Rectangle cropRectangle = new Rectangle(dashboard.x, dashboard.y, dashboard.width, dashboard.height);
 			heatMap = GrayMatrix.cropMatrix(heatMap, cropRectangle);
 			//meanValuesCrop.put(actWorkspaceFolder.getFileName(), GrayMatrix.meanStatistics(cmpMap));
-			meanValue = GrayMatrix.meanStatistics(heatMap);
+			meanValue = MathUtils.meanStatistics(heatMap);
 			meanValuesCrop.put(actWorkspaceFolder.getFileName(), meanValue);
 			image = GrayMatrix.printMatrixToImage(null, heatMap);
 			FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_x");
@@ -64,21 +67,23 @@ public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculato
 
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
-		// do nothing
 		StringBuffer sb = new StringBuffer();
 		/*for (Entry<String, MeanSatistics> entry : meanValues.entrySet()) {
 			sb.append(entry.getKey() + " " + (GrayMatrix.WHITE - ((int) entry.getValue().mean)) + " " + (int) entry.getValue().stdev + "\n");
 		}*/
 		for (WorkspaceFolder workspaceFolder : analyzedFolders) {
 			String key = workspaceFolder.getFileName();
-			 MeanSatistics entry = meanValues.get(key);
-			 MeanSatistics entryCrop = meanValuesCrop.get(key);
-			sb.append(workspaceFolder.getFileName() + " " + (GrayMatrix.WHITE - ((int) entry.mean)) + " " + (int) entry.stdev + "\n");
-			sb.append(workspaceFolder.getFileName() + " " + (GrayMatrix.WHITE - ((int) entryCrop.mean)) + " " + (int) entryCrop.stdev + "\n");
-			sb.append((GrayMatrix.WHITE - ((int) entryCrop.mean))-(GrayMatrix.WHITE - ((int) entry.mean)) + "\n");
-			sb.append("-----------------\n");
+			MeanSatistics entry = meanValues.get(key);
+			MeanSatistics entryCrop = meanValuesCrop.get(key);
+			
+			sb.append(workspaceFolder.getFileName() + " " + (GrayMatrix.WHITE - ((int) entry.mean))/255.0 + " " + (GrayMatrix.WHITE - ((int) entryCrop.mean))/255.0 + "\n");
+			 
+			//sb.append(workspaceFolder.getFileName() + " " + (GrayMatrix.WHITE - ((int) entry.mean)) + " " + (int) entry.stdev + "\n");
+			//sb.append(workspaceFolder.getFileName() + " " + (GrayMatrix.WHITE - ((int) entryCrop.mean)) + " " + (int) entryCrop.stdev + "\n");
+			//sb.append((GrayMatrix.WHITE - ((int) entryCrop.mean))-(GrayMatrix.WHITE - ((int) entry.mean)) + "\n");
+			//sb.append("-----------------\n");
 		}
-		FileUtils.saveTextFile(sb.toString(), actWorkspaceFolder.getPath(), "mean_entrophies");
+		FileUtils.saveTextFile(sb.toString(), actWorkspaceFolder.getPath() + "/_results", "mean_entrophies_borders_log");
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoEquilibrium;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoHomogenity;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRhythm;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSequence;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSimplicity;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSymmetry;
@@ -47,6 +48,7 @@ public class WidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 			formatMetric(buffer, new NgoRegularity().measure(dashboard, GEType.ALL_TYPES), df);
 			formatMetric(buffer, new NgoEconomy().measure(dashboard, GEType.ALL_TYPES), df);
 			formatMetric(buffer, new NgoHomogenity().measure(dashboard, GEType.ALL_TYPES), df);
+			formatMetric(buffer, new NgoRhythm().measure(dashboard, GEType.ALL_TYPES), df);
 		}
 		
 		return buffer.toString();

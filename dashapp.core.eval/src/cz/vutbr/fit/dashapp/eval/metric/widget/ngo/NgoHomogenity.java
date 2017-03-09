@@ -2,6 +2,9 @@ package cz.vutbr.fit.dashapp.eval.metric.widget.ngo;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
+import cz.vutbr.fit.dashapp.eval.util.QuadrantMap;
+import cz.vutbr.fit.dashapp.eval.util.QuadrantResolver;
+import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
@@ -9,8 +12,8 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 public class NgoHomogenity extends AbstractWidgetMetric {
 	
 	// TODO
-	private int fact(int n) {
-		int result = 1;
+	private double fact(int n) {
+		double result = 1;
 		for (int i = 1; i <= n; i++) {
 			result = result * i;
 		}
@@ -19,38 +22,26 @@ public class NgoHomogenity extends AbstractWidgetMetric {
 
 	@Override
 	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
-		double N = fact(dashboard.n(types));
 		
-		double centerX = dashboard.halfSizeX();
-		double centerY = dashboard.halfSizeY();
-		double dx, dy;
-		int countA = 0, countB = 0, countC = 0, countD = 0;
-		for (GraphicalElement graphicalElement : dashboard.getChildren(types)) {
-			dx = graphicalElement.dx(centerX);
-			dy = graphicalElement.dy(centerY);
-			if(dx <= 0) {
-				if(dy <= 0) {
-					countA++;
-				}
-				
-				if(dy >= 0) {
-					countB++;
-				}
-			}
+		QuadrantMap<Integer> quadrants = new QuadrantMap<Integer>(0);
+		
+		// calculate occurence of graphical elements in quadrants
+		new QuadrantResolver() {
 			
-			if(dx >= 0) {
-				if(dy <= 0) {
-					countC++;
-				}
-				
-				if(dy >= 0) {
-					countD++;
-				}
+			@Override
+			protected void performAll(GraphicalElement graphicalElement) {
+				quadrants.replace(this.q, quadrants.get(q)+1);
 			}
-		}
+		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
+		int countA = quadrants.get(Quadrant.I), countB = quadrants.get(Quadrant.II), countC = quadrants.get(Quadrant.III), countD = quadrants.get(Quadrant.IV);
 		
-		double W = ((double) N)/(fact(countA)*fact(countB)*fact(countC)*fact(countD));
-		double W_max = ((double) N)/Math.pow((((double) N)/24), 4);
+		int n = countA+countB+countC+countD;//dashboard.n(types);
+		double N = fact(n);
+		
+		double j=(fact(countA)*fact(countB)*fact(countC)*fact(countD));
+		double W = N/j;
+		double jj = Math.pow(fact(n/4), 4);
+		double W_max = N/jj;
 		
 		/*System.out.println("n = " + dashboard.n());
 		System.out.println("n! = " + N);

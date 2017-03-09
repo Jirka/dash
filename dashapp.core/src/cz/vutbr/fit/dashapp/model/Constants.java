@@ -31,4 +31,22 @@ public interface Constants {
 			return index;
 		}
 	}
+	
+	// quadrants
+	public enum Side {
+		LEFT(0),
+		RIGHT(1),
+		UP(2),
+		DOWN(3);
+		
+		private int index;
+
+		private Side(int index) {
+			this.index = index;
+		}
+		
+		public int getIndex() {
+			return index;
+		}
+	}
 }

@@ -14,15 +14,16 @@ import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.image.GrayMatrix;
+import cz.vutbr.fit.dashapp.image.MathUtils;
 import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.PixelCalculator;
+import cz.vutbr.fit.dashapp.image.GrayMatrix.ThresholdCalculator;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
 
-public class WidgetAnalysis extends AbstractAnalysis implements PixelCalculator {
+public class WidgetAnalysis extends AbstractAnalysis {
 	
 	public static final String LABEL = "Widget Detection";
 	public static final String FILE = "_widget";
@@ -42,32 +43,24 @@ public class WidgetAnalysis extends AbstractAnalysis implements PixelCalculator 
 	@Override
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
 		this.actDashboardsCount = actDashboards.length;
-		int[][] heatMatrix = actDashboards.printDashboards(null);
-		int[][] meanMatrix = GrayMatrix.normalize(heatMatrix, actDashboards.length, true);
-		actHeatMean = GrayMatrix.meanValue(meanMatrix);
-		int[][] entrophyMatrix = GrayMatrix.update(heatMatrix, new EntrophyNormalization(actDashboardsCount), true);
-		actInversedEntrophyMean = GrayMatrix.WHITE-GrayMatrix.meanValue(entrophyMatrix);
-		System.out.println(actInversedEntrophyMean);
+		int[][] printMatrix = actDashboards.printDashboards(null, true);
+		int[][] heatMatrix = GrayMatrix.normalize(printMatrix, actDashboards.length, true);
+		actHeatMean = MathUtils.meanValue(heatMatrix);
+		int[][] entrophyMatrix = GrayMatrix.update(printMatrix, new EntrophyNormalization(actDashboardsCount), true);
+		actInversedEntrophyMean = GrayMatrix.WHITE-MathUtils.meanValue(entrophyMatrix);
 		actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
-		int[][] thresholdMatrix = GrayMatrix.update(heatMatrix, this, false);
+		int[][] thresholdMatrix = GrayMatrix.update(heatMatrix, new ThresholdCalculator((int)actThreshlod), false);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, thresholdMatrix);
 		Dashboard dashboard = generateDashboard(thresholdMatrix, image);
-		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_t");
-		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_t");
-		FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_t");
-		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_t");
+		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_tb1");
+		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_tb1");
+		FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
 	}
 
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
 		// do nothing
-	}
-	
-	@Override
-	public int calculateValue(int value) {
-		int grayIntensity = GrayMatrix.toGray((double) value/actDashboardsCount);
-		grayIntensity = grayIntensity > actThreshlod ? GrayMatrix.WHITE : GrayMatrix.BLACK;
-		return grayIntensity;
 	}
 	
 	private Dashboard generateDashboard(int[][] thresholdMatrix, BufferedImage image) {
@@ -182,6 +175,10 @@ public class WidgetAnalysis extends AbstractAnalysis implements PixelCalculator 
                 			
                 			// log the line to the outpu image
                 			line.draw(image, Color.RED.getRGB());
+                		} else {
+                			if(colorShare > 0.75) {
+                				dashboard.addChildGE(new GraphicalElement(dashboard, rectangle.x, rectangle.y, rectangle.width, rectangle.height));
+                			}
                 		}
                 	}
         		}

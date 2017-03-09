@@ -1,7 +1,11 @@
 package cz.vutbr.fit.dashapp.util;
 
 import java.awt.Color;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,10 +22,28 @@ public class MatrixUtils {
 	
 	public interface ColorChannel {
 		public enum ColorChannelType {
-			HUE, SATURATION, BRIGHTNESS, LIGHTNESS, A, B, CHROMA
+			HUE, SATURATION, BRIGHTNESS, LIGHTNESS, A, B, CHROMA, GRAY
 		}
 		
 		public double getColorChannel(ColorChannelType type);
+	}
+	
+	public static class Gray implements ColorChannel {
+		public int grayValue;
+		
+		public Gray(int rgb) {
+			this.grayValue = getGrayScaleValue(getRed(rgb), getGreen(rgb), getBlue(rgb));
+		}
+
+		@Override
+		public double getColorChannel(ColorChannelType type) {
+			switch (type) {
+				case GRAY:
+					return grayValue;
+				default:
+					return 0;
+			}
+		}
 	}
 	
 	public static class HSB implements ColorChannel {
@@ -64,9 +86,9 @@ public class MatrixUtils {
 			//float[] rgbvals = { ((float) getRed(rgb))/255, ((float) getGreen(rgb))/255, ((float) getBlue(rgb))/255 } ;
 			//float[] lchvals = cielab.fromRGB(rgbvals);
 			double[] lchvals = toColorSpace(rgb);
-			if(lchvals[0] == 0) {
+			/*if(lchvals[0] == 0) {
 				lchvals = toColorSpace(rgb);
-			}
+			}*/
 			this.l = lchvals[0];
 			this.a = lchvals[1];
 			this.b = lchvals[2];
@@ -178,9 +200,9 @@ public class MatrixUtils {
 	
 	public static int getGrayScale(int r, int g, int b) {
 		int gray = getGrayScaleValue(r, g, b);
-		if(gray < 0 && gray >= 256) {
+		/*if(gray < 0 && gray >= 256) {
 			System.out.println(gray);
-		}
+		}*/
 		return getRGB(gray, gray, gray);
 	}
 
@@ -196,38 +218,109 @@ public class MatrixUtils {
 			}
 		}*/
 	}
-
+	
+	public static boolean[][] printDashboard(Dashboard dashboard, boolean clear, GEType[] types) {
+		boolean[][] matrix = new boolean[dashboard.width][dashboard.height];
+		printDashboard(matrix, dashboard, clear, types, false);
+		return matrix;
+	}
+	
 	public static void printDashboard(boolean[][] matrix, Dashboard dashboard, boolean clear, GEType[] types) {
+		printDashboard(matrix, dashboard, clear, types, false);
+	}
+
+	public static void printDashboard(boolean[][] matrix, Dashboard dashboard, boolean clear, GEType[] types, boolean excludeBorders) {
 		if(clear) {
 			initMattrix(matrix, false);
 		}
 		List<GraphicalElement> graphicalElements = dashboard.getChildren(types);
 		for(GraphicalElement graphicalElement : graphicalElements) {
-			printGraphicalElement(matrix, graphicalElement);
+			printGraphicalElement(matrix, graphicalElement, excludeBorders);
 		}
 	}
-
+	
 	public static void printGraphicalElement(boolean[][] matrix, GraphicalElement graphicalElement) {
+		printGraphicalElement(matrix, graphicalElement, false);
+	}
+
+	public static void printGraphicalElement(boolean[][] matrix, GraphicalElement graphicalElement, boolean excludeBorders) {
 		// optimization
 		int x2 = graphicalElement.x2();
 		int y2 = graphicalElement.y2();
+		
+		int x1 = excludeBorders ? (graphicalElement.x+1) : graphicalElement.x;
+		int y1 = excludeBorders ? (graphicalElement.y+1) : graphicalElement.y;
+		x2 = excludeBorders ? (x2-1) : x2;
+		y2 = excludeBorders ? (y2-1) : y2;
+		
 		// print
-		for(int i = graphicalElement.x; i < x2; i++) {
-			for(int j = graphicalElement.y; j < y2; j++) {
+		for(int i = x1; i < x2; i++) {
+			for(int j = y1; j < y2; j++) {
 				matrix[i][j] = true;
 			}
 		}
 	}
 	
 	public static int[][] printBufferedImage(BufferedImage image) {
-		int[][] matrix = new int[image.getWidth()][image.getHeight()];
-		for (int i = 0; i < image.getWidth(); i++) {
-			for (int j = 0; j < image.getHeight(); j++) {
-				matrix[i][j] = image.getRGB(i, j);
+		int mW = image.getWidth();
+		int mH = image.getHeight();
+		int[][] matrix = new int[mW][mH];
+		int[] pixels = image.getRGB(0, 0, mW, mH, null, 0, mW);;
+		int k = 0;
+		for (int j = 0; j < mH; j++) {
+			for (int i = 0; i < mW; i++) {
+				matrix[i][j] = pixels[k];
+				//matrix[i][j] = image.getRGB(i, j);
+				k++;
 			}
+			
 		}
+		//int[][] matrix = convertTo2DWithoutUsingGetRGB(image);
 		return matrix;
 	}
+	
+	/*private static int[][] convertTo2DWithoutUsingGetRGB(BufferedImage image) {
+
+	      final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+	      final int width = image.getWidth();
+	      final int height = image.getHeight();
+	      final boolean hasAlphaChannel = image.getAlphaRaster() != null;
+
+	      int[][] result = new int[width][height];
+	      if (hasAlphaChannel) {
+	         final int pixelLength = 4;
+	         for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+	            int argb = 0;
+	            argb += (((int) pixels[pixel] & 0xff) << 24); // alpha
+	            argb += ((int) pixels[pixel + 1] & 0xff); // blue
+	            argb += (((int) pixels[pixel + 2] & 0xff) << 8); // green
+	            argb += (((int) pixels[pixel + 3] & 0xff) << 16); // red
+	            result[col][row] = argb;
+	            col++;
+	            if (col == width) {
+	               col = 0;
+	               row++;
+	            }
+	         }
+	      } else {
+	         final int pixelLength = 3;
+	         for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
+	            int argb = 0;
+	            argb += -16777216; // 255 alpha
+	            argb += ((int) pixels[pixel] & 0xff); // blue
+	            argb += (((int) pixels[pixel + 1] & 0xff) << 8); // green
+	            argb += (((int) pixels[pixel + 2] & 0xff) << 16); // red
+	            result[col][row] = argb;
+	            col++;
+	            if (col == width) {
+	               col = 0;
+	               row++;
+	            }
+	         }
+	      }
+
+	      return result;
+	   }*/
 	
 	/*public static int[][] printBufferedImage(BufferedImage image, Dashboard dashboard) {
 		int[][] matrix = new int[dashboard.width][dashboard.height];
@@ -442,6 +535,21 @@ public class MatrixUtils {
 		return workingCopy;
 	}
 	
+	public static int calculatePixels(boolean[][] matrix) {
+		int sum = 0;
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				if(matrix[i][j]) {
+					sum++;
+				}
+			}
+		}
+		return sum;
+	}
+	
 	public static int[][] grayScale(int[][] matrix, boolean rawValues, boolean createCopy) {
 		int[][] workingCopy = matrix;
 		if(matrix.length > 0) {
@@ -582,6 +690,46 @@ public class MatrixUtils {
 			return matrixLCH;
 		}
 		return null;
+	}
+	
+	public static Gray[][] RGBtoGray(int[][] matrix) {
+		if(matrix.length > 0) {
+			Gray[][] matrixGray = new Gray[matrix.length][matrix[0].length];
+			for (int i = 0; i < matrix.length; i++) {
+				for (int j = 0; j < matrix[i].length; j++) {
+					matrixGray[i][j] = new Gray(matrix[i][j]);
+				}
+			}
+			return matrixGray;
+		}
+		return null;
+	}
+	
+	public static ColorChannel[][] cropMatrix(ColorChannel[][] matrix, Rectangle cropRectangle) {
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int x1 = Math.min(cropRectangle.x, mW);
+		int x2 = Math.min(cropRectangle.x+cropRectangle.width, mW);
+		int y1 = Math.min(cropRectangle.y, mH);
+		int y2 = Math.min(cropRectangle.y+cropRectangle.height, mH);
+		
+		int cW = x2-x1; 
+		int cH = y2-y1;
+		
+		if(cW <= 0 && cH <= 0) {
+			return new ColorChannel[0][0];
+		}
+		
+		ColorChannel[][] cropMatrix = new ColorChannel[cW][cH];
+		
+		for (int ci = 0, i = cropRectangle.x; ci < cW; ci++, i++) {
+			for (int cj = 0, j = cropRectangle.y; cj < cH; cj++, j++) {
+				cropMatrix[ci][cj] = matrix[i][j];
+			}
+		}
+		
+		return cropMatrix;
 	}
 	
 	public static double getColorChannelMean(ColorChannel[][] matrix, ColorChannelType type) {

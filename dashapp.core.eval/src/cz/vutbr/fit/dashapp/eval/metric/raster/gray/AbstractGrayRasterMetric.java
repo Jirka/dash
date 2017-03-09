@@ -2,6 +2,7 @@ package cz.vutbr.fit.dashapp.eval.metric.raster.gray;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.IRasterMetric;
+import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.util.MatrixUtils;
@@ -20,7 +21,7 @@ public abstract class AbstractGrayRasterMetric implements IRasterMetric {
 	
 	@Override
 	public MetricResult[] measure(int matrix[][]) {
-		int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(MatrixUtils.grayScale(matrix, false, true), true);
+		int matrixGrayValue[][] = ColorMatrix.toGrayScale(matrix, true, true);
 		return measureGrayMatrix(matrixGrayValue);
 	}
 

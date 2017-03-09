@@ -23,7 +23,7 @@ public class Dashboard extends GraphicalElement {
 	/**
 	 * dashboard physical representation (image or structural description)
 	 */
-	private DashboardFile dashboardFile;
+	private IDashboardFile dashboardFile;
 	
 	/**
 	 * flag which specifies whether dashboard has already been initialized
@@ -74,7 +74,7 @@ public class Dashboard extends GraphicalElement {
 	 * 
 	 * @return dashboard file
 	 */
-	public DashboardFile getDashboardFile() {
+	public IDashboardFile getDashboardFile() {
 		return dashboardFile;
 	}
 	
@@ -84,9 +84,8 @@ public class Dashboard extends GraphicalElement {
 	 * 
 	 * @param dashboardFile
 	 */
-	public void setDashboardFile(DashboardFile dashboardFile) {
+	public void setDashboardFile(IDashboardFile dashboardFile) {
 		this.dashboardFile = dashboardFile;
-		this.dashboardFile.setDashboard(this);
 	}
 	
 	@Override
@@ -184,11 +183,12 @@ public class Dashboard extends GraphicalElement {
 	 * @return area which is used by child elements
 	 */
 	public int getElementsArea(GEType[] types) {
-		int areas = 0;
+		/*int areas = 0;
 		for (GraphicalElement graphicalElement : this.getChildren(types)) {
 			areas += graphicalElement.area();
-		}
-		return areas;
+		}*/
+		boolean matrix[][] = MatrixUtils.printDashboard(this, true, GEType.ALL_TYPES);
+		return MatrixUtils.calculatePixels(matrix);
 	}
 	
 	/**
@@ -215,7 +215,8 @@ public class Dashboard extends GraphicalElement {
 	 */
 	public int getHAP(GEType[] types) {
 		Set<Integer> listX = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getChildren(types)) {
+		List<GraphicalElement> actChildren = this.getChildren(types);
+		for (GraphicalElement graphicalElement : actChildren) {
 			if(!listX.contains(graphicalElement.x)) {
 				listX.add(graphicalElement.x);
 			}
@@ -230,12 +231,27 @@ public class Dashboard extends GraphicalElement {
 	 */
 	public int getVAP(GEType[] types) {
 		Set<Integer> listY = new HashSet<Integer>();
-		for (GraphicalElement graphicalElement : this.getChildren(types)) {
+		List<GraphicalElement> actChildren = this.getChildren(types);
+		for (GraphicalElement graphicalElement : actChildren) {
 			if(!listY.contains(graphicalElement.y)) {
 				listY.add(graphicalElement.y);
 			}
 		}
 		return listY.size();
+	}
+	
+	public Dashboard copy() {
+		Dashboard d = new Dashboard();
+		d.setParent(d);
+		d.setDimension(this.x, this.y, this.width, this.height);
+		List<GraphicalElement> children = getChildren();
+		if(children != null) {
+			for (GraphicalElement childGE : children) {
+				GraphicalElement childGECopy = childGE.copy();
+				d.addChildGE(childGECopy);
+			}
+		}
+		return d;
 	}
 	
 	public Dashboard copy(Rectangle cr, int tolerance) {

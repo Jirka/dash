@@ -29,6 +29,7 @@ import dashapp.core.eval.analysis.heatmap.CompareAnalysis;
 import dashapp.core.eval.analysis.heatmap.EdgesAnalysis;
 import dashapp.core.eval.analysis.heatmap.EntrophyAnalysis;
 import dashapp.core.eval.analysis.heatmap.HeatMapAnalysis;
+import dashapp.core.eval.analysis.heatmap.HeatMapMetricAnalysis;
 import dashapp.core.eval.analysis.heatmap.ThresholdAnalysis;
 import dashapp.core.eval.analysis.heatmap.WidgetAnalysis;
 import dashapp.core.eval.analysis.heatmap.WidgetMetricAnalysis;
@@ -81,6 +82,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		heatmapActions.add(new EdgesAnalysis());
 		heatmapActions.add(new WidgetAnalysis());
 		heatmapActions.add(new CompareAnalysis());
+		heatmapActions.add(new HeatMapMetricAnalysis());
 		heatmapActions.add(new WidgetMetricAnalysis());
 		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysis[heatmapActions.size()])));
 	}

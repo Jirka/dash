@@ -12,6 +12,7 @@ import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.model.IDashboardFile;
 import cz.vutbr.fit.dashapp.model.SerializedDashboard;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
 import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent.Change;
@@ -128,7 +129,7 @@ public class EventManager {
 		// if change has been made, XML needs to be updated and change event needs to be fired 
 		if(copy != null) {
 			// update dashboard serialized definition (serialization problem should not occur)
-			DashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
+			IDashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
 			String oldXML = dashboardFile.getSerializedDashboard().getXml();
 			String newXML = XMLUtils.serialize(ge.getDashboard());
 			dashboardFile.getSerializedDashboard().setXml(newXML);
@@ -212,7 +213,7 @@ public class EventManager {
 			GraphicalElement copy = ge.copy();
 			ge.type = type;
 			// update dashboard serialized definition (serialization problem should not occur)
-			DashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
+			IDashboardFile dashboardFile = ge.getDashboard().getDashboardFile();
 			String oldXML = dashboardFile.getSerializedDashboard().getXml();
 			String newXML = XMLUtils.serialize(dashboardFile);
 			dashboardFile.getSerializedDashboard().setXml(newXML);
@@ -236,7 +237,7 @@ public class EventManager {
 			// delete from parent
 			parent.deleteChildGE(selectedElement);
 			// update dashboard serialized definition (serialization problem should not occur)
-			DashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
+			IDashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
 			String oldXML = dashboardFile.getSerializedDashboard().getXml();
 			String newXML = XMLUtils.serialize(dashboardFile);
 			dashboardFile.getSerializedDashboard().setXml(newXML);
@@ -270,7 +271,7 @@ public class EventManager {
 		// add to parent
 		parent.addChildGE(graphicalElement);
 		// update dashboard serialized definition (serialization problem should not occur)
-		DashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
+		IDashboardFile dashboardFile = parent.getDashboard().getDashboardFile();
 		String oldXML = dashboardFile.getSerializedDashboard().getXml();
 		String newXML = XMLUtils.serialize(dashboardFile);
 		dashboardFile.getSerializedDashboard().setXml(newXML);
@@ -289,7 +290,7 @@ public class EventManager {
 	 * 
 	 * @param dashboardFile
 	 */
-	public void updateDashboardFileState(DashboardFile dashboardFile) {
+	public void updateDashboardFileState(IDashboardFile dashboardFile) {
 		boolean shouldBeDirty = !dashboardFile.getSerializedDashboard().getXml().equals(dashboardFile.getXML());
 		if(dashboardFile.getSerializedDashboard().isDirty() != shouldBeDirty) {
 			dashboardFile.getSerializedDashboard().setDirty(shouldBeDirty);

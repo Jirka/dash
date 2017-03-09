@@ -31,7 +31,7 @@ public class NgoEquilibrium extends AbstractWidgetMetric {
 		
 		double EM_x = 0.0;
 		double EM_y = 0.0;
-		int areas = 0;
+		double areas = 0;
 		
 		for (GraphicalElement graphicalElement : dashboard.getChildren(types)) {
 			int area = graphicalElement.area();
@@ -40,9 +40,10 @@ public class NgoEquilibrium extends AbstractWidgetMetric {
 			areas += area;
 		}
 		
-		int elemCount = dashboard.n(types);
-		EM_x = 2*EM_x/(elemCount*dashboard.width*areas);
-		EM_y = 2*EM_y/(elemCount*dashboard.height*areas);
+		//double elemCount = dashboard.n(types);
+		EM_x = (2*EM_x)/(/*elemCount**/dashboard.width*areas);
+		EM_y = (2*EM_y)/(/*elemCount**/dashboard.height*areas);
+		// it makes no sense to apply elemCount in equation (mistake in the paper?)
 		
 		return new MetricResult[] { 
 				new MetricResult("Equilibrium", "EM", 1-(Math.abs(EM_x)+Math.abs(EM_y))/2.0),

@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import cz.vutbr.fit.dashapp.Logger;
+import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
 
 /**
@@ -19,7 +20,7 @@ import cz.vutbr.fit.dashapp.util.XMLUtils;
  * @author Jiri Hynek
  *
  */
-public class DashboardFile extends WorkspaceFile implements IWorkspaceFile {
+public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 
 	private File imageFile;
 	private File xmlFile;
@@ -45,6 +46,11 @@ public class DashboardFile extends WorkspaceFile implements IWorkspaceFile {
 		serializedDashboard = new SerializedDashboard();
 		cachedXMLFile = null;
 		setFile(file);
+	}
+	
+	public DashboardFile(DashAppModel model) {
+		super(model);
+		// temporary virtual dashboard file
 	}
 
 	public void setFile(File file) {
@@ -205,7 +211,16 @@ public class DashboardFile extends WorkspaceFile implements IWorkspaceFile {
 		out.close();
 	}
 
-	public Object getXML() {
+	public String getXML() {
 		return cachedXMLFile;
+	}
+
+	@Override
+	public int[][] getImageMatrix() {
+		BufferedImage image = getImage();
+		if(image != null) {
+			return MatrixUtils.printBufferedImage(image);
+		}
+		return null;
 	}
 }

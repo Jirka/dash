@@ -8,6 +8,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
+import cz.vutbr.fit.dashapp.model.Constants.Side;
 
 /**
  * 
@@ -279,29 +280,149 @@ public class GraphicalElement {
 	 */
 	public double area(Quadrant q) {
 		Dashboard dashboard = getDashboard();
-		double dx = 0;
-		double dy = 0;
+		double cx = dashboard.centerX();
+		double cy = dashboard.centerY();
+		double x1 = absoluteX();
+		double x2 = absoluteX()+width;
+		double y1 = absoluteY();
+		double y2 = absoluteY()+height;
 		switch (q) {
-		case I:
-			dx = dashboard.halfSizeX()-x;
-			dy = dashboard.halfSizeY()-y;
-			break;
-		case II:
-			dx = x2()-dashboard.halfSizeX();
-			dy = dashboard.halfSizeY()-y;
-			break;
-		case III:
-			dx = dashboard.halfSizeX()-x;
-			dy = y2()-dashboard.halfSizeY();
-			break;
-		case IV:
-			dx = x2()-dashboard.halfSizeX();
-			dy = y2()-dashboard.halfSizeY();
-			break;
+			case I:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case II:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case III:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
+			case IV:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
 		}
 		
-		return Math.min(dx, width)
-				* Math.min(dy, height);
+		return (x2-x1)*(y2-y1);
+	}
+	
+	/**
+	 * Returns area which lays in specific dashboard side.
+	 * 
+	 * @param s
+	 * @return area of dashboard side.
+	 */
+	public double area(Side s) {
+		Dashboard dashboard = getDashboard();
+		double cx = dashboard.centerX();
+		double cy = dashboard.centerY();
+		double x1 = absoluteX();
+		double x2 = absoluteX()+width;
+		double y1 = absoluteY();
+		double y2 = absoluteY()+height;
+		switch (s) {
+			case LEFT:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(0, Math.min(y1, dashboard.height));
+				y2 = Math.max(0, Math.min(y2, dashboard.height));
+				break;
+			case RIGHT:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, dashboard.height));
+				y2 = Math.max(0, Math.min(y2, dashboard.height));
+				break;
+			case UP:
+				x1 = Math.max(0, Math.min(x1, dashboard.width));
+				x2 = Math.max(0, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case DOWN:
+				x1 = Math.max(0, Math.min(x1, dashboard.width));
+				x2 = Math.max(0, Math.min(x2, dashboard.width));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
+		}
+		
+		return (x2-x1)*(y2-y1);
+	}
+	
+	/**
+	 * Returns distance between center of dashboard and far border.
+	 * 
+	 * @param s
+	 * @return distance between far border of GE and center of dashboard.
+	 */
+	public double depth(Side s) {
+		GraphicalElement dashboard = getParent();
+		double depth = 0.0;
+		switch (s) {
+			case LEFT:
+				depth = dashboard.centerX()-absoluteX();
+				break;
+			case RIGHT:
+				depth = absoluteX()+width-dashboard.centerX();
+				break;
+			case UP:
+				depth = dashboard.centerY()-absoluteY();
+				break;
+			case DOWN:
+				depth = absoluteY()+height-dashboard.centerY();
+				break;
+		}
+		
+		return depth;
+	}
+	
+	public Rectangle getRectangle(Side s) {
+		Dashboard dashboard = getDashboard();
+		double cx = dashboard.centerX();
+		double cy = dashboard.centerY();
+		double x1 = absoluteX();
+		double x2 = absoluteX()+width;
+		double y1 = absoluteY();
+		double y2 = absoluteY()+height;
+		switch (s) {
+			case LEFT:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(0, Math.min(y1, dashboard.height));
+				y2 = Math.max(0, Math.min(y2, dashboard.height));
+				break;
+			case RIGHT:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, dashboard.height));
+				y2 = Math.max(0, Math.min(y2, dashboard.height));
+				break;
+			case UP:
+				x1 = Math.max(0, Math.min(x1, dashboard.width));
+				x2 = Math.max(0, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case DOWN:
+				x1 = Math.max(0, Math.min(x1, dashboard.width));
+				x2 = Math.max(0, Math.min(x2, dashboard.width));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
+		}
+		
+		return new Rectangle((int) x1, (int) y1, (int) Math.round(x2-x1), (int) Math.round(y2-y1));
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import cz.vutbr.fit.dashapp.eval.metric.widget.basic.Area;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoCohesion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
+import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
@@ -99,7 +100,7 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					rgb12firstSecond.add(new Double((double) result[7].value));
 					
 					// Gray 4 bit
-					int matrixGray[][] = MatrixUtils.grayScale(matrix, false, true);
+					int matrixGray[][] = ColorMatrix.toGrayScale(matrix, false, true);
 					int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(MatrixUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), false);
 					int histogram[] = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
 					
@@ -120,7 +121,7 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					rgb4Symmetry.add(new Double((double) result[0].value));
 					
 					// BW 1 bit
-					int matrixBW[][] = MatrixUtils.grayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+					int matrixBW[][] = ColorMatrix.toGrayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
 					bwBlack.add(new Double((double) (new BlackDensity()).measureGrayMatrix(matrixBW)[0].value));
 				}
 				
