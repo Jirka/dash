@@ -5,6 +5,7 @@ public class MetricResult {
 	public String name;
 	public String inicials;
 	public Object value;
+	public boolean disabled = false;
 	
 	public MetricResult(String name, String initials, Object value) {
 		this.name = name;

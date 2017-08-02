@@ -5,10 +5,11 @@ import java.text.DecimalFormat;
 
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
 public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 	
@@ -20,14 +21,14 @@ public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 	}
 	
 	private void analyzeImage(StringBuffer buffer, BufferedImage image, Dashboard dashboard, int bit) {
-		int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
+		int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
 		ColorMatrix.toGrayScale(matrix, false, false);
 		if(bit != 8) {
-			MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, bit)), false);
+			PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, bit)), false);
 		}
-		MatrixUtils.grayScaleToValues(matrix, false);
+		ColorMatrix.toGrayScale(matrix, true, false);
 		
-		int histogram[] = MatrixUtils.getGrayscaleHistogram(matrix);
+		int histogram[] = HistogramUtils.getGrayscaleHistogram(matrix);
 		
 		buffer.append("===== " + bit + " bit (" + (int)(Math.pow(2, bit)) + " colors) =====\n");
 		formatMetric(buffer, new BackgroundShare().measureGrayHistogram(histogram), df);

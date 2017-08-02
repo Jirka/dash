@@ -1,14 +1,14 @@
 package cz.vutbr.fit.dashapp.eval.metric.raster.color;
 
+import cz.vutbr.fit.dashapp.eval.metric.AbstractMetric;
 import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorChannelUtils;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorSpace;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
 
-public class Colorfulness implements IMetric {
+public class Colorfulness extends AbstractMetric implements IMetric {
 	
 	@Override
 	public MetricResult[] measure(DashboardFile dashboardFile) {
@@ -22,9 +22,9 @@ public class Colorfulness implements IMetric {
 		return null;
 	}
 
-	public MetricResult[] measure(ColorChannel[][] matrix, ColorChannelType type) {
-		double mean = MatrixUtils.getColorChannelMean(matrix, type);
-		double stdDev = MatrixUtils.getColorChannelStdDev(matrix, mean, type);
+	public MetricResult[] measure(ColorSpace[][] matrix, int colorChannel) {
+		double mean = ColorChannelUtils.getColorChannelMean(matrix, colorChannel);
+		double stdDev = ColorChannelUtils.getColorChannelStdDev(matrix, mean, colorChannel);
 		return new MetricResult[] {
 				new MetricResult("Colorfulness (m+s)", "CLR", mean+stdDev),
 				new MetricResult("Colorfulness m", "CLR_m", mean),

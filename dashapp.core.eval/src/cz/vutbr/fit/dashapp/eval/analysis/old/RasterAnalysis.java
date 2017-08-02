@@ -5,11 +5,11 @@ import java.text.DecimalFormat;
 
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.BlackDensity;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import extern.AdaptiveThreshold;
 
 public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -33,8 +33,8 @@ public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
 				buffer.append("===== ADAPTIVE THRESHOLD =====\n");
 				
 				Dashboard dashboard = dashboardFile.getDashboard(true);
-				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
-				MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, false);
+				int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
+				AdaptiveThreshold.adaptiveThreshold(matrix, false, 0, 0, false);
 				ColorMatrix.toGrayScale(matrix, true, false);
 				formatMetric(buffer, new BlackDensity().measureGrayMatrix(matrix), df);
 				formatMetric(buffer, new GrayBalance().measureGrayMatrix(matrix), df);
@@ -43,7 +43,7 @@ public class RasterAnalysis extends AbstractAnalysis implements IAnalysis {
 				
 				buffer.append("===== GRAYSCALE =====\n");
 				
-				matrix = MatrixUtils.printBufferedImage(image, dashboard);
+				matrix = ColorMatrix.printImageToMatrix(image, dashboard);
 				ColorMatrix.toGrayScale(matrix, true, false);
 				formatMetric(buffer, new GrayBalance().measureGrayMatrix(matrix), df);
 				formatMetric(buffer, new GraySymmetry().measureGrayMatrix(matrix), df);

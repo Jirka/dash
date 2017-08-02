@@ -1,6 +1,6 @@
 package cz.vutbr.fit.dashapp.eval.metric;
 
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
 
 public class MetricResultsCollection {
 	
@@ -14,10 +14,14 @@ public class MetricResultsCollection {
 		double mean = 0;
 		int size = results.length;
 		
+		int usedSize = 0;
 		for (int i = 0; i < size; i++) {
-			mean += results[i][statID].number();
+			if(!results[i][statID].disabled) {
+				mean += results[i][statID].number();
+				usedSize++;
+			}
 		}
-		mean = mean/(size);
+		mean = mean/(usedSize);
 		
 		return mean;
 	}
@@ -27,13 +31,40 @@ public class MetricResultsCollection {
 		int size = results.length;
 		double act;
 		
+		int usedSize = 0;
 		for (int i = 0; i < size; i++) {
-			act = (double) results[i][statID].number();
-			variance += (mean-act)*(mean-act);
+			if(!results[i][statID].disabled) {
+				act = (double) results[i][statID].number();
+				variance += (mean-act)*(mean-act);
+				usedSize++;
+			}
 		}
-		variance = variance/(size);
+		variance = variance/(usedSize);
 		
 		return variance;
+	}
+	
+	private void disableMostExtreme(int statID, double mean) {
+		int size = results.length;
+		double act;
+		double maxDifference = 0;
+		int maxDifferenceIndex = -1;
+		
+		for (int i = 0; i < size; i++) {
+			if(!results[i][statID].disabled) {
+				act = Math.abs((mean-(double) results[i][statID].number()));
+				if(act > maxDifference) {
+					maxDifference = act;
+					maxDifferenceIndex = i;
+				}
+			}
+		}
+		
+		if(maxDifferenceIndex != -1) {
+			results[maxDifferenceIndex][statID].disabled = true;
+		}
+		
+		return;
 	}
 	
 	private double minValue(int statID) {
@@ -42,9 +73,11 @@ public class MetricResultsCollection {
 		double act;
 		
 		for (int i = 0; i < size; i++) {
-			act = (double) results[i][statID].number();
-			if(min > act) {
-				min = act;
+			if(!results[i][statID].disabled) {
+				act = (double) results[i][statID].number();
+				if(min > act) {
+					min = act;
+				}
 			}
 		}
 		
@@ -57,9 +90,11 @@ public class MetricResultsCollection {
 		double act;
 		
 		for (int i = 0; i < size; i++) {
-			act = (double) results[i][statID].number();
-			if(max < act) {
-				max = act;
+			if(!results[i][statID].disabled) {
+				act = (double) results[i][statID].number();
+				if(max < act) {
+					max = act;
+				}
 			}
 		}
 		
@@ -70,14 +105,19 @@ public class MetricResultsCollection {
 		return Math.sqrt(variance);
 	}
 	
-	public MeanSatistics[] meanStatistics() {
+	public MeanSatistics[] meanStatistics(int filterExtremeItems) {		
 		MeanSatistics[] statistics = null;
 		int resultsLength = resultsLength();
 		if(resultsLength > 0) {
 			statistics = new MeanSatistics[resultsLength];
 			for (int i = 0; i < statistics.length; i++) {
 				statistics[i] = new MeanSatistics();
-				statistics[i].mean = meanValue(i);
+				statistics[i].mean = meanValue(i);				
+				for (int j = 0; j < filterExtremeItems; j++) {
+					disableMostExtreme(i, statistics[i].mean);
+					statistics[i].mean = meanValue(i);
+				}
+				
 				statistics[i].variance = varianceValue(i, statistics[i].mean);
 				statistics[i].stdev = stdevValue(i, statistics[i].variance);
 				statistics[i].min = minValue(i);

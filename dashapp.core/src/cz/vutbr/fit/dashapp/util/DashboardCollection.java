@@ -4,6 +4,7 @@ import java.util.List;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
 
 public class DashboardCollection {
 	
@@ -53,7 +54,7 @@ public class DashboardCollection {
 		// print dashboards
 		for (Dashboard dashboard : dashboards) {
 			boolean[][] dashboardMatrix = new boolean[dashboard.width][dashboard.height];
-			MatrixUtils.printDashboard(dashboardMatrix, dashboard, true, types, excludeBorders);
+			BooleanMatrix.printDashboard(dashboardMatrix, dashboard, true, types, excludeBorders);
 			for(int i = 0; i < dashboard.width; i++) {
 				for(int j = 0; j < dashboard.height; j++) {
 					if(dashboardMatrix[i][j]) {

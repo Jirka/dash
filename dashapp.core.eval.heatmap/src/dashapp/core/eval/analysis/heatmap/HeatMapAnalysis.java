@@ -7,12 +7,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.MathUtils;
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
 
 public class HeatMapAnalysis extends AbstractAnalysis {
 	
@@ -34,7 +34,7 @@ public class HeatMapAnalysis extends AbstractAnalysis {
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
 		int[][] heatMap = actDashboards.printDashboards(null);
 		GrayMatrix.normalize(heatMap, actDashboards.length, false);
-		MeanSatistics meanValue = MathUtils.meanStatistics(heatMap);
+		MeanSatistics meanValue = StatsUtils.meanStatistics(heatMap);
 		System.out.println((int) meanValue.mean);
 		meanValues.put(actWorkspaceFolder.getFileName(), meanValue);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, heatMap);

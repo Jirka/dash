@@ -4,11 +4,11 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.ThresholdNormalization;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdNormalization;
 
 public class ThresholdAnalysis extends AbstractAnalysis {
 	

@@ -22,24 +22,47 @@ import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoEquilibrium;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoHomogenity;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRhythm;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSequence;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSimplicity;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoSymmetry;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoUnity;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance.NgoIntensityBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance.NgoColorfulnessBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance.NgoHSBBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance.NgoHSBBalance2;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance.NgoHSBBalance4;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyIntensityBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyColorfulnessBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyHSBBalance;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyHSBBalance2;
-import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.MyRasterBalance.MyHSBBalance4;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.ColorfulnessRatioCalculator;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.DummyRatioCalculator;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sblog;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sblog_x;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sb;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sb_final;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sb_final05;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sb05;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSBRatioCalculator_sb05_max1;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.HSLRatioCalculator;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.IntensityRatioCalculator;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.RasterRatioCalculator.PosterizedIntensityRatioCalculator;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterBalance;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterDensity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterDensity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterEquilibrium;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterFinalDensity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterFinalDensity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterSymmetry;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterSymmetry2;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterUnity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.my.MyRasterUnity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoNormRasterDensity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoNormRasterDensity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoNormRasterUnity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoNormRasterUnity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterBalance;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterDensity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterDensity_X;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterEquilibrium;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterRhythm;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterSequence;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterSymmetry;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterSymmetry2;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterUnity;
+import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.raster.NgoRasterUnity_X;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
@@ -49,7 +72,9 @@ import cz.vutbr.fit.dashapp.model.VirtualDashboardFile;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
 
 public class WidgetMetricAnalysis extends AbstractAnalysis {
 	
@@ -65,34 +90,231 @@ public class WidgetMetricAnalysis extends AbstractAnalysis {
 	private static boolean filtered = false;
 	private static boolean stdev = true;
 	private static boolean cacheImages = true;
-	
+	private static int FILTER_EXTREME_ITEMS = 4;
 	
 	IWidgetMetric[] metrics = new IWidgetMetric[] { 
-			//new WidgetCount(),
-			//new Area(),
+			//new MyRasterBalance(new HSBRatioCalculator_sb05()),
+			/*new NgoBalance(),
+			new NgoRasterBalance(new IntensityRatioCalculator()),
+			new NgoRasterBalance(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterBalance(new ColorfulnessRatioCalculator()),
+			new NgoRasterBalance(new HSBRatioCalculator_sb()),
+			new NgoRasterBalance(new HSBRatioCalculator_sb05()),
+			new NgoRasterBalance(new HSBRatioCalculator_sblog()),
+			new MyRasterBalance(new DummyRatioCalculator()),
+			new MyRasterBalance(new IntensityRatioCalculator()),
+			new MyRasterBalance(new PosterizedIntensityRatioCalculator()),
+			new MyRasterBalance(new ColorfulnessRatioCalculator()),
+			new MyRasterBalance(new HSBRatioCalculator_sb()),
+			new MyRasterBalance(new HSBRatioCalculator_sb05()),
+			new MyRasterBalance(new HSBRatioCalculator_sblog()),*/
+			/*new NgoEquilibrium(),
+			new NgoRasterEquilibrium(new DummyRatioCalculator()),
+			new NgoRasterEquilibrium(new IntensityRatioCalculator()),
+			new NgoRasterEquilibrium(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterEquilibrium(new ColorfulnessRatioCalculator()),
+			new NgoRasterEquilibrium(new HSBRatioCalculator_sb()),
+			new NgoRasterEquilibrium(new HSBRatioCalculator_sb05()),
+			new NgoRasterEquilibrium(new HSBRatioCalculator_sblog()),
+			new MyRasterEquilibrium(new DummyRatioCalculator()),
+			new MyRasterEquilibrium(new IntensityRatioCalculator()),
+			new MyRasterEquilibrium(new PosterizedIntensityRatioCalculator()),
+			new MyRasterEquilibrium(new ColorfulnessRatioCalculator()),
+			new MyRasterEquilibrium(new HSBRatioCalculator_sb()),
+			new MyRasterEquilibrium(new HSBRatioCalculator_sb05()),
+			new MyRasterEquilibrium(new HSBRatioCalculator_sb05_max1()),
+			new MyRasterEquilibrium(new HSBRatioCalculator_sblog()),*/
+			//new NgoSymmetry(NgoSymmetry.MAX),
+			/*new NgoRasterSymmetry2(new DummyRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new IntensityRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new PosterizedIntensityRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new ColorfulnessRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sb(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sb05(), NgoSymmetry.MAX),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sblog(), NgoSymmetry.MAX),*/
+			//new NgoSymmetry(NgoSymmetry.SUM),
+			/*new NgoRasterSymmetry2(new DummyRatioCalculator(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new IntensityRatioCalculator(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new PosterizedIntensityRatioCalculator(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new ColorfulnessRatioCalculator(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sb(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sb05(), NgoSymmetry.SUM),
+			new NgoRasterSymmetry2(new HSBRatioCalculator_sblog(), NgoSymmetry.SUM),*/
+			/*new MyRasterSymmetry2(new DummyRatioCalculator(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new IntensityRatioCalculator(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new PosterizedIntensityRatioCalculator(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new ColorfulnessRatioCalculator(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sb(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sb05(), MyRasterSymmetry.MAX),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sblog(), MyRasterSymmetry.MAX),*/
+			/*new MyRasterSymmetry2(new DummyRatioCalculator(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new IntensityRatioCalculator(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new PosterizedIntensityRatioCalculator(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new ColorfulnessRatioCalculator(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sb(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sb05(), MyRasterSymmetry.SUM),
+			new MyRasterSymmetry2(new HSBRatioCalculator_sblog(), MyRasterSymmetry.SUM),*/
+			/*new NgoRasterSequence(new DummyRatioCalculator(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new IntensityRatioCalculator(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new PosterizedIntensityRatioCalculator(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new ColorfulnessRatioCalculator(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sb(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sb05(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sblog(), NgoRasterSequence.QUADRANT_AREA),
+			new NgoRasterSequence(new DummyRatioCalculator(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new IntensityRatioCalculator(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new PosterizedIntensityRatioCalculator(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new ColorfulnessRatioCalculator(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sb(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sb05(), NgoRasterSequence.ALL_AREA),
+			new NgoRasterSequence(new HSBRatioCalculator_sblog(), NgoRasterSequence.ALL_AREA),*/
+			//new NgoRasterUnity(new HSBRatioCalculator_sblog()),
+			/*new NgoRasterUnity(new DummyRatioCalculator()),
+			new NgoRasterUnity(new IntensityRatioCalculator()),
+			new NgoRasterUnity(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterUnity(new ColorfulnessRatioCalculator()),
+			new NgoRasterUnity(new HSBRatioCalculator_sb()),
+			new NgoRasterUnity(new HSBRatioCalculator_sb05()),
+			new NgoRasterUnity(new HSBRatioCalculator_sblog()),
+			new MyRasterUnity(new DummyRatioCalculator()),
+			new MyRasterUnity(new IntensityRatioCalculator()),
+			new MyRasterUnity(new PosterizedIntensityRatioCalculator()),
+			new MyRasterUnity(new ColorfulnessRatioCalculator()),
+			new MyRasterUnity(new HSBRatioCalculator_sb()),
+			new MyRasterUnity(new HSBRatioCalculator_sb05()),
+			new MyRasterUnity(new HSBRatioCalculator_sblog()),
+			new NgoNormRasterUnity(new DummyRatioCalculator()),
+			new NgoNormRasterUnity(new IntensityRatioCalculator()),
+			new NgoNormRasterUnity(new PosterizedIntensityRatioCalculator()),
+			new NgoNormRasterUnity(new ColorfulnessRatioCalculator()),
+			new NgoNormRasterUnity(new HSBRatioCalculator_sb()),
+			new NgoNormRasterUnity(new HSBRatioCalculator_sb05()),
+			new NgoNormRasterUnity(new HSBRatioCalculator_sblog()),*/
+			/*new NgoRasterUnity_X(new DummyRatioCalculator()),
+			new NgoRasterUnity_X(new IntensityRatioCalculator()),
+			new NgoRasterUnity_X(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterUnity_X(new ColorfulnessRatioCalculator()),
+			new NgoRasterUnity_X(new HSBRatioCalculator_sb()),
+			new NgoRasterUnity_X(new HSBRatioCalculator_sb05()),
+			new NgoRasterUnity_X(new HSBRatioCalculator_sblog()),*/
+			/*new MyRasterUnity_X(new DummyRatioCalculator()),
+			new MyRasterUnity_X(new IntensityRatioCalculator()),
+			new MyRasterUnity_X(new PosterizedIntensityRatioCalculator()),
+			new MyRasterUnity_X(new ColorfulnessRatioCalculator()),
+			new MyRasterUnity_X(new HSBRatioCalculator_sb()),
+			new MyRasterUnity_X(new HSBRatioCalculator_sb05()),
+			new MyRasterUnity_X(new HSBRatioCalculator_sblog()),
+			new NgoNormRasterUnity_X(new DummyRatioCalculator()),
+			new NgoNormRasterUnity_X(new IntensityRatioCalculator()),
+			new NgoNormRasterUnity_X(new PosterizedIntensityRatioCalculator()),
+			new NgoNormRasterUnity_X(new ColorfulnessRatioCalculator()),
+			new NgoNormRasterUnity_X(new HSBRatioCalculator_sb()),
+			new NgoNormRasterUnity_X(new HSBRatioCalculator_sb05()),
+			new NgoNormRasterUnity_X(new HSBRatioCalculator_sblog()),*/
+			/*new NgoRasterDensity(new DummyRatioCalculator()),
+			new NgoRasterDensity(new IntensityRatioCalculator()),
+			new NgoRasterDensity(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterDensity(new ColorfulnessRatioCalculator()),
+			new NgoRasterDensity(new HSBRatioCalculator_sb()),
+			new NgoRasterDensity(new HSBRatioCalculator_sb05()),
+			new NgoRasterDensity(new HSBRatioCalculator_sblog()),
+			new MyRasterDensity(new DummyRatioCalculator()),
+			new MyRasterDensity(new IntensityRatioCalculator()),
+			new MyRasterDensity(new PosterizedIntensityRatioCalculator()),
+			new MyRasterDensity(new ColorfulnessRatioCalculator()),
+			new MyRasterDensity(new HSBRatioCalculator_sb()),
+			new MyRasterDensity(new HSBRatioCalculator_sb05()),
+			new MyRasterDensity(new HSBRatioCalculator_sblog()),
+			new NgoNormRasterDensity(new DummyRatioCalculator()),
+			new NgoNormRasterDensity(new IntensityRatioCalculator()),
+			new NgoNormRasterDensity(new PosterizedIntensityRatioCalculator()),
+			new NgoNormRasterDensity(new ColorfulnessRatioCalculator()),
+			new NgoNormRasterDensity(new HSBRatioCalculator_sb()),
+			new NgoNormRasterDensity(new HSBRatioCalculator_sb05()),
+			new NgoNormRasterDensity(new HSBRatioCalculator_sblog()),*/
+			/*new NgoRasterDensity_X(new DummyRatioCalculator()),
+			new NgoRasterDensity_X(new IntensityRatioCalculator()),
+			new NgoRasterDensity_X(new PosterizedIntensityRatioCalculator()),
+			new NgoRasterDensity_X(new ColorfulnessRatioCalculator()),
+			new NgoRasterDensity_X(new HSBRatioCalculator_sb()),
+			new NgoRasterDensity_X(new HSBRatioCalculator_sb05()),
+			new NgoRasterDensity_X(new HSBRatioCalculator_sblog()),
+			new MyRasterDensity_X(new DummyRatioCalculator()),
+			new MyRasterDensity_X(new IntensityRatioCalculator()),
+			new MyRasterDensity_X(new PosterizedIntensityRatioCalculator()),
+			new MyRasterDensity_X(new ColorfulnessRatioCalculator()),
+			new MyRasterDensity_X(new HSBRatioCalculator_sb()),
+			new MyRasterDensity_X(new HSBRatioCalculator_sb05()),
+			new MyRasterDensity_X(new HSBRatioCalculator_sblog()),
+			new NgoNormRasterDensity_X(new DummyRatioCalculator()),
+			new NgoNormRasterDensity_X(new IntensityRatioCalculator()),
+			new NgoNormRasterDensity_X(new PosterizedIntensityRatioCalculator()),
+			new NgoNormRasterDensity_X(new ColorfulnessRatioCalculator()),
+			new NgoNormRasterDensity_X(new HSBRatioCalculator_sb()),
+			new NgoNormRasterDensity_X(new HSBRatioCalculator_sb05()),
+			new NgoNormRasterDensity_X(new HSBRatioCalculator_sblog()),*/
+			/*new NgoRasterRhythm(new DummyRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new IntensityRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new PosterizedIntensityRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new ColorfulnessRatioCalculator(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new HSBRatioCalculator_sb(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new HSBRatioCalculator_sb05(), NgoSymmetry.MAX),
+			new NgoRasterRhythm(new HSBRatioCalculator_sblog(), NgoSymmetry.MAX),*/
+			/*new WidgetCount(),
+			new Area(),
 			new NgoBalance(),
-			new NgoIntensityBalance(),
-			new NgoColorfulnessBalance(),
-			new NgoHSBBalance(),
-			new NgoHSBBalance2(),
-			new NgoHSBBalance4(),
-			new MyBalance(),
-			new MyIntensityBalance(),
-			new MyColorfulnessBalance(),
-			new MyHSBBalance(),
-			new MyHSBBalance2(),
-			new MyHSBBalance4(),
-			/*new NgoCohesion(),
+			new NgoCohesion(),
 			new NgoDensity(),
 			new NgoEconomy(),
 			new NgoEquilibrium(),
 			new NgoHomogenity(),
 			new NgoProportion(),
 			new NgoRegularity(),
+			new NgoRhythm(),
 			new NgoSimplicity(),
 			new NgoSequence(),
 			new NgoSymmetry(),
 			new NgoUnity(),*/
+			//new NgoDensity(),
+			
+			/*new MyRasterFinalDensity(new DummyRatioCalculator()),
+			new MyRasterFinalDensity(new IntensityRatioCalculator()),
+			new MyRasterFinalDensity(new PosterizedIntensityRatioCalculator()),
+			new MyRasterFinalDensity(new ColorfulnessRatioCalculator()),
+			new MyRasterFinalDensity(new HSBRatioCalculator_sb()),
+			new MyRasterFinalDensity(new HSBRatioCalculator_sb05()),
+			new MyRasterFinalDensity(new HSBRatioCalculator_sblog()),
+			
+			new MyRasterFinalDensity_X(new DummyRatioCalculator()),
+			new MyRasterFinalDensity_X(new IntensityRatioCalculator()),
+			new MyRasterFinalDensity_X(new PosterizedIntensityRatioCalculator()),
+			new MyRasterFinalDensity_X(new ColorfulnessRatioCalculator()),
+			new MyRasterFinalDensity_X(new HSBRatioCalculator_sb()),
+			new MyRasterFinalDensity_X(new HSBRatioCalculator_sb05()),
+			new MyRasterFinalDensity_X(new HSBRatioCalculator_sblog()),*/
+			
+			//new NgoRasterBalance(new HSLRatioCalculator()),
+			//new MyRasterBalance(new HSLRatioCalculator()),
+			//new MyRasterFinalDensity(new HSLRatioCalculator()),
+			//new MyRasterFinalDensity_X(new HSLRatioCalculator()),
+			//new MyRasterFinalDensity_X(new HSBRatioCalculator_sblog()),
+			//new NgoRasterBalance(new HSBRatioCalculator_sblog_x()),
+			//new MyRasterBalance(new HSBRatioCalculator_sblog_x()),
+			//new MyRasterFinalDensity(new HSBRatioCalculator_sblog_x()),
+			//new MyRasterFinalDensity_X(new HSBRatioCalculator_sblog_x()),
+			
+			new NgoRasterBalance(new HSBRatioCalculator_sb_final()),
+			new MyRasterBalance(new HSBRatioCalculator_sb_final()),
+			new MyRasterFinalDensity(new HSBRatioCalculator_sb_final()),
+			new MyRasterFinalDensity_X(new HSBRatioCalculator_sb_final()),
+			
+			new NgoRasterBalance(new HSBRatioCalculator_sb_final05()),
+			new MyRasterBalance(new HSBRatioCalculator_sb_final05()),
+			new MyRasterFinalDensity(new HSBRatioCalculator_sb_final05()),
+			new MyRasterFinalDensity_X(new HSBRatioCalculator_sb_final05()),
+			
+			/*new MyRasterFinalDensity(new ColorfulnessRatioCalculator()),
+			new MyRasterFinalDensity_X(new ColorfulnessRatioCalculator()),*/
 	};
 	
 	Map<WorkspaceFolder, Map<IWidgetMetric, MeanSatistics[]>> meanValues;
@@ -144,7 +366,7 @@ public class WidgetMetricAnalysis extends AbstractAnalysis {
 					vdfFiltered.setImage(image);
 				}
 				if(crop) {
-					image = ColorMatrix.printMatrixToImage(null, MatrixUtils.printBufferedImage(image, dashboard));
+					image = ColorMatrix.printMatrixToImage(null, ColorMatrix.printImageToMatrix(image, dashboard));
 					vdfCrop.setImage(image);
 				}
 				
@@ -246,7 +468,7 @@ public class WidgetMetricAnalysis extends AbstractAnalysis {
 				metrics,
 				GEType.ALL_TYPES
 		);
-		Map<IWidgetMetric, MeanSatistics[]> stats = calculator.statistics(resultsCollection);
+		Map<IWidgetMetric, MeanSatistics[]> stats = calculator.statistics(resultsCollection, FILTER_EXTREME_ITEMS);
 		return stats;
 	}
 
@@ -278,9 +500,12 @@ public class WidgetMetricAnalysis extends AbstractAnalysis {
 			}
 			FileUtils.saveTextFile(
 					sb.toString(),
-					actWorkspaceFolder.getPath() + "/_results/" + FILE + "_" + dashboard_source.name(),
-					metric.getClass().getSimpleName()
+					actWorkspaceFolder.getPath() + 
+					  (FILTER_EXTREME_ITEMS > 0 ? ("/_results_filtered_" + FILTER_EXTREME_ITEMS + "/") : "/results/")
+					  + FILE + "_" + dashboard_source.name() + "/debug",
+					metric.getName()
 			);
+			//System.out.println(sb.toString());
 		}
 	}
 	

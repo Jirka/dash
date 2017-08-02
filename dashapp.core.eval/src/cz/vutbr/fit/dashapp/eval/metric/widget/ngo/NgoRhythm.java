@@ -11,6 +11,24 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
 public class NgoRhythm extends AbstractWidgetMetric {
 	
+	public static final int SUM = 0;
+	public static final int MAX = 1;
+	
+	private int normalizationType;
+	
+	public NgoRhythm(int normalizationType) {
+		this.normalizationType = normalizationType;
+	}
+	
+	public NgoRhythm() {
+		this.normalizationType = MAX;
+	}
+	
+	@Override
+	public String getName() {
+		return (normalizationType == MAX ? "MAX_" : "SUM_") + super.getName();
+	}
+	
 	private QuadrantMap<RhythmValues> quadrants;
 
 	@Override
@@ -21,17 +39,17 @@ public class NgoRhythm extends AbstractWidgetMetric {
 		// calculate symmetry values for all quadrants
 		new QuadrantResolver() {
 			
-			protected void performAll(GraphicalElement graphicalElement) {
+			protected void performAllPre(GraphicalElement graphicalElement) {
 				RhythmValues value = quadrants.get(q);
 				value.n++;
 				value.x += Math.abs(dx);
 				value.y += Math.abs(dy);
-				//value.a += graphicalElement.area();
+				value.a += graphicalElement.area();
 				
-				quadrants.get(Quadrant.I).a += graphicalElement.area(Quadrant.I);
+				/*quadrants.get(Quadrant.I).a += graphicalElement.area(Quadrant.I);
 				quadrants.get(Quadrant.II).a += graphicalElement.area(Quadrant.II);
 				quadrants.get(Quadrant.III).a += graphicalElement.area(Quadrant.III);
-				quadrants.get(Quadrant.IV).a += graphicalElement.area(Quadrant.IV);
+				quadrants.get(Quadrant.IV).a += graphicalElement.area(Quadrant.IV);*/
 			};
 			
 		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
@@ -42,17 +60,30 @@ public class NgoRhythm extends AbstractWidgetMetric {
 		RhythmValues q3 = quadrants.get(Quadrant.III);
 		RhythmValues q4 = quadrants.get(Quadrant.IV);
 		
-		double nn = q1.n + q2.n + q3.n + q4.n;
+		/*double nn = q1.n + q2.n + q3.n + q4.n;
 		//double xx = nn*dashboard.width/2;
 		double xx = q1.x + q2.x + q3.x + q4.x;
 		//double yy = nn*dashboard.height/2;
 		double yy = q1.y + q2.y + q3.y + q4.y;
-		double aa = dashboard.area()/4;//q1.a + q2.a + q3.a + q4.a;
+		double aa = dashboard.area()/4;//q1.a + q2.a + q3.a + q4.a;*/
 		
-		q1.normalize((xx), (yy), aa);
-		q2.normalize((xx), (yy), aa);
-		q3.normalize((xx), (yy), aa);
-		q4.normalize((xx), (yy), aa);
+		if(normalizationType == SUM) {
+			double xx = sum(new double[] { q1.x , q2.x , q3.x , q4.x });
+			double yy = sum(new double[] { q1.y , q2.y , q3.y , q4.y });
+			double aa = sum(new double[] { q1.a , q2.a , q3.a , q4.a });
+			q1.normalize((xx), (yy), aa);
+			q2.normalize((xx), (yy), aa);
+			q3.normalize((xx), (yy), aa);
+			q4.normalize((xx), (yy), aa);
+		} else if(normalizationType == MAX) {
+			double xx = max(new double[] { q1.x , q2.x , q3.x , q4.x });
+			double yy = max(new double[] { q1.y , q2.y , q3.y , q4.y });
+			double aa = max(new double[] { q1.a , q2.a , q3.a , q4.a });
+			q1.normalize((xx), (yy), aa);
+			q2.normalize((xx), (yy), aa);
+			q3.normalize((xx), (yy), aa);
+			q4.normalize((xx), (yy), aa);
+		}
 		
 		double RHM_x = (diff(q1.x, q2.x) + diff(q3.x, q4.x) + diff(q1.x, q3.x) + diff(q2.x, q4.x)
 						+ diff(q1.x, q4.x) + diff(q2.x, q3.x))/6.0;
@@ -75,6 +106,24 @@ public class NgoRhythm extends AbstractWidgetMetric {
 	
 	private double diff(double a, double b) {
 		return Math.abs(a - b);
+	}
+	
+	private double sum(double[] ds) {
+		double sum = 0.0;
+		for (double d : ds) {
+			sum += d;
+		}
+		return sum;
+	}
+	
+	private double max(double[] ds) {
+		double max = Double.MIN_VALUE;
+		for (double d : ds) {
+			if(max < d) {
+				max = d;
+			}
+		}
+		return max;
 	}
 	
 	private static class RhythmValues implements cz.vutbr.fit.dashapp.eval.util.Cloneable {

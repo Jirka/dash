@@ -13,15 +13,16 @@ import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.MathUtils;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.ThresholdCalculator;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
 
 public class WidgetAnalysis extends AbstractAnalysis {
 	
@@ -45,17 +46,21 @@ public class WidgetAnalysis extends AbstractAnalysis {
 		this.actDashboardsCount = actDashboards.length;
 		int[][] printMatrix = actDashboards.printDashboards(null, true);
 		int[][] heatMatrix = GrayMatrix.normalize(printMatrix, actDashboards.length, true);
-		actHeatMean = MathUtils.meanValue(heatMatrix);
+		actHeatMean = StatsUtils.meanValue(heatMatrix);
 		int[][] entrophyMatrix = GrayMatrix.update(printMatrix, new EntrophyNormalization(actDashboardsCount), true);
-		actInversedEntrophyMean = GrayMatrix.WHITE-MathUtils.meanValue(entrophyMatrix);
+		actInversedEntrophyMean = GrayMatrix.WHITE-StatsUtils.meanValue(entrophyMatrix);
 		actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
 		int[][] thresholdMatrix = GrayMatrix.update(heatMatrix, new ThresholdCalculator((int)actThreshlod), false);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, thresholdMatrix);
 		Dashboard dashboard = generateDashboard(thresholdMatrix, image);
-		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_tb1");
-		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_tb1");
-		FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
-		FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+		//FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_tb1");
+		//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_tb1");
+		//FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+		//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+		int[][] widgetMatrix = new DashboardCollection(new Dashboard[] { dashboard }).printDashboards(GEType.ALL_TYPES);
+		GrayMatrix.normalize(widgetMatrix, 1, false);
+		BufferedImage widgetImage = GrayMatrix.printMatrixToImage(null, widgetMatrix);
+		FileUtils.saveImage(widgetImage, actWorkspaceFolder.getPath() + "/../_000-widget", actWorkspaceFolder.getFileName().substring(1));
 	}
 
 	@Override

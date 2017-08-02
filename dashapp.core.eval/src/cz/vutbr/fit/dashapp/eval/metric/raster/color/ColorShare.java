@@ -2,13 +2,16 @@ package cz.vutbr.fit.dashapp.eval.metric.raster.color;
 
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.eval.metric.AbstractMetric;
 import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
-public class ColorShare implements IMetric {
+public class ColorShare extends AbstractMetric implements IMetric {
 	
 	@Override
 	public MetricResult[] measure(DashboardFile dashboardFile) {
@@ -45,9 +48,9 @@ public class ColorShare implements IMetric {
 	public MetricResult[] measure(int[][] matrix, int posterization) {
 		int[][] posterizedMatrix = matrix;
 		if(posterization > 0) {
-			posterizedMatrix = MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, posterization)), true); // 4 bit
+			posterizedMatrix = PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, posterization)), true); // 4 bit
 		}
-		Map<Integer, Integer> histogram = MatrixUtils.getColorHistogram(posterizedMatrix);
+		Map<Integer, Integer> histogram = HistogramUtils.getColorHistogram(posterizedMatrix);
 		long count = histogram.values().size();
 		double posterizationShare = (((double) count)/(posterization > 0 ? Math.pow(2, posterization*3) : 16777216))*100;
 		double share = (((double) count)/16777216)*100; //2^(8*3)
@@ -56,13 +59,13 @@ public class ColorShare implements IMetric {
 		Integer key = max.getKey();
 		Integer color1Count = max.getValue();
 		int area = posterizedMatrix.length*posterizedMatrix[0].length;
-		String color1 = "(" + MatrixUtils.getRed(key) + "," + MatrixUtils.getGreen(key) + "," + MatrixUtils.getBlue(key) + ")";
+		String color1 = "(" + ColorMatrix.getRed(key) + "," + ColorMatrix.getGreen(key) + "," + ColorMatrix.getBlue(key) + ")";
 		double color1Share = ((((double) color1Count)/(area))*100);
 		
 		max = getMax(histogram, max);
 		key = max.getKey();
 		Integer color2Count = max.getValue();
-		String color2 = "(" + MatrixUtils.getRed(key) + "," + MatrixUtils.getGreen(key) + "," + MatrixUtils.getBlue(key) + ")";
+		String color2 = "(" + ColorMatrix.getRed(key) + "," + ColorMatrix.getGreen(key) + "," + ColorMatrix.getBlue(key) + ")";
 		double color2Share = ((((double) color2Count)/(area))*100);
 		return new MetricResult[] {
 				new MetricResult("Color Count", "CLR_n", count),

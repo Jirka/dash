@@ -10,8 +10,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import cz.vutbr.fit.dashapp.Logger;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
 /**
  * This class represents dashboard source file
@@ -219,7 +219,7 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 	public int[][] getImageMatrix() {
 		BufferedImage image = getImage();
 		if(image != null) {
-			return MatrixUtils.printBufferedImage(image);
+			return ColorMatrix.printImageToMatrix(image);
 		}
 		return null;
 	}

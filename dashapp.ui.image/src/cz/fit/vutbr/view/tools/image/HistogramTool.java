@@ -7,9 +7,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 
 import cz.fit.vutbr.view.util.Histogram;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.view.Canvas;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
@@ -43,9 +44,9 @@ public class HistogramTool extends AbstractGUITool implements IGUITool {
 				Canvas canvas = DashAppView.getInstance().getDashboardView().getCanvas();
 				BufferedImage image = canvas.getImage();
 				if(image != null) {
-					int[][] matrix = MatrixUtils.printBufferedImage(image, selectedDashboard);
-					MatrixUtils.grayScale(matrix, true, false);
-					int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
+					int[][] matrix = ColorMatrix.printImageToMatrix(image, selectedDashboard);
+					ColorMatrix.toGrayScale(matrix, true, false);
+					int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
 					new Histogram(histogram).openWindow();
 				}
 			}

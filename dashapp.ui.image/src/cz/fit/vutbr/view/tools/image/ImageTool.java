@@ -19,18 +19,23 @@ import javax.swing.JTextArea;
 
 import cz.fit.vutbr.view.util.Histogram;
 import cz.vutbr.fit.dashapp.controller.DashAppController;
+import cz.vutbr.fit.dashapp.image.colorspace.CIE;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorChannelUtils;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorSpace;
+import cz.vutbr.fit.dashapp.image.colorspace.HSB;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardFileFilter;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
+import extern.AdaptiveThreshold;
 import cz.vutbr.fit.dashapp.view.Canvas;
 
 public class ImageTool extends AbstractGUITool implements IGUITool {
@@ -116,47 +121,47 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 					BufferedImage image = surface.getImage();
 					Dashboard dashboard = selectedDashboardFile.getDashboard(false);
 					if(image != null) {
-						int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
+						int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
 						if(kind == ADAPTIVE1) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
-							MatrixUtils.adaptiveThreshold(matrix, false, s, t, false);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
+							AdaptiveThreshold.adaptiveThreshold(matrix, false, s, t, false);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == ADAPTIVE2) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
-							MatrixUtils.adaptiveThreshold(matrix, true, s, t, false);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
+							AdaptiveThreshold.adaptiveThreshold(matrix, true, s, t, false);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == GRAY_SCALE) {
-							MatrixUtils.grayScale(matrix, false, false);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
+							ColorMatrix.toGrayScale(matrix, false, false);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == POSTERIZE) {
 							int range = askForInteger("color bit width", "Posterization option", 4);
-							MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, range)), false);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
+							PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, range)), false);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == HSB_SATURATION) {
-							ColorChannel[][] matrixHSB = MatrixUtils.RGBtoHSB(matrix);
-							MatrixUtils.normalizeColorChannel(matrixHSB, matrix, ColorChannelType.SATURATION);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
-							MatrixUtils.grayScale(matrix, true, false);
-							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
+							ColorSpace[][] matrixHSB = HSB.fromRGB(matrix);
+							ColorChannelUtils.normalizeColorChannel(matrixHSB, matrix, HSB.CHANNEL_SATURATION);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
+							ColorMatrix.toGrayScale(matrix, true, false);
+							int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
 							surface.updateImage(image, true, true);
 						} else if(kind == LCH_SATURATION) {
-							ColorChannel[][] matrixLCH = MatrixUtils.RGBtoLCH(matrix);
-							MatrixUtils.normalizeColorChannel(matrixLCH, matrix, ColorChannelType.SATURATION);
-							MatrixUtils.updateBufferedImage(image, matrix, dashboard);
-							MatrixUtils.grayScale(matrix, true, false);
-							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
+							ColorSpace[][] matrixLCH = CIE.fromRGB(matrix);
+							ColorChannelUtils.normalizeColorChannel(matrixLCH, matrix, CIE.CHANNEL_SATURATION);
+							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
+							ColorMatrix.toGrayScale(matrix, true, false);
+							int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
 							surface.updateImage(image, true, true);
 						} else if(kind == HISTOGRAM) {
-							MatrixUtils.grayScale(matrix, true, false);
-							int[] histogram = MatrixUtils.getGrayscaleHistogram(matrix);
+							ColorMatrix.toGrayScale(matrix, true, false);
+							int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
 							new Histogram(histogram).openWindow();
 						} else if(kind == RASTER_ANALYSIS || kind == WIDGET_ANALYSIS) {
 							DashAppModel model = DashAppModel.getInstance();

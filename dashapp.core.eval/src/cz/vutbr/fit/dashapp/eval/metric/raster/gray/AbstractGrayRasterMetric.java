@@ -1,17 +1,17 @@
 package cz.vutbr.fit.dashapp.eval.metric.raster.gray;
 
+import cz.vutbr.fit.dashapp.eval.metric.AbstractMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.IRasterMetric;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
-public abstract class AbstractGrayRasterMetric implements IRasterMetric {
+public abstract class AbstractGrayRasterMetric extends AbstractMetric implements IRasterMetric {
 
 	@Override
 	public MetricResult[] measure(DashboardFile dashboardFile) {
-		return measure(MatrixUtils.printBufferedImage(dashboardFile.getImage(), dashboardFile.getDashboard(true)));
+		return measure(ColorMatrix.printImageToMatrix(dashboardFile.getImage(), dashboardFile.getDashboard(true)));
 	}
 
 	@Override

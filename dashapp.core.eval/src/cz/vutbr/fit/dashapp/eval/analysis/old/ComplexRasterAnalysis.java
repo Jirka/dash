@@ -7,17 +7,18 @@ import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
+import cz.vutbr.fit.dashapp.image.colorspace.CIE;
+import cz.vutbr.fit.dashapp.image.colorspace.HSB;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.BlackDensity;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.HSB;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.LCH;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import extern.AdaptiveThreshold;
 
 public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -42,24 +43,24 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 			if(image != null) {
 				DecimalFormat df = new DecimalFormat("#.#####");
 				Dashboard dashboard = dashboardFile.getDashboard(true);
-				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
+				int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
 				//MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 4)));
 				
 				Colorfulness colorfunessMetric = new Colorfulness();
 				// HSB
-				HSB matrixHSB[][] = MatrixUtils.RGBtoHSB(matrix);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, ColorChannelType.HUE), 0, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, ColorChannelType.SATURATION), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, ColorChannelType.BRIGHTNESS), 1, true);
+				HSB matrixHSB[][] = HSB.fromRGB(matrix);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_HUE), 0, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_SATURATION), 1, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_BRIGHTNESS), 1, true);
 				
 				// CIE Lab/Lch
-				LCH matrixLCH[][] = MatrixUtils.RGBtoLCH(matrix);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.LIGHTNESS), 2, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.A), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.B), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.CHROMA), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.HUE), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, ColorChannelType.SATURATION), 1, true);
+				CIE matrixLCH[][] = CIE.fromRGB(matrix);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_LIGHTNESS), 2, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_A), 1, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_B), 1, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_CHROMA), 1, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_HUE), 1, true);
+				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_SATURATION), 1, true);
 				
 				// RGB 3*8 and 3*4 bit
 				ColorShare colorShare = new ColorShare();
@@ -69,23 +70,23 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 				// Gray
 				int matrixGray[][] = ColorMatrix.toGrayScale(matrix, false, true);
 				// 8 bit
-				int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(matrixGray, true);
-				int histogram[] = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
+				int matrixGrayValue[][] = ColorMatrix.toGrayScale(matrixGray, true, true);
+				int histogram[] = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
 				appendValue(buffer, df, (new IntensitiesCount()).measureGrayHistogram(histogram), 2, false);
 				appendValue(buffer, df, (new BackgroundShare()).measureGrayHistogram(histogram), 1, true);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixGrayValue), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixGrayValue), 1, true);
 				
 				// 4 bit
-				matrixGrayValue = MatrixUtils.grayScaleToValues(MatrixUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), false);
-				histogram = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
+				matrixGrayValue = ColorMatrix.toGrayScale(PosterizationUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), true, false);
+				histogram = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
 				appendValue(buffer, df, (new IntensitiesCount()).measureGrayHistogram(histogram), 2, false);
 				appendValue(buffer, df, (new BackgroundShare()).measureGrayHistogram(histogram), 1, true);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixGrayValue), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixGrayValue), 1, true);
 				
 				// BW
-				int matrixBW[][] = ColorMatrix.toGrayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+				int matrixBW[][] = ColorMatrix.toGrayScale(AdaptiveThreshold.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
 				appendValue(buffer, df, (new BlackDensity()).measureGrayMatrix(matrixBW), 2, false);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixBW), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixBW), 1, true);

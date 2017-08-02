@@ -1,11 +1,12 @@
 package cz.vutbr.fit.dashapp.eval.metric.widget;
 
+import cz.vutbr.fit.dashapp.eval.metric.AbstractMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
-public abstract class AbstractWidgetMetric implements IWidgetMetric {
+public abstract class AbstractWidgetMetric extends AbstractMetric implements IWidgetMetric {
 	
 	@Override
 	public MetricResult[] measure(DashboardFile dashboardFile) {

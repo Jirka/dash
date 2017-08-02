@@ -3,13 +3,13 @@ package cz.vutbr.fit.dashapp.eval.metric.raster;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
 public abstract class AbstractRasterMetric implements IRasterMetric {
 
 	@Override
 	public MetricResult[] measure(DashboardFile dashboardFile) {
-		return measure(MatrixUtils.printBufferedImage(dashboardFile.getImage(), dashboardFile.getDashboard(true)));
+		return measure(ColorMatrix.printImageToMatrix(dashboardFile.getImage(), dashboardFile.getDashboard(true)));
 	}
 
 	@Override

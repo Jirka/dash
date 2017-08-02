@@ -9,13 +9,13 @@ import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 
 public class HeatMapMetricAnalysis extends AbstractAnalysis {
 	

@@ -29,7 +29,7 @@ public class NgoHomogenity extends AbstractWidgetMetric {
 		new QuadrantResolver() {
 			
 			@Override
-			protected void performAll(GraphicalElement graphicalElement) {
+			protected void performAllPre(GraphicalElement graphicalElement) {
 				quadrants.replace(this.q, quadrants.get(q)+1);
 			}
 		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);

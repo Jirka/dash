@@ -13,7 +13,10 @@ import cz.vutbr.fit.dashapp.eval.metric.widget.basic.Area;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoCohesion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
-import cz.vutbr.fit.dashapp.image.ColorMatrix;
+import cz.vutbr.fit.dashapp.image.colorspace.CIE;
+import cz.vutbr.fit.dashapp.image.colorspace.HSB;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
@@ -22,10 +25,8 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.ColorChannel.ColorChannelType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.HSB;
-import cz.vutbr.fit.dashapp.util.MatrixUtils.LCH;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import extern.AdaptiveThreshold;
 
 public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -80,17 +81,17 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 				List<Double> rgb4Symmetry = new ArrayList<>();
 				List<Double> bwBlack = new ArrayList<>();
 				for (GraphicalElement ge : elements) {
-					int[][] matrix = MatrixUtils.printBufferedImage(image, ge);
+					int[][] matrix = ColorMatrix.printImageToMatrix(image, ge);
 					//MatrixUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 4)));
 					
 					// HSB
-					HSB matrixHSB[][] = MatrixUtils.RGBtoHSB(matrix);
+					HSB matrixHSB[][] = HSB.fromRGB(matrix);
 					Colorfulness colorfunessMetric = new Colorfulness();
-					hsbSaturation.add(new Double((double) (colorfunessMetric.measure(matrixHSB, ColorChannelType.SATURATION))[0].value));
+					hsbSaturation.add(new Double((double) (colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_SATURATION))[0].value));
 					
 					// CIE Lab/Lch
-					LCH matrixLCH[][] = MatrixUtils.RGBtoLCH(matrix);
-					lchSaturation.add(new Double((double) (colorfunessMetric.measure(matrixLCH, ColorChannelType.SATURATION))[0].value));
+					CIE matrixLCH[][] = CIE.fromRGB(matrix);
+					lchSaturation.add(new Double((double) (colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_SATURATION))[0].value));
 					
 					// RGB 12 bit
 					ColorShare colorShare = new ColorShare();
@@ -101,8 +102,8 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					
 					// Gray 4 bit
 					int matrixGray[][] = ColorMatrix.toGrayScale(matrix, false, true);
-					int matrixGrayValue[][] = MatrixUtils.grayScaleToValues(MatrixUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), false);
-					int histogram[] = MatrixUtils.getGrayscaleHistogram(matrixGrayValue);
+					int matrixGrayValue[][] = ColorMatrix.toGrayScale(PosterizationUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), true, false);
+					int histogram[] = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
 					
 					result = (new IntensitiesCount()).measureGrayHistogram(histogram);
 					rgb4amount.add(new Double((int) result[0].value));
@@ -121,7 +122,7 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					rgb4Symmetry.add(new Double((double) result[0].value));
 					
 					// BW 1 bit
-					int matrixBW[][] = ColorMatrix.toGrayScale(MatrixUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+					int matrixBW[][] = ColorMatrix.toGrayScale(AdaptiveThreshold.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
 					bwBlack.add(new Double((double) (new BlackDensity()).measureGrayMatrix(matrixBW)[0].value));
 				}
 				

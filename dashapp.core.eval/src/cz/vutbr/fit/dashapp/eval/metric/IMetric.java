@@ -9,4 +9,6 @@ public interface IMetric {
 
 	MetricResult[] measure(DashboardFile dashboardFile, boolean forceReload, GEType[] types);
 
+	String getName();
+
 }

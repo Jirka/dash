@@ -7,17 +7,18 @@ import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.PixelCalculator;
-import cz.vutbr.fit.dashapp.image.MathUtils;
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.MathUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.PixelCalculator;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
 	
 public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculator {
 	
@@ -44,7 +45,7 @@ public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculato
 		this.actDashboardsCount = actDashboards.length;
 		int[][] heatMap = actDashboards.printDashboards(null, true);
 		GrayMatrix.update(heatMap, new EntrophyNormalization(actDashboardsCount), false);
-		MeanSatistics meanValue = MathUtils.meanStatistics(heatMap);
+		MeanSatistics meanValue = StatsUtils.meanStatistics(heatMap);
 		meanValues.put(actWorkspaceFolder.getFileName(), meanValue);
 		BufferedImage image = GrayMatrix.printMatrixToImage(null, heatMap);
 		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE);
@@ -58,7 +59,7 @@ public class EntrophyAnalysis extends AbstractAnalysis implements PixelCalculato
 			Rectangle cropRectangle = new Rectangle(dashboard.x, dashboard.y, dashboard.width, dashboard.height);
 			heatMap = GrayMatrix.cropMatrix(heatMap, cropRectangle);
 			//meanValuesCrop.put(actWorkspaceFolder.getFileName(), GrayMatrix.meanStatistics(cmpMap));
-			meanValue = MathUtils.meanStatistics(heatMap);
+			meanValue = StatsUtils.meanStatistics(heatMap);
 			meanValuesCrop.put(actWorkspaceFolder.getFileName(), meanValue);
 			image = GrayMatrix.printMatrixToImage(null, heatMap);
 			FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_x");

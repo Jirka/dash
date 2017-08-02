@@ -14,7 +14,7 @@ import cz.vutbr.fit.dashapp.controller.PropertyChangeEvent;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils.WorkingCopy;
 
@@ -89,8 +89,8 @@ public class WandTool extends AbstractCanvasTool {
 		// TODO
 		Dashboard dashboard = canvas.getDashboard();
 		BufferedImage image = canvas.getDashboardFile().getImage();
-		int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
-		MatrixUtils.grayScale(matrix, true, false);
+		int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
+		ColorMatrix.toGrayScale(matrix, true, false);
 		int refValue = matrix[candidateElement.x1][candidateElement.y1];
 		matrix[candidateElement.x1][candidateElement.y1] = -1;
 		for (int i = 0; i < matrix.length; i++) {

@@ -177,6 +177,26 @@ public class GraphicalElement {
 	}
 	
 	/**
+	 * Returns children which are not hidden behind another GE.
+	 * 
+	 * @param types
+	 * @return visible child graphical elements
+	 */
+	public List<GraphicalElement> getVisibleChildren(GEType[] types) {
+		ArrayList<GraphicalElement> result = new ArrayList<GraphicalElement>();
+		// it returns empty array list instead of null array list 
+		List<GraphicalElement> children = getChildren(types);
+		if(children != null) {
+			for (GraphicalElement child : children) {
+				if(!child.isHidden(children)) {
+					result.add(child);
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Replace children with the selected list.
 	 * 
 	 * @param children
@@ -251,7 +271,7 @@ public class GraphicalElement {
 	 * @return relative center X
 	 */
 	public double halfSizeX() {
-		return width/2.0;
+		return ((double)width)/2;
 	}
 	
 	/**
@@ -260,7 +280,7 @@ public class GraphicalElement {
 	 * @return relative center Y
 	 */
 	public double halfSizeY() {
-		return height/2.0;
+		return ((double) height)/2;
 	}
 	
 	/**
@@ -387,6 +407,12 @@ public class GraphicalElement {
 		return depth;
 	}
 	
+	/**
+	 * Returns rectangle of GE which lays in specific dashboard side.
+	 * 
+	 * @param s
+	 * @return
+	 */
 	public Rectangle getRectangle(Side s) {
 		Dashboard dashboard = getDashboard();
 		double cx = dashboard.centerX();
@@ -417,6 +443,50 @@ public class GraphicalElement {
 			case DOWN:
 				x1 = Math.max(0, Math.min(x1, dashboard.width));
 				x2 = Math.max(0, Math.min(x2, dashboard.width));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
+		}
+		
+		return new Rectangle((int) x1, (int) y1, (int) Math.round(x2-x1), (int) Math.round(y2-y1));
+	}
+	
+	/**
+	 * Returns rectangle of GE which lays in specific dashboard quadrant.
+	 * 
+	 * @param s
+	 * @return
+	 */
+	public Rectangle getRectangle(Quadrant q) {
+		Dashboard dashboard = getDashboard();
+		double cx = dashboard.centerX();
+		double cy = dashboard.centerY();
+		double x1 = absoluteX();
+		double x2 = absoluteX()+width;
+		double y1 = absoluteY();
+		double y2 = absoluteY()+height;
+		switch (q) {
+			case I:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case II:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
+				y1 = Math.max(0, Math.min(y1, cy));
+				y2 = Math.max(0, Math.min(y2, cy));
+				break;
+			case III:
+				x1 = Math.max(0, Math.min(x1, cx));
+				x2 = Math.max(0, Math.min(x2, cx));
+				y1 = Math.max(cy, Math.min(y1, dashboard.height));
+				y2 = Math.max(cy, Math.min(y2, dashboard.height));
+				break;
+			case IV:
+				x1 = Math.max(cx, Math.min(x1, dashboard.width));
+				x2 = Math.max(cx, Math.min(x2, dashboard.width));
 				y1 = Math.max(cy, Math.min(y1, dashboard.height));
 				y2 = Math.max(cy, Math.min(y2, dashboard.height));
 				break;
@@ -462,6 +532,27 @@ public class GraphicalElement {
 			pi = 1/pi;
 		}
 		return pi;
+	}
+	
+	/**
+	 * Tests if this graphical element is all hidden behind some another GE.
+	 * 
+	 * @param ges
+	 * @return
+	 */
+	public boolean isHidden(List<GraphicalElement> ges) {
+		for (GraphicalElement ge : ges) {
+			if(this != ge) {
+				if(this.x() >= ge.x() && this.x2() <= ge.x2() &&
+						this.y() >= ge.y() && this.y2() <= ge.y2()) {
+					// actGe is hidden behind ge
+					return true;
+				}
+			}
+		}
+		
+		return false;
+		
 	}
 	
 	

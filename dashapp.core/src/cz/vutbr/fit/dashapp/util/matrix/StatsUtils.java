@@ -1,9 +1,6 @@
-package cz.vutbr.fit.dashapp.image;
+package cz.vutbr.fit.dashapp.util.matrix;
 
-public class MathUtils {
-	
-	private static final double LOG_e_2 = Math.log(2);
-	private static final double LOG_10_2 = Math.log10(2);
+public class StatsUtils {
 	
 	public static class MeanSatistics {
 		public double mean;
@@ -113,22 +110,6 @@ public class MathUtils {
 		statistics.min = minValue(matrix);
 		statistics.max = maxValue(matrix);
 		return statistics;
-	}
-	
-	public static double entrophy(double p) {
-		double pp = 1-p;
-		if(p == 0 || pp == 0) {
-			return 0.0;
-		}
-		return -(pp*log2_via_e(pp)+p*log2_via_e(p));
-	}
-	
-	public static double log2_via_e(double x) {
-		return Math.log(x)/LOG_e_2;
-	}
-	
-	public static double log2_via_10(double x) {
-		return Math.log10(x)/LOG_10_2;
 	}
 
 }

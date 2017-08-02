@@ -9,7 +9,7 @@ public class NgoUnity extends AbstractWidgetMetric {
 
 	@Override
 	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
-		int areas = dashboard.getElementsArea(types);
+		int areas = dashboard.getElementsArea(types, true);
 		
 		double UM_form = 1 - (((double)(dashboard.getNumberOfSizes(types)-1))/dashboard.n(types));
 		double UM_space = 0;

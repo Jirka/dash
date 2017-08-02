@@ -1,7 +1,9 @@
-package cz.vutbr.fit.dashapp.image;
+package cz.vutbr.fit.dashapp.util.matrix;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+
+import cz.vutbr.fit.dashapp.util.MathUtils;
 
 public class GrayMatrix {
 	
@@ -298,7 +300,7 @@ public class GrayMatrix {
 		int cW = x2-x1; 
 		int cH = y2-y1;
 		
-		if(cW <= 0 && cH <= 0) {
+		if(cW <= 0 || cH <= 0) {
 			return new int[0][0];
 		}
 		

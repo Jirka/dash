@@ -2,7 +2,7 @@ package cz.vutbr.fit.dashapp.model;
 
 import java.awt.image.BufferedImage;
 
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
 public class VirtualDashboardFile extends WorkspaceFile implements IDashboardFile {
 	
@@ -65,7 +65,7 @@ public class VirtualDashboardFile extends WorkspaceFile implements IDashboardFil
 	@Override
 	public int[][] getImageMatrix() {
 		if(imageMatrix == null) {
-			imageMatrix = MatrixUtils.printBufferedImage(image);
+			imageMatrix = ColorMatrix.printImageToMatrix(image);
 		}
 		return imageMatrix;
 	}

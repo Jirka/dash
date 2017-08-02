@@ -4,10 +4,10 @@ import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
-import cz.vutbr.fit.dashapp.view.DashAppView;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
 public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -38,10 +38,10 @@ public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 		
 		Dashboard dashboard = dashboardFile.getDashboard(true);
 		if(dashboard != null) {
-			BufferedImage image = DashAppView.getInstance().getDashboardView().getCanvas().getImage();
+			BufferedImage image = dashboardFile.getImage();;
 			if(image != null) {
-				int[][] matrix = MatrixUtils.printBufferedImage(image, dashboard);
-				Map<Integer, Integer> histogram = MatrixUtils.getColorHistogram(matrix);
+				int[][] matrix = ColorMatrix.printImageToMatrix(image, dashboard);
+				Map<Integer, Integer> histogram = HistogramUtils.getColorHistogram(matrix);
 				
 				DecimalFormat df = new DecimalFormat("#.#####");
 				
@@ -64,13 +64,13 @@ public class ActualAnalysis extends AbstractAnalysis implements IAnalysis {
 				Integer key = max.getKey();
 				Integer value = max.getValue();
 				int area = dashboard.area();
-				buffer.append("Most frequent color: R=" + MatrixUtils.getRed(key) + " G=" + MatrixUtils.getGreen(key) + " B=" + MatrixUtils.getBlue(key) + "\n");
+				buffer.append("Most frequent color: R=" + ColorMatrix.getRed(key) + " G=" + ColorMatrix.getGreen(key) + " B=" + ColorMatrix.getBlue(key) + "\n");
 				buffer.append("  -> " + value + "/" + area + "=" + df.format((((double) value)/(area))*100) + "%\n");
 				
 				max = getMax(histogram, max);
 				key = max.getKey();
 				value = max.getValue();
-				buffer.append("Second frequent color: R=" + MatrixUtils.getRed(key) + " G=" + MatrixUtils.getGreen(key) + " B=" + MatrixUtils.getBlue(key) + "\n");
+				buffer.append("Second frequent color: R=" + ColorMatrix.getRed(key) + " G=" + ColorMatrix.getGreen(key) + " B=" + ColorMatrix.getBlue(key) + "\n");
 				buffer.append("  -> " + value + "/" + area + "=" + df.format((((double) value)/(area))*100) + "%\n");
 			}
 		}

@@ -10,7 +10,7 @@ public class NgoDensity extends AbstractWidgetMetric {
 	@Override
 	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
 		return new MetricResult[] {
-				new MetricResult("Density", "DM", 1.0-2*Math.abs(0.5-(((double) dashboard.getElementsArea(types))/dashboard.area())))
+				new MetricResult("Density", "DM", 1.0-2*Math.abs(0.5-(((double) dashboard.getElementsArea(types, true))/dashboard.area())))
 		};
 	}
 

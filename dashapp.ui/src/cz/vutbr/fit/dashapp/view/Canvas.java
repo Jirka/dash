@@ -28,7 +28,7 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.AbstractCanvasTool;
 
@@ -128,9 +128,9 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	}
 	
 	private void convertToGrayScale(BufferedImage image) {
-		int[][] matrix = MatrixUtils.printBufferedImage(image);
-		MatrixUtils.grayScale(matrix, false, false);
-		MatrixUtils.updateBufferedImage(image, matrix);
+		int[][] matrix = ColorMatrix.printImageToMatrix(image);
+		ColorMatrix.toGrayScale(matrix, false, false);
+		ColorMatrix.printMatrixToImage(image, matrix);
 	}
 	
 	private boolean grayScaleToolEnabled;

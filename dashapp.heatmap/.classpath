@@ -7,7 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.image"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.eval"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.eval"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.rel.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.eval.heatmap"/>
 	<classpathentry kind="output" path="bin"/>

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.simpleframework.xml.Root;
 
-import cz.vutbr.fit.dashapp.util.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
 
 /**
  * This class represents dashboard definition.
@@ -117,7 +117,7 @@ public class Dashboard extends GraphicalElement {
 	
 	public boolean[][] getBooleanMatrix(GEType[] types) {
 		boolean[][] mattrix = new boolean[width][height];
-		MatrixUtils.printDashboard(mattrix, this, true, types);
+		BooleanMatrix.printDashboard(mattrix, this, true, types);
 		return mattrix;
 	}
 	
@@ -178,17 +178,48 @@ public class Dashboard extends GraphicalElement {
 	}
 	
 	/**
+	 * Returns rectangle of layout.
+	 * 
+	 * @param types
+	 * @return
+	 */
+	public Rectangle getLayoutRectangle(GEType[] types) {
+		int minX = this.width, maxX = 0;
+		int minY = this.height, maxY = 0;
+		List<GraphicalElement> ges = this.getChildren(types);
+		for (GraphicalElement graphicalElement : ges) {
+			if(minX > graphicalElement.x) {
+				minX = graphicalElement.x;
+			}
+			if(maxX < graphicalElement.x+graphicalElement.width) {
+				maxX = graphicalElement.x+graphicalElement.width;
+			}
+			if(minY > graphicalElement.y) {
+				minY = graphicalElement.y;
+			}
+			if(maxY < graphicalElement.y+graphicalElement.height) {
+				maxY = graphicalElement.y+graphicalElement.height;
+			}
+		}
+		return new Rectangle(minX, minY, maxX-minX, maxY-minY);
+	}
+	
+	/**
 	 * 
 	 * @param types
 	 * @return area which is used by child elements
 	 */
-	public int getElementsArea(GEType[] types) {
-		/*int areas = 0;
-		for (GraphicalElement graphicalElement : this.getChildren(types)) {
-			areas += graphicalElement.area();
-		}*/
-		boolean matrix[][] = MatrixUtils.printDashboard(this, true, GEType.ALL_TYPES);
-		return MatrixUtils.calculatePixels(matrix);
+	public int getElementsArea(GEType[] types, boolean spaceArea) {
+		if(spaceArea) {
+			boolean matrix[][] = BooleanMatrix.printDashboard(this, true, GEType.ALL_TYPES);
+			return BooleanMatrix.count(matrix);
+		} else {
+			int areas = 0;
+			for (GraphicalElement graphicalElement : this.getChildren(types)) {
+				areas += graphicalElement.area();
+			}
+			return areas;
+		}
 	}
 	
 	/**
@@ -200,6 +231,24 @@ public class Dashboard extends GraphicalElement {
 		Set<Point> sizes = new HashSet<Point>();
 		Point p;
 		for (GraphicalElement graphicalElement : this.getChildren(types)) {
+			p = new Point(graphicalElement.width, graphicalElement.height);
+			if(!(sizes.contains(p))) {
+				sizes.add(p);
+			}
+		}
+		return sizes.size();
+	}
+	
+	/**
+	 * Returns number of sizes for visible children.
+	 * 
+	 * @param types
+	 * @return
+	 */
+	public int getNumberOfVisibleSizes(GEType[] types) {
+		Set<Point> sizes = new HashSet<Point>();
+		Point p;
+		for (GraphicalElement graphicalElement : this.getVisibleChildren(types)) {
 			p = new Point(graphicalElement.width, graphicalElement.height);
 			if(!(sizes.contains(p))) {
 				sizes.add(p);

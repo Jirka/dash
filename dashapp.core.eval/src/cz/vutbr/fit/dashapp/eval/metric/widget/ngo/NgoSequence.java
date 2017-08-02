@@ -23,10 +23,19 @@ public class NgoSequence extends AbstractWidgetMetric {
 	private int getQuadrantValue(Quadrant q, QuadrantMap<Double> map) {
 		int value = 1;
 		Double item = map.get(q);
+		int qIndex = q.getIndex();
+		int i = 0;
 		for(Entry<Quadrant, Double> act : quadrants2.entrySet()) {
-			if(act.getKey() != q && item > act.getValue()) {
-				value++;
+			if(act.getKey() != q && item >= act.getValue()) {
+				if(item == act.getValue()) {
+					if(qIndex < i) {
+						value++;
+					}
+				} else {
+					value++;
+				}
 			}
+			i++;
 		}
 		return value;
 	}
@@ -49,7 +58,7 @@ public class NgoSequence extends AbstractWidgetMetric {
 		new QuadrantResolver() {
 			
 			@Override
-			protected void performAll(GraphicalElement graphicalElement) {
+			protected void performAllPre(GraphicalElement graphicalElement) {
 				quadrants2.replace(this.q, quadrants2.get(q)+graphicalElement.area(q));
 			}
 		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);

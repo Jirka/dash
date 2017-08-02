@@ -7,17 +7,17 @@ import java.util.List;
 import java.util.Map;
 
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.image.GrayMatrix;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.image.GrayMatrix.ThresholdCalculator;
-import cz.vutbr.fit.dashapp.image.MathUtils;
-import cz.vutbr.fit.dashapp.image.MathUtils.MeanSatistics;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
 
 public class CompareAnalysis extends AbstractAnalysis {
 	
@@ -56,9 +56,9 @@ public class CompareAnalysis extends AbstractAnalysis {
 		if(!widgetInsteadOfThreshold) {
 			// make threshold matrix
 			int[][] heatMatrix = GrayMatrix.normalize(printMatrix, actDashboards.length, true);
-			double actHeatMean = MathUtils.meanValue(heatMatrix);
+			double actHeatMean = StatsUtils.meanValue(heatMatrix);
 			int[][] entrophyMatrix = GrayMatrix.update(printMatrix, new EntrophyNormalization(actDashboardsCount), true);
-			double actInversedEntrophyMean = GrayMatrix.WHITE-MathUtils.meanValue(entrophyMatrix);
+			double actInversedEntrophyMean = GrayMatrix.WHITE-StatsUtils.meanValue(entrophyMatrix);
 			double actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
 			thresholdMatrix = GrayMatrix.update(heatMatrix, new ThresholdCalculator((int) actThreshlod), true);
 			//double actThreshlod = 1-((actHeatMean+actInversedEntrophyMean)/(2*GrayMatrix.WHITE));
@@ -95,7 +95,7 @@ public class CompareAnalysis extends AbstractAnalysis {
 			GrayMatrix.normalize(refMap, refDashboard.length, false);
 			int[][] cmpMap = GrayMatrix.compareMatrices(thresholdMatrix, refMap);
 			if(makeMeanStats) {
-				meanValues.put(actWorkspaceFolder.getFileName(), MathUtils.meanStatistics(cmpMap));
+				meanValues.put(actWorkspaceFolder.getFileName(), StatsUtils.meanStatistics(cmpMap));
 			}
 			countValues.put(actWorkspaceFolder.getFileName(), ((double) GrayMatrix.getColorCount(cmpMap, GrayMatrix.BLACK))/
 					(actDashboards.size()));
@@ -108,7 +108,7 @@ public class CompareAnalysis extends AbstractAnalysis {
 			if(cropRectangle != null) {
 				int[][] cmpMapCrop = GrayMatrix.cropMatrix(cmpMap, cropRectangle);
 				if(makeMeanStats) {
-					meanValuesCrop.put(actWorkspaceFolder.getFileName(), MathUtils.meanStatistics(cmpMapCrop));
+					meanValuesCrop.put(actWorkspaceFolder.getFileName(), StatsUtils.meanStatistics(cmpMapCrop));
 				}
 				countValuesCrop.put(actWorkspaceFolder.getFileName(), ((double) GrayMatrix.getColorCount(cmpMapCrop, GrayMatrix.BLACK))
 						/(cropRectangle.width*cropRectangle.height));//meanValues.put(actWorkspaceFolder.getFileName(), GrayMatrix.meanStatistics(cmpMap));
