@@ -111,6 +111,31 @@ public class EventManager {
 	}
 	
 	/**
+	 * Method updates dashboard. If change is made dashboard XML is updated
+	 * and dashboard model property change event is fired.
+	 * 
+	 * @param newDashboard
+	 */
+	public void updateDashboard(Dashboard newDashboard) {
+		IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
+		if(selectedFile instanceof DashboardFile) {
+			DashboardFile dashboardFile = (DashboardFile) selectedFile;
+			Dashboard actDashboard = dashboardFile.getDashboard(false);
+			Dashboard oldDashboard = actDashboard.copy();
+			actDashboard.setDimension(newDashboard.x, newDashboard.y, newDashboard.width, newDashboard.height);
+			actDashboard.setChildren(newDashboard.getChildren());
+			// update XML
+			String oldXML = dashboardFile.getSerializedDashboard().getXml();
+			String newXML = XMLUtils.serialize(actDashboard);
+			dashboardFile.getSerializedDashboard().setXml(newXML);
+			// fire property change
+			controller.firePropertyChange(new PropertyChangeEvent(EventKind.GRAPHICAL_ELEMENT_CHANGED, dashboardFile, new Change(oldDashboard, actDashboard), new Change(oldXML, newXML)));
+			// updates dashboard state
+			updateDashboardFileState(dashboardFile);
+		}
+	}
+	
+	/**
 	 * Method updates graphical element. If change is made dashboard XML is updated
 	 * and dashboard model property change event is fired.
 	 * 
