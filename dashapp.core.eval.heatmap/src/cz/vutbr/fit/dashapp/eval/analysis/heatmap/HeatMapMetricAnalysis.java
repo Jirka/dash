@@ -1,4 +1,4 @@
-package dashapp.core.eval.analysis.heatmap;
+package cz.vutbr.fit.dashapp.eval.analysis.heatmap;
 
 import java.awt.Rectangle;
 import java.util.LinkedHashMap;

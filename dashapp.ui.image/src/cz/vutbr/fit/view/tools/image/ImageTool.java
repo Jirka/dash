@@ -1,4 +1,4 @@
-package cz.fit.vutbr.view.tools.image;
+package cz.vutbr.fit.view.tools.image;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import cz.fit.vutbr.view.util.Histogram;
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.image.colorspace.CIE;
 import cz.vutbr.fit.dashapp.image.colorspace.ColorChannelUtils;
@@ -35,6 +34,7 @@ import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
+import cz.vutbr.fit.view.util.Histogram;
 import extern.AdaptiveThreshold;
 import cz.vutbr.fit.dashapp.view.Canvas;
 

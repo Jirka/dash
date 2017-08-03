@@ -5,8 +5,15 @@ import java.util.LinkedList;
 
 import javax.swing.ButtonGroup;
 
-import cz.fit.vutbr.view.tools.image.ImageTool;
 import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.CompareAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.EdgesAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.EntrophyAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapMetricAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.ThresholdAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.WidgetAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.WidgetMetricAnalysis;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
@@ -25,14 +32,7 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import dashapp.core.eval.analysis.heatmap.CompareAnalysis;
-import dashapp.core.eval.analysis.heatmap.EdgesAnalysis;
-import dashapp.core.eval.analysis.heatmap.EntrophyAnalysis;
-import dashapp.core.eval.analysis.heatmap.HeatMapAnalysis;
-import dashapp.core.eval.analysis.heatmap.HeatMapMetricAnalysis;
-import dashapp.core.eval.analysis.heatmap.ThresholdAnalysis;
-import dashapp.core.eval.analysis.heatmap.WidgetAnalysis;
-import dashapp.core.eval.analysis.heatmap.WidgetMetricAnalysis;
+import cz.vutbr.fit.view.tools.image.ImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	

@@ -1,4 +1,4 @@
-package cz.fit.vutbr.view.util;
+package cz.vutbr.fit.view.util;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

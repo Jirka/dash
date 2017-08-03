@@ -1,4 +1,4 @@
-package dashapp.core.eval.analysis.heatmap;
+package cz.vutbr.fit.dashapp.eval.analysis.heatmap;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -8,12 +8,14 @@ import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
-import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdNormalization;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.PixelCalculator;
 
-public class ThresholdAnalysis extends AbstractAnalysis {
+public class EdgesAnalysis extends AbstractAnalysis implements PixelCalculator {
 	
-	public static final String LABEL = "Threshold Analysis";
-	public static final String FILE = "_threshold";
+	private static final String LABEL = "Edge Detection";
+	private static final String FILE = "_edges";
+	
+	private int actDashboardsCount;
 	
 	@Override
 	public String getLabel() {
@@ -22,15 +24,23 @@ public class ThresholdAnalysis extends AbstractAnalysis {
 
 	@Override
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
-		int actDashboardsCount = actDashboards.length;
+		this.actDashboardsCount = actDashboards.length;
 		int[][] outputMatrix = actDashboards.printDashboards(null);
-		GrayMatrix.update(outputMatrix, new ThresholdNormalization(0.8, actDashboardsCount), false);
-		BufferedImage image = GrayMatrix.printMatrixToImage(null, outputMatrix);
+		GrayMatrix.update(outputMatrix, this, false);
+		int[][] edgesMatrix = GrayMatrix.edges(outputMatrix);
+		BufferedImage image = GrayMatrix.printMatrixToImage(null, edgesMatrix);
 		FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE);
 	}
 
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
 		// do nothing
+	}
+
+	@Override
+	public int calculateValue(int value) {
+		double probabilty = (double) value/this.actDashboardsCount;
+		probabilty = probabilty > 0.8 ? 1.0 : 0.0;
+		return GrayMatrix.toGray(probabilty);
 	}
 }

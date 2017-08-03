@@ -1,4 +1,4 @@
-package cz.fit.vutbr.view.tools.image;
+package cz.vutbr.fit.view.tools.image;
 
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 
-import cz.fit.vutbr.view.util.Histogram;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
@@ -16,6 +15,7 @@ import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
+import cz.vutbr.fit.view.util.Histogram;
 
 /**
  * 
