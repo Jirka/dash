@@ -6,6 +6,11 @@ import java.util.List;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.convert.Convert;
+import org.simpleframework.xml.convert.Converter;
+import org.simpleframework.xml.stream.InputNode;
+import org.simpleframework.xml.stream.OutputNode;
 
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.Constants.Side;
@@ -24,10 +29,31 @@ public class GraphicalElement {
 	 * @author Jiri Hynek
 	 *
 	 */
+	@Root
+	@Convert(GETypeConverter.class)
 	public static enum GEType {
-		TOOLBAR, BUTTON, HEADER, CHART, LABEL, DECORATION;
+		TOOLBAR, BUTTON, HEADER, CHART, LABEL, DECORATION,
+		/**
+		 * web-app compatibility
+		 */
+		bullet, sparklines, linegraph, text, table,
+		graph_horizontal("graph-horizontal"), graph_vertical("graph-vertical");
 		
 		public static final GEType[] ALL_TYPES = null;
+		
+		private String name;
+		
+		private GEType() {
+			this.name = this.toString();
+		}
+		
+		private GEType(String name) {
+			this.name = name;
+		}
+		
+		public String getName() {
+			return name;
+		}
 
 		public static boolean contains(GEType[] types, GEType type) {
 			for (GEType preferredType : types) {
@@ -46,6 +72,26 @@ public class GraphicalElement {
 			}
 			return null;
 		}
+	}
+	
+	public static class GETypeConverter implements Converter<GEType> {
+
+		@Override
+		public GEType read(InputNode node) throws Exception {
+			final String value = node.getValue();
+
+	        for(GEType geType : GEType.values()) {
+	            if(geType.getName().equalsIgnoreCase(value) )
+	                return geType;
+	        }
+	        throw new IllegalArgumentException("No enum available for " + value);
+		}
+
+		@Override
+		public void write(OutputNode node, GEType value) throws Exception {
+	        node.setValue(value.getName());
+		}
+		
 	}
 	
 	/**
@@ -77,6 +123,12 @@ public class GraphicalElement {
 	 */
 	@Element(required=false)
 	public GEType type = GEType.CHART;
+	
+	/**
+	 * web-app compatibility
+	 */
+	@Element(required=false)
+	public GEStyle style;
 	
 	/**
 	 * dashboard

@@ -3,6 +3,7 @@ package cz.vutbr.fit.dashapp.util;
 import java.io.StringWriter;
 
 import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -25,7 +26,7 @@ public class XMLUtils {
 	 * @return
 	 */
 	public static String serialize(Dashboard dashboard) {
-		Serializer serializer = new Persister();
+		Serializer serializer = new Persister(new AnnotationStrategy());
 		StringWriter writer = new StringWriter();
 		try {
 			serializer.write(dashboard, writer);
@@ -41,12 +42,12 @@ public class XMLUtils {
 	 * @return
 	 */
 	public static Dashboard deserialize(String xml) {
-		Serializer serializer = new Persister();
+		Serializer serializer = new Persister(new AnnotationStrategy());
 		Dashboard newDashboard = null;
 		try {
 			newDashboard = serializer.read(Dashboard.class, xml);
 		} catch (Exception e) {
-			System.err.println("Unable to deserialize dashboard");
+			System.err.println("Unable to deserialize dashboard\n" + e);
 		}
 		return newDashboard;
 	}

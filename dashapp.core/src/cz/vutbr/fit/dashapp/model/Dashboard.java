@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
@@ -19,6 +20,12 @@ import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
  */
 @Root(name="dashboard")
 public class Dashboard extends GraphicalElement {
+	
+	/**
+	 * web-app compatibility
+	 */
+	@Element(required=false)
+	public String title;
 	
 	/**
 	 * dashboard physical representation (image or structural description)

@@ -122,17 +122,22 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 			if(xml != null) {
 				// try to deserialize XML (test if valid)
 				Dashboard deserializedXML = XMLUtils.deserialize(xml);
-				// description is empty -> set image default dimension
-				if(xml.startsWith(SerializedDashboard.EMPTY_XML)) {
-					BufferedImage image = getImage();
-					if(image != null) {
-						deserializedXML.width = image.getWidth();
-						deserializedXML.height = image.getHeight();
+				if(deserializedXML != null) {
+					// description is empty -> set image default dimension
+					if(xml.startsWith(SerializedDashboard.EMPTY_XML)) {
+						BufferedImage image = getImage();
+						if(image != null) {
+							deserializedXML.width = image.getWidth();
+							deserializedXML.height = image.getHeight();
+						}
+					} else {
+						dashboard = new Dashboard(this);
+						dashboard.setDimension(deserializedXML.x, deserializedXML.y, deserializedXML.width, deserializedXML.height);
+						dashboard.setChildren(deserializedXML.getChildren());
 					}
 				} else {
+					// corrupted XML
 					dashboard = new Dashboard(this);
-					dashboard.setDimension(deserializedXML.x, deserializedXML.y, deserializedXML.width, deserializedXML.height);
-					dashboard.setChildren(deserializedXML.getChildren());
 				}
 				serializedDashboard.setXml(xml);
 			}
