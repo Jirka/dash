@@ -164,7 +164,9 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 		File folderFile = folder.getFile();
 		if(folderFile.exists() && folderFile.isDirectory()) {
 			// parent folder
-			listModel.addElement(new WorkspaceFolder(folder.getModel(), folderFile.getParentFile()));
+			if(folderFile.getParentFile() != null) {
+				listModel.addElement(new WorkspaceFolder(folder.getModel(), folderFile.getParentFile()));
+			}
 			// folder and dashboard files
 			IWorkspaceFile[] children = folder.getChildren(true);
 			for (IWorkspaceFile child : children) {

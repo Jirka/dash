@@ -42,7 +42,7 @@ public class WorkspaceFolder extends WorkspaceFile implements IWorkspaceFile {
 	}
 
 	public boolean isParentOf(WorkspaceFolder dashboardFolder) {
-		return dashboardFolder.getFile().getParentFile().equals(folderFile);
+		return folderFile.equals(dashboardFolder.getFile().getParentFile());
 	}
 	
 	@Override
