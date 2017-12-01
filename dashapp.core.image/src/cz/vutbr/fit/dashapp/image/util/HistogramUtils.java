@@ -71,5 +71,17 @@ public class HistogramUtils {
 		
 		return map;
 	}
+	
+	public static int findMax(int[] histogram, int upperLimitIndex) {
+		int max = 0;
+		for (int i = 0; i < histogram.length; i++) {
+			if(histogram[i] > histogram[max]) {
+				if(upperLimitIndex < 0 || histogram[i] < histogram[upperLimitIndex]) {
+					max = i;
+				}
+			}
+		}
+		return max;
+	}
 
 }

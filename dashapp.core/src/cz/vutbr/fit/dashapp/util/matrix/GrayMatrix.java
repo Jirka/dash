@@ -1,7 +1,11 @@
 package cz.vutbr.fit.dashapp.util.matrix;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
 
@@ -72,6 +76,23 @@ public class GrayMatrix {
 		return resultMatrix;
 	}
 	
+	public static int[][] copy(int[][] to, int[][] from) {
+		int mW = Math.min(to.length, from.length);
+		int mH = Math.min(to[0].length, from[0].length);
+		
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
+				to[x][y] = from[x][y];
+			}
+		}
+		
+		return to;
+	}
+	
+	public static int[][] convolve(int[][] matrix, int[][] filter) {
+		return convolve(matrix, filter, 1);
+	}
+	
 	/**
 	 * Makes convolution between matrix and filter
 	 * 
@@ -80,7 +101,7 @@ public class GrayMatrix {
 	 * @param createNew
 	 * @return
 	 */
-	public static int[][] convolve(int[][] matrix, int[][] filter) {
+	public static int[][] convolve(int[][] matrix, int[][] filter, int div) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);
 		
@@ -90,10 +111,11 @@ public class GrayMatrix {
 		int fW_2 = (fW-1)/2;
 		int fH = MatrixUtils.height(filter);
 		int fH_2 = (fH-1)/2;
+		int value = 0;
 		
 		for (int x = 0; x < mW; x++) {
 			for (int y = 0; y < mH; y++) {
-				int value = 0;
+				value = 0;
 				for (int i = 0; i < fW; i++) {
 					for (int j = 0; j < fH; j++) {
 						// border pixels use pixels from the other side
@@ -102,7 +124,7 @@ public class GrayMatrix {
 					    value += matrix[imageX][imageY]*filter[i][j];
 					}
 				}
-				output[x][y] = Math.min(Math.max(value,0), 255);
+				output[x][y] = Math.min(Math.max(value/div,0), 255);
 			}
 		}
 		
@@ -133,6 +155,38 @@ public class GrayMatrix {
 		}
 		
 		return inverseMatrix;
+	}
+	
+	public static int[][] medianFilter(int[][] matrix, int kernelDepth) {
+		int mW = MatrixUtils.width(matrix)-kernelDepth;
+		int mH = MatrixUtils.height(matrix)-kernelDepth;
+		
+		int resultMatrix[][] = new int[matrix.length][matrix[0].length];
+		
+		int kernelWidth = kernelDepth*2+1;
+		int middle = (kernelWidth*kernelWidth)/2;
+		int[] kernel = new int[kernelWidth*kernelWidth];
+		int k; // kernel iterator
+		
+		for (int x = kernelDepth; x < mW; x++) {
+			for (int y = kernelDepth; y < mH; y++) {
+				k = 0;
+				for (int i = 0; i < kernelWidth; i++) {
+					for (int j = 0; j < kernelWidth; j++) {
+						// save pixel of kernel
+						// border pixels use pixels from the other side
+						int imageX = (x - kernelDepth + i + mW) % mW;
+					    int imageY = (y - kernelDepth + j + mH) % mH;
+					    kernel[k] = matrix[imageX][imageY];
+					    k++;
+					}
+				}
+				Arrays.sort(kernel);
+				resultMatrix[x][y] = kernel[middle];
+			}
+		}
+		
+		return resultMatrix;
 	}
 	
 	/**
@@ -332,6 +386,106 @@ public class GrayMatrix {
 		return cropMatrix;
 	}
 	
+	/**
+	 * Expects black and white matrix.
+	 * 
+	 * @param matrix
+	 * @param createNew
+	 * @return
+	 */
+	public static int[][] createRectangles(int[][] matrix, boolean createNew) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int rectangleMatrix[][] = matrix;
+		if(createNew) {
+			rectangleMatrix = new int[mW][mH];
+			copy(rectangleMatrix, matrix);
+		}
+		
+		// process matrix
+		int color = -1;
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				if(rectangleMatrix[i][j] == BLACK) {
+					processSeedPixel(i, j, color, rectangleMatrix);
+					color--;
+				}
+			}
+		}
+		
+		// convert colors to black
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				if(rectangleMatrix[i][j] < 0) {
+					rectangleMatrix[i][j] = BLACK;
+				}
+			}
+		}
+		
+		return rectangleMatrix;
+	}
 	
+	private static void processSeedPixel(int i, int j, int color, int[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		// do flood fill algorithm
+		Queue<Point> queue = new LinkedList<Point>();
+        queue.add(new Point(i, j));
+        int x1 = i, x2 = i, y1 = j, y2 = j;
+        while (!queue.isEmpty()) {
+            Point p = queue.remove();
+            if ((p.x >= 0) && (p.x < mW) && (p.y >= 0) && (p.y < mH)) {
+                if (matrix[p.x][p.y] == GrayMatrix.BLACK) {
+                	matrix[p.x][p.y] = color;
+                	
+                	// update min/max points 
+                	if(p.x < x1) {
+                		x1 = p.x;
+                	} else if(p.x > x2) {
+                		x2 = p.x;
+                	}
+                	if(p.y < y1) {
+                		y1 = p.y;
+                	} else if(p.y > y2) {
+                		y2 = p.y;
+                	}
+
+                	// add neighbour points
+                    queue.add(new Point(p.x + 1, p.y));
+                    queue.add(new Point(p.x - 1, p.y));
+                    queue.add(new Point(p.x, p.y + 1));
+                    queue.add(new Point(p.x, p.y - 1));
+                    
+                    queue.add(new Point(p.x + 1, p.y + 1));
+                    queue.add(new Point(p.x + 1, p.y - 1));
+                    queue.add(new Point(p.x - 1, p.y + 1));
+                    queue.add(new Point(p.x - 1, p.y - 1));
+                }
+            }
+        }
+        
+        x2++; y2++;
+        
+        // test rectangle size
+        if(x2-x1 > mW/2 && y2-y1 > mH/2) {
+        	// delete area
+           for (int x = 0; x < mW; x++) {
+    			for (int y = 0; y < mH; y++) {
+    				if(matrix[x][y] == color) {
+    					matrix[x][y] = WHITE;
+    				}
+    			}
+    		}
+        } else {
+        	// create rectangle
+            for (int x = x1; x < x2; x++) {
+    			for (int y = y1; y < y2; y++) {
+    				matrix[x][y] = color;
+    			}
+    		}
+        }
+	}
 	
 }

@@ -10,6 +10,7 @@ import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationAlgorithm2;
+import cz.vutbr.fit.dashapp.segmenation.XYCut;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationAlgorithm1;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
@@ -26,7 +27,8 @@ public class SegmentationTool extends AbstractGUITool implements IGUITool {
 	
 	private static final ISegmentationAlgorithm[] ALGORITHMS = new ISegmentationAlgorithm[] {
 			new SegmentationAlgorithm1(),
-			new SegmentationAlgorithm2()
+			new SegmentationAlgorithm2(),
+			new XYCut(),
 	};
 	
 	@Override

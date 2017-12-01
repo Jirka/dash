@@ -27,10 +27,17 @@ import cz.vutbr.fit.view.tools.image.ImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
+	public static final String DEFAULT_WORKSPACE_PATH = "/home/jurij/work/dash/";
+	
 	/**
 	 * version
 	 */
 	public static final String VERSION = "rel-segmentation";
+	
+	@Override
+	public String getDefaultWorkspacePath() {
+		return DEFAULT_WORKSPACE_PATH;
+	}
 	
 	@Override
 	public String getVersion() {
