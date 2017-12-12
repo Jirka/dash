@@ -11,10 +11,12 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationAlgorithm2;
 import cz.vutbr.fit.dashapp.segmenation.XYCut;
+import cz.vutbr.fit.dashapp.segmenation.XYCut2;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationAlgorithm1;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
+import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 
@@ -25,11 +27,24 @@ import cz.vutbr.fit.dashapp.view.tools.IGUITool;
  */
 public class SegmentationTool extends AbstractGUITool implements IGUITool {
 	
+	private static XYCut xyCutAlg;
+	private static XYCut2 xyCutAlg2;
+	
 	private static final ISegmentationAlgorithm[] ALGORITHMS = new ISegmentationAlgorithm[] {
 			new SegmentationAlgorithm1(),
 			new SegmentationAlgorithm2(),
-			new XYCut(),
+			xyCutAlg = new XYCut(),
+			xyCutAlg2 = new XYCut2(),
 	};
+	
+	@Override
+	public void provideToolbarItems(ToolBar toolbar) {
+		if (toolbar.getAmountOfItems() > 0) {
+			toolbar.addSeparator();
+		}
+		toolbar.addButton("XY-cut", "/icons/Application form.png", new SegmentationAction(xyCutAlg), 0);
+		toolbar.addButton("XY-cut 2", "/icons/Application form.png", new SegmentationAction(xyCutAlg2), 0);
+	}
 	
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {

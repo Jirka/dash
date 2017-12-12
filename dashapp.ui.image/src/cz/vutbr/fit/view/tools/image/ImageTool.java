@@ -30,6 +30,7 @@ import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.util.DashboardFileFilter;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
@@ -48,6 +49,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 		menuBar.addItem(subMenu, "Adaptive 2", new ImageAction(ImageAction.ADAPTIVE2));
 		menuBar.addItem(subMenu, "Gray", new ImageAction(ImageAction.GRAY_SCALE));
 		menuBar.addItem(subMenu, "Posterize", new ImageAction(ImageAction.POSTERIZE));
+		menuBar.addItem(subMenu, "Edges", new ImageAction(ImageAction.EDGES));
 		menuBar.addItem(subMenu, "HSB Saturation", new ImageAction(ImageAction.HSB_SATURATION));
 		menuBar.addItem(subMenu, "LCH Saturation", new ImageAction(ImageAction.LCH_SATURATION));
 		menuBar.addItem(subMenu, "Histogram", new ImageAction(ImageAction.HISTOGRAM));
@@ -80,6 +82,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 		public static final int HISTOGRAM = 7;
 		public static final int RASTER_ANALYSIS = 8;
 		public static final int WIDGET_ANALYSIS = 9;
+		public static final int EDGES = 10;
 		
 		private static final int WIDTH = 600;
 		private static final int HEIGHT = 400;
@@ -142,6 +145,12 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							int range = askForInteger("color bit width", "Posterization option", 4);
 							PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, range)), false);
 							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
+							surface.updateImage(image, true, true);
+						} else if(kind == EDGES) {
+							ColorMatrix.toGrayScale(matrix, true, false);
+							matrix = GrayMatrix.edges(matrix);
+							GrayMatrix.inverse(matrix, false);
+							GrayMatrix.printMatrixToImage(image, matrix);
 							surface.updateImage(image, true, true);
 						} else if(kind == HSB_SATURATION) {
 							ColorSpace[][] matrixHSB = HSB.fromRGB(matrix);

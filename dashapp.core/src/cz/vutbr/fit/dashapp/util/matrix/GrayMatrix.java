@@ -89,6 +89,23 @@ public class GrayMatrix {
 		return to;
 	}
 	
+	public static int[][] copy(int[][] to, int[][] from, Rectangle rectangle) {
+		
+		int x1 = rectangle.x;
+		int x2 = rectangle.x+rectangle.width;
+		
+		int y1 = rectangle.y;
+		int y2 = rectangle.y+rectangle.height;
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				to[x][y] = from[x][y];
+			}
+		}
+		
+		return to;
+	}
+	
 	public static int[][] convolve(int[][] matrix, int[][] filter) {
 		return convolve(matrix, filter, 1);
 	}
@@ -155,6 +172,71 @@ public class GrayMatrix {
 		}
 		
 		return inverseMatrix;
+	}
+	
+	public static int[][] lines(int[][] matrix, int minWidth, int minHeight) {
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int lineMatrix[][] = new int[mW][mH];
+		
+		// clear matrix
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				lineMatrix[i][j] = WHITE;
+			}
+		}
+		
+		// horizontal lines
+		int counter;
+		for (int i = 0; i < mW; i++) {
+			counter = 0;
+			for (int j = 0; j < mH; j++) {
+				if(matrix[i][j] != WHITE) {
+					counter++;
+					continue;
+				} else {
+					if(counter > minHeight) {
+						for (int k = j-counter; k < j; k++) {
+							lineMatrix[i][k] = matrix[i][k];
+						}
+					}
+					counter = 0;
+				}
+			}
+			
+			if(counter > minHeight) {
+				for (int k = mH-counter; k < mH; k++) {
+					lineMatrix[i][k] = matrix[i][k];
+				}
+			}
+		}
+		
+		// vertical lines
+		for (int i = 0; i < mH; i++) {
+			counter = 0;
+			for (int j = 0; j < mW; j++) {
+				if(matrix[j][i] != WHITE) {
+					counter++;
+					continue;
+				} else {
+					if(counter > minWidth) {
+						for (int k = j-counter; k < j; k++) {
+							lineMatrix[k][i] = matrix[k][i];
+						}
+					}
+					counter = 0;
+				}
+			}
+			
+			if(counter > minWidth) {
+				for (int k = mW-counter; k < mW; k++) {
+					lineMatrix[k][i] = matrix[k][i];
+				}
+			}
+		}
+		
+		return lineMatrix;
 	}
 	
 	public static int[][] medianFilter(int[][] matrix, int kernelDepth) {
@@ -386,6 +468,43 @@ public class GrayMatrix {
 		return cropMatrix;
 	}
 	
+	public static int[][] emphasize(int[][] matrix, int size) {
+		int mW = matrix.length;
+		int mH = matrix[0].length;
+		
+		int fS = size*2+1;
+		
+		int emphasizedMatrix[][] = new int[mW][mH];
+		clearMatrix(emphasizedMatrix, WHITE);
+		
+		int actX, actY;
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
+				if(matrix[x][y] != WHITE) {
+					if(matrix[x][y] < emphasizedMatrix[x][y]) {
+						emphasizedMatrix[x][y] = matrix[x][y];
+					}
+					for (int i = 0; i < fS; i++) {
+						actX = (x - size + i);
+						if(actX >= 0 && actX < mW) {
+							for (int j = 0; j < fS; j++) {
+								// border pixels use pixels from the other side
+							    actY = (y - size + j);
+							    if(actY >= 0 && actY < mH) {
+							    	if(matrix[x][y] < emphasizedMatrix[actX][actY]) {
+							    		emphasizedMatrix[actX][actY] = matrix[x][y];
+							    	}
+							    }
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return emphasizedMatrix;
+	}
+	
 	/**
 	 * Expects black and white matrix.
 	 * 
@@ -486,6 +605,28 @@ public class GrayMatrix {
     			}
     		}
         }
+	}
+
+	public static int[][] filterPixels(int[][] matrix, int[][] maskMatrix, boolean createNew) {
+		int mW = Math.min(matrix.length, maskMatrix.length);
+		int mH = Math.min(matrix[0].length, maskMatrix[0].length);
+		
+		int ressultMatrix[][] = matrix;
+		if(createNew) {
+			ressultMatrix = new int[mW][mH];
+		}
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				if(maskMatrix[i][j] == BLACK) {
+					ressultMatrix[i][j] = matrix[i][j];
+				} else {
+					ressultMatrix[i][j] = WHITE;
+				}
+			}
+		}
+		
+		return ressultMatrix;
 	}
 	
 }
