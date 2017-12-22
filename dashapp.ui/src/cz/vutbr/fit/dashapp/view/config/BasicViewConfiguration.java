@@ -61,9 +61,14 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	public static final String VERSION = "rel-master";
 	
 	/**
-	 * default project path
+	 * default project home path
 	 */
-	public static final String DEFAULT_WORKSPACE_PATH = System.getProperty("user.home");
+	public static final String DEFAULT_WORKSPACE_HOME_PATH = System.getProperty("user.home");
+	
+	/**
+	 * default workspace dashboard.samples path
+	 */
+	public static final String DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH = System.getProperty("user.dir") + "/../../dash.samples";
 	
 	public BasicViewConfiguration() {
 		// set workspace path
@@ -142,7 +147,11 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	
 	@Override
 	public String getDefaultWorkspacePath() {
-		return DEFAULT_WORKSPACE_PATH;
+		File dash_samples_dir = new File(DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH);
+		if(dash_samples_dir.exists() && dash_samples_dir.isDirectory()) {
+			return DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH;
+		}
+		return DEFAULT_WORKSPACE_HOME_PATH;
 	}
 
 }

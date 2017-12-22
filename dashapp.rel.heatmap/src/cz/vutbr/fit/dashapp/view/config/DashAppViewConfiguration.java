@@ -36,14 +36,7 @@ import cz.vutbr.fit.view.tools.image.ImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
-	public static final String DEFAULT_WORKSPACE_PATH = "/home/jurij/work/dashboards/evals/widget-based/iis/60001/dashboards";
-	
 	public static final String EVAL_VERSION = "rel-heatmap";	
-	
-	@Override
-	public String getDefaultWorkspacePath() {
-		return DEFAULT_WORKSPACE_PATH;
-	}
 	
 	protected void initTools() {
 		guiTools = new ArrayList<>();;

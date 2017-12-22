@@ -25,14 +25,7 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
-	public static final String DEFAULT_WORKSPACE_PATH = "/home/jurij/work/dashboards/evals/widget-based/random";
-	
-	public static final String EVAL_VERSION = "rel-eval-2016";	
-	
-	@Override
-	public String getDefaultWorkspacePath() {
-		return DEFAULT_WORKSPACE_PATH;
-	}
+	public static final String EVAL_VERSION = "rel-eval-2016";
 	
 	protected void initTools() {
 		guiTools = new ArrayList<>();;
