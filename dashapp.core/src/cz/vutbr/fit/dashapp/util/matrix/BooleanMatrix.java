@@ -10,8 +10,8 @@ public class BooleanMatrix {
 	
 	public static int count(boolean[][] matrix) {
 		int sum = 0;
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
@@ -24,8 +24,10 @@ public class BooleanMatrix {
 	}
 	
 	public static void initMattrix(boolean[][] matrix, boolean initValue) {
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
 				matrix[i][j] = initValue;
 			}
 		}
@@ -56,14 +58,19 @@ public class BooleanMatrix {
 	}
 
 	public static void printGraphicalElement(boolean[][] matrix, GraphicalElement graphicalElement, boolean excludeBorders) {
-		// optimization
-		int x2 = graphicalElement.x2();
-		int y2 = graphicalElement.y2();
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		int x1 = Math.min(Math.max(0, graphicalElement.x), mW);
+		int y1 = Math.min(Math.max(0, graphicalElement.y), mH);
+		int x2 = Math.min(Math.max(0, graphicalElement.x2()), mW);
+		int y2 = Math.min(Math.max(0, graphicalElement.y2()), mH);
 		
-		int x1 = excludeBorders ? (graphicalElement.x+1) : graphicalElement.x;
-		int y1 = excludeBorders ? (graphicalElement.y+1) : graphicalElement.y;
-		x2 = excludeBorders ? (x2-1) : x2;
-		y2 = excludeBorders ? (y2-1) : y2;
+		if(excludeBorders) {
+			x1=x1+1;
+			y1=y1+1;
+			x2=x2-1;
+			y2=y2-1;
+		}
 		
 		// print
 		for(int i = x1; i < x2; i++) {

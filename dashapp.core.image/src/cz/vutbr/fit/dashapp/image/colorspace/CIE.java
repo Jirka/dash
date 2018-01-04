@@ -1,6 +1,7 @@
 package cz.vutbr.fit.dashapp.image.colorspace;
 
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import extern.CIELab2;
 
 public class CIE implements ColorSpace {
@@ -56,15 +57,14 @@ public class CIE implements ColorSpace {
 	}
 	
 	public static CIE[][] fromRGB(int[][] matrix) {
-		if(matrix.length > 0) {
-			CIE[][] matrixLCH = new CIE[matrix.length][matrix[0].length];
-			for (int i = 0; i < matrix.length; i++) {
-				for (int j = 0; j < matrix[i].length; j++) {
-					matrixLCH[i][j] = new CIE(matrix[i][j]);
-				}
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		CIE[][] matrixLCH = new CIE[mW][mH];
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrixLCH[i][j] = new CIE(matrix[i][j]);
 			}
-			return matrixLCH;
 		}
-		return null;
+		return matrixLCH;
 	}
 }

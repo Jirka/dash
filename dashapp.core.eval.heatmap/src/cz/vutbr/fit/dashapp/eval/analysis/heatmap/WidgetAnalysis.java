@@ -12,55 +12,119 @@ import java.util.Vector;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
-import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
-import cz.vutbr.fit.dashapp.util.FileUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
 
-public class WidgetAnalysis extends AbstractAnalysis {
+public class WidgetAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Widget Detection";
-	public static final String FILE = "_widget";
+	public static final String NAME = "widget";
+	public static final String FILE = "_" + NAME;
+	
+	// dynamic threshold is preferred
+	private static final double DEFAULT_THRESHOLD = 0.8;
+	
+	// enable/disable according to requirements
+	public boolean enable_basic_output = true;
+	public boolean enable_basic_body_output = true;
+	public boolean enable_borders_output = true;
+	public boolean enable_borders_body_output = true;
+	public boolean enable_act_folder_output = true;
+	public boolean enable_all_folder_output = true;
+	public boolean enable_custom_threshold = false;
+	public double threshold = DEFAULT_THRESHOLD;
+	public String inputFilesRegex = DEFAULT_FILE_REGEX;
+	public String outputFolderPath = DEFAULT_OUTPUT_PATH + NAME;
+	public String outputFile = FILE;
 	
 	private int actDashboardsCount;
-	EntrophyNormalization entrophyCalculator;
+	//private EntrophyNormalization entrophyCalculator;
 	
-	double actHeatMean;
-	double actInversedEntrophyMean;
-	double actThreshlod;
+	/*double actHeatMean;
+	double actInversedEntrophyMean;*/
+	private double actThreshlod;
+	
+	public WidgetAnalysis() {
+		init();
+	}
 	
 	@Override
 	public String getLabel() {
 		return LABEL;
 	}
-
+	
 	@Override
-	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
+	public void init() {
+	}
+	
+	@Override
+	public void processFolder(WorkspaceFolder actWorkspaceFolder) {
+		DashboardCollection actDashboards = getDashboardCollection(actWorkspaceFolder, inputFilesRegex);
+		int matrix[][] = actDashboards.printDashboards(null, false);
+		if(enable_basic_output) {
+			processHeatMap(actWorkspaceFolder, actDashboards, matrix, FILE_SUFFIX_BASIC);
+		}
+		if(enable_basic_body_output) {
+			processHeatMap(actWorkspaceFolder, actDashboards, cropMatrix(actWorkspaceFolder, matrix), FILE_SUFFIX_BASIC_BODY);
+		}
+		matrix = actDashboards.printDashboards(null, true);
+		if(enable_borders_output) {
+			processHeatMap(actWorkspaceFolder, actDashboards, matrix, FILE_SUFFIX_BORDERS);
+		}
+		if(enable_borders_body_output) {
+			processHeatMap(actWorkspaceFolder, actDashboards, cropMatrix(actWorkspaceFolder, matrix), FILE_SUFFIX_BORDERS_BODY);
+		}
+	}
+
+	public void processHeatMap(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards,
+			int[][] heatMap, String suffix) {
 		this.actDashboardsCount = actDashboards.length;
-		int[][] printMatrix = actDashboards.printDashboards(null, true);
-		int[][] heatMatrix = GrayMatrix.normalize(printMatrix, actDashboards.length, true);
-		actHeatMean = StatsUtils.meanValue(heatMatrix);
-		int[][] entrophyMatrix = GrayMatrix.update(printMatrix, new EntrophyNormalization(actDashboardsCount), true);
-		actInversedEntrophyMean = GrayMatrix.WHITE-StatsUtils.meanValue(entrophyMatrix);
-		actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
-		int[][] thresholdMatrix = GrayMatrix.update(heatMatrix, new ThresholdCalculator((int)actThreshlod), false);
-		BufferedImage image = GrayMatrix.printMatrixToImage(null, thresholdMatrix);
+		this.actThreshlod = getThreshold(actWorkspaceFolder, actDashboards, heatMap);
+		int[][] heatNormMatrix = GrayMatrix.normalize(heatMap, actDashboards.length, true);
+		int[][] thresholdMatrix = GrayMatrix.update(heatNormMatrix, new ThresholdCalculator((int)actThreshlod), false);
+		BufferedImage image = GrayMatrix.printMatrixToImage(null, thresholdMatrix); // image for visualization of rectangles decomposition
 		Dashboard dashboard = generateDashboard(thresholdMatrix, image);
-		//FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_tb1");
-		//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_tb1");
-		//FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
-		//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
-		int[][] widgetMatrix = new DashboardCollection(new Dashboard[] { dashboard }).printDashboards(GEType.ALL_TYPES);
-		GrayMatrix.normalize(widgetMatrix, 1, false);
-		BufferedImage widgetImage = GrayMatrix.printMatrixToImage(null, widgetMatrix);
-		FileUtils.saveImage(widgetImage, actWorkspaceFolder.getPath() + "/../_000-widget", actWorkspaceFolder.getFileName().substring(1));
+		if(enable_act_folder_output || enable_all_folder_output) {
+			//FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + "_tb1");
+			//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath(), FILE + "_tb1");
+			//FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+			//FileUtils.saveDashboard(dashboard, actWorkspaceFolder.getPath() + "/../_000-sum", actWorkspaceFolder.getFileName() + FILE + "_tb1");
+			
+			// print detected rectangles as image
+			int[][] widgetMatrix = new DashboardCollection(new Dashboard[] { dashboard }).printDashboards(GEType.ALL_TYPES);
+			GrayMatrix.normalize(widgetMatrix, 1, false);
+			BufferedImage widgetImage = GrayMatrix.printMatrixToImage(null, widgetMatrix);
+			String thresholdLabel = "_" + String.format("%.2f", actThreshlod).replace('.', ',');
+			if(enable_act_folder_output) {
+				printImage(actWorkspaceFolder, widgetImage, actWorkspaceFolder.getPath(), outputFile + thresholdLabel + suffix);
+				printDashboard(actWorkspaceFolder, dashboard, actWorkspaceFolder.getPath(), outputFile + thresholdLabel + suffix);
+			}
+			if(enable_all_folder_output) {
+				printImage(actWorkspaceFolder, widgetImage, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + NAME + suffix, actWorkspaceFolder.getFileName() + thresholdLabel + outputFile + suffix);
+				printDashboard(actWorkspaceFolder, dashboard, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + NAME + suffix, actWorkspaceFolder.getFileName() + thresholdLabel + outputFile + suffix);
+			}
+		}
+	}
+	
+	private double getThreshold(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards, int[][] matrix) {
+		if(enable_custom_threshold) {
+			return threshold;
+		} else {
+			// provide dynamic threshold according to requirements
+			int[][] heatNormMatrix = GrayMatrix.normalize(matrix, actDashboards.length, true);
+			double actHeatMean = StatsUtils.meanValue(heatNormMatrix);
+			int[][] entrophyNormMatrix = GrayMatrix.update(matrix, new EntrophyNormalization(actDashboardsCount), true);
+			double actInversedEntrophyMean = GrayMatrix.WHITE-StatsUtils.meanValue(entrophyNormMatrix);
+			return (actHeatMean+actInversedEntrophyMean)/2;
+		}
 	}
 
 	@Override
@@ -69,20 +133,19 @@ public class WidgetAnalysis extends AbstractAnalysis {
 	}
 	
 	private Dashboard generateDashboard(int[][] thresholdMatrix, BufferedImage image) {
-		
-		int width = thresholdMatrix.length;
-		int height = thresholdMatrix[0].length;
+		int mW = MatrixUtils.width(thresholdMatrix);
+		int mH = MatrixUtils.height(thresholdMatrix);
 		
 		// calculate edges
 		int[][] edgesMatrix = GrayMatrix.edges(thresholdMatrix);
 		
 		// calculate graphical elements
 		Dashboard dashboard = new Dashboard();
-		dashboard.setDimension(0, 0, width, height);
+		dashboard.setDimension(0, 0, mW, mH);
 		
 		int color = -1;
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
 				if(thresholdMatrix[i][j] == GrayMatrix.BLACK) {
 					processSeedPixel(i, j, color, thresholdMatrix, edgesMatrix, image, dashboard);
 					color--;
@@ -94,9 +157,8 @@ public class WidgetAnalysis extends AbstractAnalysis {
 	}
 
 	private void processSeedPixel(int i, int j, int color, int[][] thresholdMatrix, int[][] edgesMatrix, BufferedImage image, Dashboard dashboard) {
-		
-		int actWidth = thresholdMatrix.length;
-		int actHeight = thresholdMatrix[0].length;
+		int mW = MatrixUtils.width(thresholdMatrix);
+		int mH = MatrixUtils.height(thresholdMatrix);
 		
 		// do flood fill algorithm
 		Queue<Point> queue = new LinkedList<Point>();
@@ -104,7 +166,7 @@ public class WidgetAnalysis extends AbstractAnalysis {
         int x1 = i, x2 = i, y1 = j, y2 = j;
         while (!queue.isEmpty()) {
             Point p = queue.remove();
-            if ((p.x >= 0) && (p.x < actWidth && (p.y >= 0) && (p.y < actHeight))) {
+            if ((p.x >= 0) && (p.x < mW && (p.y >= 0) && (p.y < mH))) {
                 if (thresholdMatrix[p.x][p.y] == GrayMatrix.BLACK) {
                 	thresholdMatrix[p.x][p.y] = color;
                 	
@@ -149,7 +211,7 @@ public class WidgetAnalysis extends AbstractAnalysis {
                 		// split rectangle...
                 		
                 		// use Hough Transform to detect lines 
-                		HoughTransform t = new HoughTransform(actWidth, actHeight);
+                		HoughTransform t = new HoughTransform(mW, mH);
                 		
                 		// print pixels of important edges
                 		findRectangleEdgesPoints(rectangle, thresholdMatrix, edgesMatrix, color, t);
@@ -167,12 +229,12 @@ public class WidgetAnalysis extends AbstractAnalysis {
                 		if(line != null) {
                 			Orientation orientation = line.getOrientation();
                 			if(orientation == Orientation.H) {
-                				int h1 = linePosition(line.r, orientation, actWidth, actHeight)-rectangle.y;
+                				int h1 = linePosition(line.r, orientation, mW, mH)-rectangle.y;
                 				int h2 = rectangle.height-h1;
                 				rectangles.add(new Rectangle(rectangle.x, rectangle.y, rectangle.width, h1));
                 				rectangles.add(new Rectangle(rectangle.x, rectangle.y+h1, rectangle.width, h2));
                 			} else if(orientation == Orientation.V) {
-                				int w1 = linePosition(line.r, orientation, actWidth, actHeight)-rectangle.x;
+                				int w1 = linePosition(line.r, orientation, mW, mH)-rectangle.x;
                 				int w2 = rectangle.width-w1;
                 				rectangles.add(new Rectangle(rectangle.x, rectangle.y, w1, rectangle.height));
                 				rectangles.add(new Rectangle(rectangle.x+w1, rectangle.y, w2, rectangle.height));
@@ -208,16 +270,16 @@ public class WidgetAnalysis extends AbstractAnalysis {
 	}
 
 	private void findRectangleEdgesPoints(Rectangle rectangle, int[][] outputMatrix, int[][] edgesMatrix, int color, HoughTransform t) {
-		int actWidth = outputMatrix.length;
-		int actHeight = outputMatrix[0].length;
+		int mW = MatrixUtils.width(outputMatrix);
+		int mH = MatrixUtils.height(outputMatrix);
 		
 		int r_x1 = rectangle.x;
 		int r_x2 = rectangle.x+rectangle.width;
 		int r_y1 = rectangle.y;
 		int r_y2 = rectangle.y+rectangle.height;
 		//int objectMask[][] = new int[actWidth][actHeight];
-		for (int ii = 0; ii < actWidth; ii++) {
-			for (int jj = 0; jj < actHeight; jj++) {
+		for (int ii = 0; ii < mW; ii++) {
+			for (int jj = 0; jj < mH; jj++) {
 				// do not consider border edges of selected rectangle area
 				// filter 5 pixels of border space
 				if(ii > r_x1+5 && ii < r_x2-5 && jj > r_y1+5 && jj < r_y2-5) {
@@ -241,18 +303,18 @@ public class WidgetAnalysis extends AbstractAnalysis {
 	}
 
 	private HoughLine getCandidateLine(Vector<HoughLine> lines, int[][] outputMatrix, int color) {
-		int actWidth = outputMatrix.length;
-		int actHeight = outputMatrix[0].length;
+		int mW = MatrixUtils.width(outputMatrix);
+		int mH = MatrixUtils.height(outputMatrix);
 		
 		HoughLine resultLine = null;
-		int crossedPixels = Math.max(actWidth, actWidth);
+		int crossedPixels = Math.max(mW, mW);
 		for (HoughLine line : lines) {
 			
 			Orientation orientation = line.getOrientation();
 			
 			// is horizontal
 			if(orientation == Orientation.H) {
-				int linePositon = linePosition(line.r, orientation, actWidth, actHeight);
+				int linePositon = linePosition(line.r, orientation, mW, mH);
 				int actCrossedPixels = Math.min(
 						calculateCrossedPixels(0, linePositon-1, 1, 0, outputMatrix, color),
 						calculateCrossedPixels(0, linePositon+1, 1, 0, outputMatrix, color)
@@ -262,7 +324,7 @@ public class WidgetAnalysis extends AbstractAnalysis {
 					crossedPixels = actCrossedPixels;
 				}
 			} else if(orientation == Orientation.V) {
-				int linePositon = linePosition(line.r, orientation, actWidth, actHeight);
+				int linePositon = linePosition(line.r, orientation, mW, mH);
 				int actCrossedPixels = Math.min(
 						calculateCrossedPixels(linePositon-1, 0, 0, 1, outputMatrix, color),
 						calculateCrossedPixels(linePositon+1, 0, 0, 1, outputMatrix, color)
@@ -277,11 +339,11 @@ public class WidgetAnalysis extends AbstractAnalysis {
 	}
 	
 	private int calculateCrossedPixels(int x, int y, int dx, int dy, int[][] outputMatrix, int color) {
-		int actWidth = outputMatrix.length;
-		int actHeight = outputMatrix[0].length;
+		int mW = MatrixUtils.width(outputMatrix);
+		int mH = MatrixUtils.height(outputMatrix);
 		
 		int count = 0;
-		while(x >= 0 && x < actWidth && y >= 0 && y < actHeight) {
+		while(x >= 0 && x < mW && y >= 0 && y < mH) {
 			if(outputMatrix[x][y] == color) {
 				count++;
 			}

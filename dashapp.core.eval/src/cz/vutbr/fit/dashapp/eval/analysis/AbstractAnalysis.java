@@ -3,7 +3,6 @@ package cz.vutbr.fit.dashapp.eval.analysis;
 import java.util.List;
 
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
-import cz.vutbr.fit.dashapp.util.DashboardCollection;
 
 public abstract class AbstractAnalysis {
 	
@@ -16,8 +15,10 @@ public abstract class AbstractAnalysis {
 	}
 
 	public abstract String getLabel();
+	
+	public abstract void init();
 
-	public abstract void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards);
+	public abstract void processFolder(WorkspaceFolder actWorkspaceFolder);
 	
 	public abstract void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders);
 

@@ -11,7 +11,20 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoRegularity extends AbstractWidgetMetric {
+	
+	public NgoRegularity() {
+		super();
+	}
+	
+	public NgoRegularity(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	private int computeNumberOfSpacings(Dashboard dashboard, GEType[] types, int dimension) {
 		int n = dashboard.n(types);
@@ -43,16 +56,16 @@ public class NgoRegularity extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		double RM_alignment, RM_spacing;
-		int n_spacing = computeNumberOfSpacings(dashboard, types, Constants.X) + computeNumberOfSpacings(dashboard, types, Constants.Y);//4; // TODO
+		int n_spacing = computeNumberOfSpacings(dashboard, getGeTypes(), Constants.X) + computeNumberOfSpacings(dashboard, getGeTypes(), Constants.Y);//4; // TODO
 		//int n_spacing = 16; // TODO
-		int n = dashboard.n(types);
+		int n = dashboard.n(getGeTypes());
 		
 		if(n == 1) {
 			RM_alignment = RM_spacing = 1;
 		} else {
-			RM_alignment = 1-(((double) dashboard.getVAP(types)+dashboard.getHAP(types))/(2*n));
+			RM_alignment = 1-(((double) dashboard.getVAP(getGeTypes())+dashboard.getHAP(getGeTypes()))/(2*n));
 			RM_spacing = 1-(((double) n_spacing-1)/(2*(n-1)));
 			//System.out.println(RM_alignment);
 			//System.out.println(RM_spacing);

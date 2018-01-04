@@ -1,13 +1,19 @@
 package cz.vutbr.fit.dashapp.eval.metric.raster.gray;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class GraySymmetry extends AbstractGrayRasterMetric {
 	
 	public double getHorizontalSymmetry(int[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		double hits = 0, misses = 0;
 		double hit, miss;
@@ -38,8 +44,8 @@ public class GraySymmetry extends AbstractGrayRasterMetric {
 	
 	public double getVerticalSymmetry(int[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		double hits = 0, misses = 0;
 		double hit, miss;

@@ -40,8 +40,8 @@ public class GrayMatrix {
 	 * @param matrix
 	 */
 	public static BufferedImage printMatrixToImage(BufferedImage image, int[][] matrix) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		if(image == null) {
 			image = new BufferedImage(mW, mH, BufferedImage.TYPE_INT_RGB);
@@ -55,6 +55,23 @@ public class GrayMatrix {
 		return image;
 	}
 	
+	public static int[][] toColorMatrix(int[][] matrix, boolean createNew) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int[][] resultMatrix = matrix;
+		if(createNew) {
+			resultMatrix = new int[mW][mH];
+		}
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				resultMatrix[i][j] = getRGB(matrix[i][j]);
+			}
+		}
+		return resultMatrix;
+	}
+	
 	/**
 	 * Makes convolution between matrix and filter
 	 * 
@@ -64,14 +81,14 @@ public class GrayMatrix {
 	 * @return
 	 */
 	public static int[][] convolve(int[][] matrix, int[][] filter) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int output[][] = new int[mW][mH];
 		
-		int fW = filter.length;
+		int fW = MatrixUtils.width(filter);
 		int fW_2 = (fW-1)/2;
-		int fH = filter[0].length;
+		int fH = MatrixUtils.height(filter);
 		int fH_2 = (fH-1)/2;
 		
 		for (int x = 0; x < mW; x++) {
@@ -100,8 +117,8 @@ public class GrayMatrix {
 	 * @return
 	 */
 	public static int[][] inverse(int[][] matrix, boolean createNew) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int inverseMatrix[][] = matrix;
 		if(createNew) {
@@ -143,8 +160,8 @@ public class GrayMatrix {
 	}
 
 	public static int[][] normalize(int[][] matrix, int maxValue, boolean createNew) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int normalizedMatrix[][] = matrix;
 		if(createNew) {
@@ -213,8 +230,8 @@ public class GrayMatrix {
 	}
 	
 	public static int[][] update(int[][] matrix, PixelCalculator calculator, boolean createNew) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int updatedMatrix[][] = matrix;
 		if(createNew) {
@@ -234,10 +251,10 @@ public class GrayMatrix {
 	}
 
 	public static int[][] compareMatrices(int[][] matrix, int[][] matrix2) {
-		int mW_max = Math.max(matrix.length, matrix2.length);
-		int mH_max = Math.max(matrix[0].length, matrix2[0].length);
-		int mW_min = Math.max(matrix.length, matrix2.length);
-		int mH_min = Math.max(matrix[0].length, matrix2[0].length);
+		int mW_max = Math.max(MatrixUtils.width(matrix), MatrixUtils.width(matrix2));
+		int mH_max = Math.max(MatrixUtils.height(matrix), MatrixUtils.height(matrix2));
+		int mW_min = Math.min(MatrixUtils.width(matrix), MatrixUtils.width(matrix2));
+		int mH_min = Math.min(MatrixUtils.height(matrix), MatrixUtils.height(matrix2));
 		
 		int[][] cmpMatrix = new int[mW_max][mH_max];
 		
@@ -261,8 +278,8 @@ public class GrayMatrix {
 	}
 	
 	public static void clearMatrix(int[][] matrix, int color) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
@@ -274,8 +291,8 @@ public class GrayMatrix {
 	public static int getColorCount(int[][] matrix, int color) {
 		int count = 0;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
@@ -289,8 +306,8 @@ public class GrayMatrix {
 	}
 
 	public static int[][] cropMatrix(int[][] matrix, Rectangle cropRectangle) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int x1 = Math.min(cropRectangle.x, mW);
 		int x2 = Math.min(cropRectangle.x+cropRectangle.width, mW);

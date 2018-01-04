@@ -32,12 +32,12 @@ public class ColorfulnessAnalysis extends AbstractAnalysis implements IAnalysis 
 				
 				buffer.append("===== HSB COLORFULNESS =====\n");
 				HSB matrixHSB[][] = HSB.fromRGB(matrix);
-				formatMetric(buffer, new Colorfulness().measure(matrixHSB, HSB.CHANNEL_SATURATION), df);
+				formatMetric(buffer, new Colorfulness(HSB.CHANNEL_SATURATION).measure(matrixHSB), df);
 				buffer.append("\n");
 				
 				buffer.append("===== CIE Lch COLORFULNESS =====\n");
 				CIE matrixLCH[][] = CIE.fromRGB(matrix);
-				formatMetric(buffer, new Colorfulness().measure(matrixLCH, CIE.CHANNEL_SATURATION), df);
+				formatMetric(buffer, new Colorfulness(CIE.CHANNEL_SATURATION).measure(matrixLCH), df);
 			}
 		}
 		

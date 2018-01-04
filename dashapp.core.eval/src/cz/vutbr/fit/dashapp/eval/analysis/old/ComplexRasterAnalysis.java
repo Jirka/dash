@@ -5,14 +5,14 @@ import java.text.DecimalFormat;
 
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramBackgroundShare;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramIntensitiesCount;
 import cz.vutbr.fit.dashapp.image.colorspace.CIE;
 import cz.vutbr.fit.dashapp.image.colorspace.HSB;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
-import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
+import cz.vutbr.fit.dashapp.eval.metric.raster.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.BlackDensity;
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -49,39 +49,39 @@ public class ComplexRasterAnalysis extends AbstractAnalysis implements IAnalysis
 				Colorfulness colorfunessMetric = new Colorfulness();
 				// HSB
 				HSB matrixHSB[][] = HSB.fromRGB(matrix);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_HUE), 0, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_SATURATION), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_BRIGHTNESS), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(HSB.CHANNEL_HUE).setColorSpaceClass(HSB.class).measure(matrixHSB), 0, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(HSB.CHANNEL_SATURATION).measure(matrixHSB), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(HSB.CHANNEL_BRIGHTNESS).measure(matrixHSB), 1, true);
 				
 				// CIE Lab/Lch
 				CIE matrixLCH[][] = CIE.fromRGB(matrix);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_LIGHTNESS), 2, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_A), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_B), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_CHROMA), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_HUE), 1, true);
-				appendValue(buffer, df, colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_SATURATION), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_LIGHTNESS).setColorSpaceClass(CIE.class).measure(matrixLCH), 2, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_A).measure(matrixLCH), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_B).measure(matrixLCH), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_CHROMA).measure(matrixLCH), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_HUE).measure(matrixLCH), 1, true);
+				appendValue(buffer, df, colorfunessMetric.setColorChannel(CIE.CHANNEL_SATURATION).measure(matrixLCH), 1, true);
 				
 				// RGB 3*8 and 3*4 bit
 				ColorShare colorShare = new ColorShare();
 				appendValue(buffer, df, colorShare.measure(matrix), 2, false);
-				appendValue(buffer, df, colorShare.measure(matrix, 4), 2, false);
+				appendValue(buffer, df, colorShare.setPosterizationBitValue(4).measure(matrix), 2, false);
 				
 				// Gray
 				int matrixGray[][] = ColorMatrix.toGrayScale(matrix, false, true);
 				// 8 bit
 				int matrixGrayValue[][] = ColorMatrix.toGrayScale(matrixGray, true, true);
 				int histogram[] = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
-				appendValue(buffer, df, (new IntensitiesCount()).measureGrayHistogram(histogram), 2, false);
-				appendValue(buffer, df, (new BackgroundShare()).measureGrayHistogram(histogram), 1, true);
+				appendValue(buffer, df, (new HistogramIntensitiesCount()).measureGrayHistogram(histogram), 2, false);
+				appendValue(buffer, df, (new HistogramBackgroundShare()).measureGrayHistogram(histogram), 1, true);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixGrayValue), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixGrayValue), 1, true);
 				
 				// 4 bit
 				matrixGrayValue = ColorMatrix.toGrayScale(PosterizationUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), true, false);
 				histogram = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
-				appendValue(buffer, df, (new IntensitiesCount()).measureGrayHistogram(histogram), 2, false);
-				appendValue(buffer, df, (new BackgroundShare()).measureGrayHistogram(histogram), 1, true);
+				appendValue(buffer, df, (new HistogramIntensitiesCount()).measureGrayHistogram(histogram), 2, false);
+				appendValue(buffer, df, (new HistogramBackgroundShare()).measureGrayHistogram(histogram), 1, true);
 				appendValue(buffer, df, (new GrayBalance()).measureGrayMatrix(matrixGrayValue), 2, true);
 				appendValue(buffer, df, (new GraySymmetry()).measureGrayMatrix(matrixGrayValue), 1, true);
 				

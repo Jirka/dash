@@ -19,7 +19,7 @@ import javax.swing.JTextArea;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.image.colorspace.CIE;
-import cz.vutbr.fit.dashapp.image.colorspace.ColorChannelUtils;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorSpaceUtils;
 import cz.vutbr.fit.dashapp.image.colorspace.ColorSpace;
 import cz.vutbr.fit.dashapp.image.colorspace.HSB;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
@@ -145,7 +145,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							surface.updateImage(image, true, true);
 						} else if(kind == HSB_SATURATION) {
 							ColorSpace[][] matrixHSB = HSB.fromRGB(matrix);
-							ColorChannelUtils.normalizeColorChannel(matrixHSB, matrix, HSB.CHANNEL_SATURATION);
+							ColorSpaceUtils.normalizeColorChannel(matrixHSB, matrix, HSB.CHANNEL_SATURATION);
 							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							ColorMatrix.toGrayScale(matrix, true, false);
 							int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
@@ -153,7 +153,7 @@ public class ImageTool extends AbstractGUITool implements IGUITool {
 							surface.updateImage(image, true, true);
 						} else if(kind == LCH_SATURATION) {
 							ColorSpace[][] matrixLCH = CIE.fromRGB(matrix);
-							ColorChannelUtils.normalizeColorChannel(matrixLCH, matrix, CIE.CHANNEL_SATURATION);
+							ColorSpaceUtils.normalizeColorChannel(matrixLCH, matrix, CIE.CHANNEL_SATURATION);
 							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							ColorMatrix.toGrayScale(matrix, true, false);
 							int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);

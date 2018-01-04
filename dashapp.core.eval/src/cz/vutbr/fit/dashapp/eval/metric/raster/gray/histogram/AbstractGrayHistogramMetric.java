@@ -3,21 +3,14 @@ package cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.AbstractGrayRasterMetric;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
-import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
-import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
-public abstract class AbstractGrayHistogramMetric extends AbstractGrayRasterMetric {
-
-	@Override
-	public MetricResult[] measure(DashboardFile dashboardFile) {
-		return measure(ColorMatrix.printImageToMatrix(dashboardFile.getImage(), dashboardFile.getDashboard(true)));
-	}
-
-	@Override
-	public MetricResult[] measure(DashboardFile dashboardFile, boolean forceReload, GEType[] types) {
-		return measure(dashboardFile);
-	}
+/**
+ * Abstract implementation of metrics which works with histogram of raw gray-scale values.
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public abstract class AbstractGrayHistogramMetric extends AbstractGrayRasterMetric implements IGrayHistogramRasterMetric {
 	
 	@Override
 	public MetricResult[] measureGrayMatrix(int matrix[][]) {

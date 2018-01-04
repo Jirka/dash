@@ -5,21 +5,15 @@ import java.util.LinkedList;
 
 import javax.swing.ButtonGroup;
 
-import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.CompareAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.EdgesAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.EntrophyAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapMetricAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.ThresholdAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.WidgetAnalysis;
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.WidgetMetricAnalysis;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
 import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
 import cz.vutbr.fit.dashapp.view.tools.GETypeTool;
 import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
+//import cz.vutbr.fit.dashapp.eval.analysis.heatmap.TestOfGEBoundariesAnalysis;
+//import cz.vutbr.fit.dashapp.eval.analysis.heatmap.old.WidgetMetricAnalysis;
+import cz.vutbr.fit.dashapp.eval.metric.MetricType;
 import cz.vutbr.fit.dashapp.view.tools.AnalysisTool;
 import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
 import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
@@ -28,6 +22,16 @@ import cz.vutbr.fit.dashapp.view.tools.ReloadTool;
 import cz.vutbr.fit.dashapp.view.tools.SaveTool;
 import cz.vutbr.fit.dashapp.view.tools.XMLTool;
 import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
+import cz.vutbr.fit.dashapp.view.tools.analysis.AbstractAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.AverageMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.CompareAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.EdgesAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.EntropyAnalysisUI;
+//import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.HeatMapAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.SimpleMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.ThresholdAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.WidgetAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
@@ -68,16 +72,19 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools.add(new ImageTool());
 		
 		// heat map tools
-		LinkedList<AbstractAnalysis> heatmapActions = new LinkedList<>();
-		heatmapActions.add(new HeatMapAnalysis());
-		heatmapActions.add(new EntrophyAnalysis());
-		heatmapActions.add(new ThresholdAnalysis());
-		heatmapActions.add(new EdgesAnalysis());
-		heatmapActions.add(new WidgetAnalysis());
-		heatmapActions.add(new CompareAnalysis());
-		heatmapActions.add(new HeatMapMetricAnalysis());
-		heatmapActions.add(new WidgetMetricAnalysis());
-		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysis[heatmapActions.size()])));
+		LinkedList<AbstractAnalysisUI> heatmapActions = new LinkedList<>();
+		heatmapActions.add(new HeatMapAnalysisUI());
+		heatmapActions.add(new EntropyAnalysisUI());
+		heatmapActions.add(new ThresholdAnalysisUI());
+		heatmapActions.add(new EdgesAnalysisUI());
+		heatmapActions.add(new WidgetAnalysisUI());
+		heatmapActions.add(new CompareAnalysisUI());
+		MetricType[] metricTypes = MetricType.values();
+		heatmapActions.add(new SimpleMetricAnalysisUI(metricTypes));
+		heatmapActions.add(new AverageMetricAnalysisUI(metricTypes));
+		//heatmapActions.add(new FolderAnalysisUI(new WidgetMetricAnalysis()));
+		//heatmapActions.add(new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()));
+		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysisUI[heatmapActions.size()])));
 	}
 	
 	@Override

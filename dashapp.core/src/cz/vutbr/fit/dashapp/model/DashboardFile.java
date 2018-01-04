@@ -116,7 +116,6 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 	}
 	
 	public void reloadDashboard() {
-		dashboard = new Dashboard(this);
 		try {
 			String xml = readXMLFile();
 			if(xml != null) {
@@ -137,12 +136,20 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 					}
 				} else {
 					// corrupted XML
-					dashboard = new Dashboard(this);
+					//dashboard = new Dashboard(this);
 				}
 				serializedDashboard.setXml(xml);
 			}
 		} catch (IOException e) {
 			dashboard = null;
+		}
+		
+		if(dashboard == null) {
+			dashboard = new Dashboard(this);
+			BufferedImage image = getImage();
+			if(image != null) {
+				dashboard.setDimension(0, 0, image.getWidth(), image.getHeight());
+			}
 		}
 	}
 	

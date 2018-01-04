@@ -1,17 +1,30 @@
 package cz.vutbr.fit.dashapp.eval.metric.widget.kim;
 
-import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
-public class KimBalance extends AbstractWidgetMetric implements IMetric {
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public class KimBalance extends AbstractWidgetMetric {
+	
+	public KimBalance() {
+		super();
+	}
+	
+	public KimBalance(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	public double getHorizontalBalance(boolean[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		long upper = 0;
 		int center = mH/2;
@@ -39,8 +52,8 @@ public class KimBalance extends AbstractWidgetMetric implements IMetric {
 			diff++;
 		}
 		
-		System.out.println("upper1 = " + upper);
-		System.out.println("bottom1 = " + bottom);
+		//System.out.println("upper1 = " + upper);
+		//System.out.println("bottom1 = " + bottom);
 		
 		double b = Math.max(upper, bottom);
 		if(b == 0) {
@@ -52,8 +65,8 @@ public class KimBalance extends AbstractWidgetMetric implements IMetric {
 	
 	public double getVerticalBalance(boolean[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		long left = 0;
 		int center = mW/2;
@@ -93,8 +106,8 @@ public class KimBalance extends AbstractWidgetMetric implements IMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
-		return measure(dashboard.getBooleanMatrix(types));
+	public MetricResult[] measure(Dashboard dashboard) {
+		return measure(dashboard.getBooleanMatrix(getGeTypes()));
 	}
 	
 	public MetricResult[] measure(boolean[][] matrix) {

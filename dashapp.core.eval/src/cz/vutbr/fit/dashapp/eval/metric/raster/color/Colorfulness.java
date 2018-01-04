@@ -1,30 +1,46 @@
 package cz.vutbr.fit.dashapp.eval.metric.raster.color;
 
-import cz.vutbr.fit.dashapp.eval.metric.AbstractMetric;
-import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
-import cz.vutbr.fit.dashapp.image.colorspace.ColorChannelUtils;
+import cz.vutbr.fit.dashapp.image.colorspace.ColorSpaceUtils;
 import cz.vutbr.fit.dashapp.image.colorspace.ColorSpace;
-import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
-public class Colorfulness extends AbstractMetric implements IMetric {
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public class Colorfulness extends AbstractColorSpaceMetric implements IColorSpaceMetric {
 	
-	@Override
-	public MetricResult[] measure(DashboardFile dashboardFile) {
-		// TODO Auto-generated method stub
-		return null;
+	private int colorChannel;
+	
+	public Colorfulness() {
+		super();
+		setColorChannel(0);
+	}
+	
+	public Colorfulness(int colorChannel) {
+		super();
+		setColorChannel(colorChannel);
+	}
+	
+	public Colorfulness(Class<?> colorSpaceClass, int colorChannel) {
+		super(colorSpaceClass);
+		setColorChannel(colorChannel);
+	}
+	
+	public Colorfulness setColorChannel(int colorChannel) {
+		this.colorChannel = colorChannel;
+		return this;
+	}
+	
+	public int getColorChannel() {
+		return colorChannel;
 	}
 
-	@Override
-	public MetricResult[] measure(DashboardFile dashboardFile, boolean forceReload, GEType[] types) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public MetricResult[] measure(ColorSpace[][] matrix, int colorChannel) {
-		double mean = ColorChannelUtils.getColorChannelMean(matrix, colorChannel);
-		double stdDev = ColorChannelUtils.getColorChannelStdDev(matrix, mean, colorChannel);
+	public MetricResult[] measure(ColorSpace[][] matrix) {
+		int colorChannel = getColorChannel();
+		double mean = ColorSpaceUtils.getColorChannelMean(matrix, colorChannel);
+		double stdDev = ColorSpaceUtils.getColorChannelStdDev(matrix, mean, colorChannel);
 		return new MetricResult[] {
 				new MetricResult("Colorfulness (m+s)", "CLR", mean+stdDev),
 				new MetricResult("Colorfulness m", "CLR_m", mean),

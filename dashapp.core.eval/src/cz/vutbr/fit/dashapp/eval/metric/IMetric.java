@@ -1,14 +1,19 @@
 package cz.vutbr.fit.dashapp.eval.metric;
 
-import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.model.IDashboardFile;
 
+/**
+ * Metrics which measures one or more aspects of dashboard represented by dashboard file.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public interface IMetric {
-
-	MetricResult[] measure(DashboardFile dashboardFile);
-
-	MetricResult[] measure(DashboardFile dashboardFile, boolean forceReload, GEType[] types);
-
+	
+	public static final MetricResult[] EMPTY_RESULT = new MetricResult[0];
+	
 	String getName();
+
+	MetricResult[] measure(IDashboardFile dashboardFile);
 
 }

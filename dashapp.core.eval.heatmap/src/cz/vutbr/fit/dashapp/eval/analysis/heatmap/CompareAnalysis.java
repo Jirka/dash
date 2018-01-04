@@ -1,167 +1,151 @@
 package cz.vutbr.fit.dashapp.eval.analysis.heatmap;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
-import cz.vutbr.fit.dashapp.util.DashboardCollection;
-import cz.vutbr.fit.dashapp.util.FileUtils;
+import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
-import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
-import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanSatistics;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
-public class CompareAnalysis extends AbstractAnalysis {
+public class CompareAnalysis extends AbstractHeatMapAnalysis {
 	
-	private static final String LABEL = "Compare Analysis";
-	private static final String FILE = "_cmp";
+	public static final String LABEL = "Compare Widgets";
+	public static final String NAME = "cmp";
+	public static final String FILE = "_" + NAME;
 	
-	private static final boolean excludeBorders = false;
-	private static final boolean widgetInsteadOfThreshold = false;
-	private static final boolean printImages = false;
-	private static final boolean makeMeanStats = false;
+	public static final String DEFAULT_FILE_1 = VARIABLE_ACT_FOLDER_NAME;
+	public static final String DEFAULT_FILE_2 = HeatMapAnalysis.FILE + FILE_SUFFIX_BORDERS;
+	//public static final String DEFAULT_OUT_FILE_SUFFIX = "__" + DEFAULT_FILE_1 + "__" + DEFAULT_FILE_2;
 	
-	Map<String, MeanSatistics> meanValues;
-	Map<String, MeanSatistics> meanValuesCrop;
-	Map<String, Double> countValues;
-	Map<String, Double> countValuesCrop;
+	public boolean enable_act_folder_output = true;
+	public boolean enable_all_folder_output = true;
+	public boolean enable_stats_output = true;
+	public String outputFolderPath = DEFAULT_OUTPUT_PATH + NAME;
+	public String outputFile = FILE;
+	//public String outputFileSuffix = DEFAULT_OUT_FILE_SUFFIX;
+	public String inputFile1 = DEFAULT_FILE_1;
+	public String inputFile2 = DEFAULT_FILE_2;
+	
+	private Map<String, MeanStatistics> meanValues;
+	private Map<String, Double> countValues;
 	
 	public CompareAnalysis() {
-		meanValues = new LinkedHashMap<>();
-		countValues = new LinkedHashMap<>();
-		meanValuesCrop = new LinkedHashMap<>();
-		countValuesCrop = new LinkedHashMap<>();
+		init();
 	}
 	
 	@Override
 	public String getLabel() {
 		return LABEL;
 	}
+	
+	@Override
+	public void init() {
+		meanValues = new LinkedHashMap<>();
+		countValues = new LinkedHashMap<>();
+	}
+	
+	private String getFileSuffix(WorkspaceFolder actWorkspaceFolder) {
+		// specify name of file suffix to recognize results
+		String outputFileSuffix = "__" + inputFile1 + "__" + inputFile2;
+		return replaceVariables(outputFileSuffix, actWorkspaceFolder);
+	}
+	
+	private String getFileSuffix() {
+		// variables are removed for folder names
+		String outputFileSuffix = "__" + inputFile1 + "__" + inputFile2;
+		return outputFileSuffix.replaceAll("\\$", "");
+	}
+	
+	private String getFirstDashboardFileName(WorkspaceFolder actWorkspaceFolder) {
+		// specify dashboard to compare
+		return replaceVariables(inputFile1, actWorkspaceFolder);
+	}
+	
+	private String getSecondDashboardFileName(WorkspaceFolder actWorkspaceFolder) {
+		// specify dashboard to compare
+		return replaceVariables(inputFile2, actWorkspaceFolder);
+	}
+	
+	private int[][] getDashboardMatrix(WorkspaceFolder actWorkspaceFolder, String name) {
+		int[][] resultMatrix = null;
+		List<DashboardFile> fileList = actWorkspaceFolder.getChildren(DashboardFile.class, name, false);
+		if(fileList.size() == 1) {
+			DashboardFile df = fileList.get(0);
+			Dashboard dashboard = df.getDashboard(true);
+			File xmlFile = df.getXmlFile();
+			if(dashboard == null || !xmlFile.exists()) {
+				resultMatrix = df.getImageMatrix();
+				ColorMatrix.toGrayScale(resultMatrix, true, false);
+			} else {
+				resultMatrix = DashAppUtils.makeDashboardCollection(fileList).printDashboards(GEType.ALL_TYPES, false);
+				GrayMatrix.normalize(resultMatrix, 1, false);
+			}
+		}
+		
+		if(resultMatrix == null) {
+			resultMatrix = new int[0][0];
+		}
+		
+		return resultMatrix;
+	}
 
 	@Override
-	public void processFolder(WorkspaceFolder actWorkspaceFolder, DashboardCollection actDashboards) {
-		// make dashboards heatmap
-		int actDashboardsCount = actDashboards.length;
-		int[][] printMatrix = actDashboards.printDashboards(null, excludeBorders);
-		int[][] thresholdMatrix;
-		
-		if(!widgetInsteadOfThreshold) {
-			// make threshold matrix
-			int[][] heatMatrix = GrayMatrix.normalize(printMatrix, actDashboards.length, true);
-			double actHeatMean = StatsUtils.meanValue(heatMatrix);
-			int[][] entrophyMatrix = GrayMatrix.update(printMatrix, new EntrophyNormalization(actDashboardsCount), true);
-			double actInversedEntrophyMean = GrayMatrix.WHITE-StatsUtils.meanValue(entrophyMatrix);
-			double actThreshlod = (actHeatMean+actInversedEntrophyMean)/2;
-			thresholdMatrix = GrayMatrix.update(heatMatrix, new ThresholdCalculator((int) actThreshlod), true);
-			//double actThreshlod = 1-((actHeatMean+actInversedEntrophyMean)/(2*GrayMatrix.WHITE));
-			//int[][] thresholdMatrix = GrayMatrix.update(printMatrix, new ThresholdNormalization(actThreshlod, actDashboardsCount), true);
-		} else {
-			// use dashboard already made by widget detected instead
-			DashboardCollection widgetDashboard = DashAppUtils.makeDashboardCollection(
-					actWorkspaceFolder.getChildren(
-							DashboardFile.class, "_widget_tb", false
-					));
-			thresholdMatrix = widgetDashboard.printDashboards(null, excludeBorders);
-			GrayMatrix.normalize(thresholdMatrix, 1, false);
+	public void processFolder(WorkspaceFolder actWorkspaceFolder) {
+		// get names
+		String matrixName1 = getFirstDashboardFileName(actWorkspaceFolder);
+		String matrixName2 = getSecondDashboardFileName(actWorkspaceFolder);
+		// get matrices
+		int[][] matrix1 = getDashboardMatrix(actWorkspaceFolder, matrixName1);
+		int[][] matrix2 = getDashboardMatrix(actWorkspaceFolder, matrixName2);
+		// make diff
+		int[][] cmpMatrix = GrayMatrix.compareMatrices(matrix1, matrix2);
+		if(enable_act_folder_output) {
+			// make stats
+			meanValues.put(actWorkspaceFolder.getFileName(), StatsUtils.meanStatistics(cmpMatrix));
+			countValues.put(actWorkspaceFolder.getFileName(), ((double) GrayMatrix.getColorCount(cmpMatrix, GrayMatrix.BLACK))/
+					(MatrixUtils.area(cmpMatrix)));
 		}
-		
-		// get crop rectangle
-		DashboardCollection cropDashboard = DashAppUtils.makeDashboardCollection(
-				actWorkspaceFolder.getChildren(
-						DashboardFile.class, actWorkspaceFolder.getFileName().substring(1) + "-crop", false
-				));
-		Rectangle cropRectangle = null;
-		if(cropDashboard.length == 1) {
-			Dashboard dashboard = cropDashboard.dashboards[0];
-			cropRectangle = new Rectangle(dashboard.x, dashboard.y, dashboard.width, dashboard.height);
-		}
-		
-		// get referenced dashboard (dashboard name is same as folder name)
-		DashboardCollection refDashboard = DashAppUtils.makeDashboardCollection(
-				actWorkspaceFolder.getChildren(
-						DashboardFile.class, actWorkspaceFolder.getFileName().substring(1), false
-				));
-		if(refDashboard.length == 1) {
-			// basic compare statistics
-			int[][] refMap = refDashboard.printDashboards(null, excludeBorders);
-			GrayMatrix.normalize(refMap, refDashboard.length, false);
-			int[][] cmpMap = GrayMatrix.compareMatrices(thresholdMatrix, refMap);
-			if(makeMeanStats) {
-				meanValues.put(actWorkspaceFolder.getFileName(), StatsUtils.meanStatistics(cmpMap));
+		if(enable_act_folder_output || enable_all_folder_output) {
+			// create and save image
+			BufferedImage image = GrayMatrix.printMatrixToImage(null, cmpMatrix);
+			if(enable_act_folder_output) {
+				printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath(), outputFile + getFileSuffix(actWorkspaceFolder));
 			}
-			countValues.put(actWorkspaceFolder.getFileName(), ((double) GrayMatrix.getColorCount(cmpMap, GrayMatrix.BLACK))/
-					(actDashboards.size()));
-			if(printImages) {
-				BufferedImage image = GrayMatrix.printMatrixToImage(null, cmpMap);
-				//FileUtils.saveImage(image, actWorkspaceFolder.getPath(), FILE + getStatsNameSuffix());
-				FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_paper", actWorkspaceFolder.getFileName() + FILE + getStatsNameSuffix());
-			}
-			// crop statistics
-			if(cropRectangle != null) {
-				int[][] cmpMapCrop = GrayMatrix.cropMatrix(cmpMap, cropRectangle);
-				if(makeMeanStats) {
-					meanValuesCrop.put(actWorkspaceFolder.getFileName(), StatsUtils.meanStatistics(cmpMapCrop));
-				}
-				countValuesCrop.put(actWorkspaceFolder.getFileName(), ((double) GrayMatrix.getColorCount(cmpMapCrop, GrayMatrix.BLACK))
-						/(cropRectangle.width*cropRectangle.height));//meanValues.put(actWorkspaceFolder.getFileName(), GrayMatrix.meanStatistics(cmpMap));
-				if(printImages) {
-					BufferedImage image = GrayMatrix.printMatrixToImage(null, cmpMapCrop);
-					FileUtils.saveImage(image, actWorkspaceFolder.getPath() + "/../_paper", actWorkspaceFolder.getFileName() + FILE + getStatsNameSuffix() + "_crop");
-				}
+			if(enable_all_folder_output) {
+				printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + NAME + getFileSuffix(), actWorkspaceFolder.getFileName() + outputFile + getFileSuffix(actWorkspaceFolder));
 			}
 		}
 	}
 
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
-		// do nothing
-		StringBuffer sb = new StringBuffer();
-		/*for (Entry<String, MeanSatistics> entry : meanValues.entrySet()) {
-			sb.append(entry.getKey() + " " + (GrayMatrix.WHITE - entry.getValue().mean)/GrayMatrix.WHITE + " " + entry.getValue().stdev / GrayMatrix.WHITE
-					 + " " + entry.getValue().min + " " + entry.getValue().max+ "\n");
-		}*/
-		for (WorkspaceFolder workspaceFolder : analyzedFolders) {
-			String key = workspaceFolder.getFileName();
-			MeanSatistics stat = meanValues.get(key);
-			MeanSatistics statCrop = meanValuesCrop.get(key);
-			if(makeMeanStats) {
+		if(enable_stats_output) {
+			StringBuffer sb = new StringBuffer();
+			/*for (Entry<String, MeanSatistics> entry : meanValues.entrySet()) {
+				sb.append(entry.getKey() + " " + (GrayMatrix.WHITE - entry.getValue().mean)/GrayMatrix.WHITE + " " + entry.getValue().stdev / GrayMatrix.WHITE
+						 + " " + entry.getValue().min + " " + entry.getValue().max+ "\n");
+			}*/
+			for (WorkspaceFolder workspaceFolder : analyzedFolders) {
+				String key = workspaceFolder.getFileName();
+				MeanStatistics stat = meanValues.get(key);
 				double statMean = (GrayMatrix.WHITE - stat.mean)/GrayMatrix.WHITE;
 				double statStdev = stat.stdev / GrayMatrix.WHITE;
-				double statCropMean = (GrayMatrix.WHITE - statCrop.mean)/GrayMatrix.WHITE;
-				double statCropStdev = statCrop.stdev / GrayMatrix.WHITE;
 				Double value = countValues.get(key);
-				Double valueCrop = countValuesCrop.get(key);
-				sb.append(key + " " + statMean + " " + statStdev + " " + statCropMean + " " + statCropStdev
-						+ " " + (value) + " " + (valueCrop) + " " +  "\n");
-			} else {
-				Double value = countValues.get(key);
-				Double valueCrop = countValuesCrop.get(key);
-				sb.append(key + " " + (value) + " " + (valueCrop) + " " +  "\n");
+				sb.append(key + " " + statMean + " " + statStdev + " " + (value) + " " +  "\n");
+				//sb.append(key + " " + value + " " + valueCrop + " " + " " + (valueCrop-value) + " " + (1.0-valueCrop/value) + " " +  "\n");
 			}
-			//sb.append(key + " " + value + " " + valueCrop + " " + " " + (valueCrop-value) + " " + (1.0-valueCrop/value) + " " +  "\n");
+			printTextFile(actWorkspaceFolder, sb.toString(), actWorkspaceFolder.getPath() + "/" + outputFolderPath + "/" + NAME + getFileSuffix(), outputFile + getFileSuffix(actWorkspaceFolder));
 		}
-		FileUtils.saveTextFile(sb.toString(), actWorkspaceFolder.getPath() + "/_results", FILE + getStatsNameSuffix());
-	}
-	
-	private String getStatsNameSuffix() {
-		String result = "";
-		if(widgetInsteadOfThreshold) {
-			result += "_widget";
-		} else {
-			result += "_threshold";
-		}
-		if(excludeBorders) {
-			result += "_borders";
-		}
-		return result;
 	}
 
 }

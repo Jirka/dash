@@ -2,7 +2,7 @@ package cz.vutbr.fit.dashapp.util.matrix;
 
 public class StatsUtils {
 	
-	public static class MeanSatistics {
+	public static class MeanStatistics {
 		public double mean;
 		public double variance;
 		public double stdev;
@@ -22,8 +22,8 @@ public class StatsUtils {
 	public static double meanValue(int[][] matrix) {
 		double mean = 0;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		int size = mW*mH;
 		
 		if(size > 0) {
@@ -42,8 +42,8 @@ public class StatsUtils {
 	public static double varianceValue(int[][] matrix, double mean) {
 		double variance = 0.0;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		int size = mW*mH;
 		
 		if(size > 0) {
@@ -63,8 +63,8 @@ public class StatsUtils {
 	public static int minValue(int[][] matrix) {
 		int min = Integer.MAX_VALUE;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int act;
 		for (int i = 0; i < mW; i++) {
@@ -82,8 +82,8 @@ public class StatsUtils {
 	public static int maxValue(int[][] matrix) {
 		int max = Integer.MIN_VALUE;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int act;
 		for (int i = 0; i < mW; i++) {
@@ -102,8 +102,8 @@ public class StatsUtils {
 		return Math.sqrt(variance);
 	}
 	
-	public static MeanSatistics meanStatistics(int[][] matrix) {
-		MeanSatistics statistics = new MeanSatistics();
+	public static MeanStatistics meanStatistics(int[][] matrix) {
+		MeanStatistics statistics = new MeanStatistics();
 		statistics.mean = meanValue(matrix);
 		statistics.variance = varianceValue(matrix, statistics.mean);
 		statistics.stdev = stdevValue(matrix, statistics.variance);

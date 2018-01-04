@@ -2,6 +2,7 @@ package cz.vutbr.fit.dashapp.image.colorspace;
 
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class Gray implements ColorSpace {
 
@@ -29,15 +30,14 @@ public class Gray implements ColorSpace {
 	}
 	
 	public static Gray[][] fromRGB(int[][] matrix) {
-		if(matrix.length > 0) {
-			Gray[][] matrixGray = new Gray[matrix.length][matrix[0].length];
-			for (int i = 0; i < matrix.length; i++) {
-				for (int j = 0; j < matrix[i].length; j++) {
-					matrixGray[i][j] = new Gray(matrix[i][j]);
-				}
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		Gray[][] matrixGray = new Gray[mW][mH];
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrixGray[i][j] = new Gray(matrix[i][j]);
 			}
-			return matrixGray;
 		}
-		return null;
+		return matrixGray;
 	}
 }

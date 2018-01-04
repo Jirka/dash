@@ -6,13 +6,26 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantMap;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantResolver;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantUpdater;
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantMap;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantResolver;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantUpdater;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoSequence extends AbstractWidgetMetric {
+	
+	public NgoSequence() {
+		super();
+	}
+	
+	public NgoSequence(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	/**
 	 * Weight of quadrants
@@ -41,7 +54,7 @@ public class NgoSequence extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		// initialize quadrants
 		//quadrants = new QuadrantMap<Integer>(0);
 		quadrants2 = new QuadrantMap<Double>(0.0);
@@ -61,7 +74,7 @@ public class NgoSequence extends AbstractWidgetMetric {
 			protected void performAllPre(GraphicalElement graphicalElement) {
 				quadrants2.replace(this.q, quadrants2.get(q)+graphicalElement.area(q));
 			}
-		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getGeTypes(), QuadrantResolver.BY_CENTER, false);
 		
 		// every quadrant has its own default weight of user interest
 		new QuadrantUpdater<Double, Integer>(quadrants2, new Integer[] {4,3,2,1}, false) {

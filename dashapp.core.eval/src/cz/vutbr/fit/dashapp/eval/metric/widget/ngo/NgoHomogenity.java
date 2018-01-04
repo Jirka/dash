@@ -2,14 +2,27 @@ package cz.vutbr.fit.dashapp.eval.metric.widget.ngo;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantMap;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantResolver;
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantMap;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantResolver;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoHomogenity extends AbstractWidgetMetric {
+	
+	public NgoHomogenity() {
+		super();
+	}
+	
+	public NgoHomogenity(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	// TODO
 	private double fact(int n) {
@@ -21,7 +34,7 @@ public class NgoHomogenity extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		
 		QuadrantMap<Integer> quadrants = new QuadrantMap<Integer>(0);
 		
@@ -32,7 +45,7 @@ public class NgoHomogenity extends AbstractWidgetMetric {
 			protected void performAllPre(GraphicalElement graphicalElement) {
 				quadrants.replace(this.q, quadrants.get(q)+1);
 			}
-		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getGeTypes(), QuadrantResolver.BY_CENTER, false);
 		int countA = quadrants.get(Quadrant.I), countB = quadrants.get(Quadrant.II), countC = quadrants.get(Quadrant.III), countD = quadrants.get(Quadrant.IV);
 		
 		int n = countA+countB+countC+countD;//dashboard.n(types);

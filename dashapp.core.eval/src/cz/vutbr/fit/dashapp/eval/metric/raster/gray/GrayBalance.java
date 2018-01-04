@@ -1,13 +1,19 @@
 package cz.vutbr.fit.dashapp.eval.metric.raster.gray;
 
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class GrayBalance extends AbstractGrayRasterMetric {
 	
 	public double getHorizontalBalance(int matrix[][]) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		double upper = 0;
 		int center = mH/2;
@@ -44,8 +50,8 @@ public class GrayBalance extends AbstractGrayRasterMetric {
 	
 	public double getVerticalBalance(int matrix[][]) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		double left = 0;
 		int center = mW/2;
@@ -86,8 +92,8 @@ public class GrayBalance extends AbstractGrayRasterMetric {
 		double BM_H = getHorizontalBalance(matrix);
 		return new MetricResult[] {
 				new MetricResult("Balance", "BM'", 1-(Math.abs(BM_V)+Math.abs(BM_H))/2.0),
-				new MetricResult("Vertical Balance", "BM'", BM_V),
-				new MetricResult("Horizontal Balance", "BM'", BM_H)
+				new MetricResult("Vertical Balance", "BM_v'", BM_V),
+				new MetricResult("Horizontal Balance", "BM_h'", BM_H)
 		};
 	}
 

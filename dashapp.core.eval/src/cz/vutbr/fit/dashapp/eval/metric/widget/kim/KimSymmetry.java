@@ -1,17 +1,30 @@
 package cz.vutbr.fit.dashapp.eval.metric.widget.kim;
 
-import cz.vutbr.fit.dashapp.eval.metric.IMetric;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
-public class KimSymmetry extends AbstractWidgetMetric implements IMetric {
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public class KimSymmetry extends AbstractWidgetMetric {
 	
+	public KimSymmetry() {
+		super();
+	}
+	
+	public KimSymmetry(GEType[] geTypes) {
+		super(geTypes);
+	}
+
 	public double getHorizontalSymmetry(boolean[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		long hit = 0, miss = 0;
 		int center = mH/2;
@@ -42,8 +55,8 @@ public class KimSymmetry extends AbstractWidgetMetric implements IMetric {
 	
 	public double getVerticalSymmetry(boolean[][] matrix) {
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		int center = mW/2;
 		
@@ -74,8 +87,8 @@ public class KimSymmetry extends AbstractWidgetMetric implements IMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
-		return measure(dashboard.getBooleanMatrix(types));
+	public MetricResult[] measure(Dashboard dashboard) {
+		return measure(dashboard.getBooleanMatrix(getGeTypes()));
 	}
 	
 	public MetricResult[] measure(boolean[][] matrix) {

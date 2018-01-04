@@ -56,8 +56,8 @@ public class ColorMatrix {
 	public static int[][] toGrayScale(int[][] matrix, boolean rawValues, boolean createCopy) {
 		int[][] workingCopy = matrix;
 		
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		if(mW > 0) {
 			if(createCopy) {
@@ -85,8 +85,8 @@ public class ColorMatrix {
 	 * @param matrix
 	 */
 	public static BufferedImage printMatrixToImage(BufferedImage image, int[][] matrix) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
 		if(image == null) {
 			image = new BufferedImage(mW, mH, BufferedImage.TYPE_INT_RGB);

@@ -6,7 +6,20 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoEquilibrium extends AbstractWidgetMetric {
+	
+	public NgoEquilibrium() {
+		super();
+	}
+	
+	public NgoEquilibrium(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	public double getEquilibrium(Dashboard dashboard, GEType[] types, int dimension) {
 		double dashboardCenter = dashboard.halfSize(dimension);
@@ -24,7 +37,7 @@ public class NgoEquilibrium extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		// optimal version (equilibrium is calculated for both dimensions)
 		double centerX = dashboard.width/2.0;
 		double centerY = dashboard.height/2.0;
@@ -33,7 +46,7 @@ public class NgoEquilibrium extends AbstractWidgetMetric {
 		double EM_y = 0.0;
 		double areas = 0;
 		
-		for (GraphicalElement graphicalElement : dashboard.getChildren(types)) {
+		for (GraphicalElement graphicalElement : dashboard.getChildren(getGeTypes())) {
 			int area = graphicalElement.area();
 			EM_x += area*(graphicalElement.dx(centerX));
 			EM_y += area*(graphicalElement.dy(centerY));

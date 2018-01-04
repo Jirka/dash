@@ -8,7 +8,20 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoProportion extends AbstractWidgetMetric {
+	
+	public NgoProportion() {
+		super();
+	}
+	
+	public NgoProportion(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	public static final double[] constants = { 1.0, 1.0/1.414, 1.0/1.618, 1.0/1.732, 1.0/2.0 };
 	
@@ -25,12 +38,12 @@ public class NgoProportion extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		double aspectRatio, dist, actDist;
 		
 		// proportion of objects
 		double PM_object = 0.0;
-		List<GraphicalElement> children = dashboard.getChildren(types);
+		List<GraphicalElement> children = dashboard.getChildren(getGeTypes());
 		for (GraphicalElement graphicalElement : children) {
 			// normalized aspect ratio of graphical element 
 			aspectRatio = graphicalElement.aspectRatio(true);
@@ -39,7 +52,7 @@ public class NgoProportion extends AbstractWidgetMetric {
 			// add distance
 			PM_object += (1-(dist*2));
 		}
-		PM_object /= dashboard.n(types);
+		PM_object /= dashboard.n(getGeTypes());
 		
 		// proportion of layout
 		aspectRatio = dashboard.aspectRatio(true);

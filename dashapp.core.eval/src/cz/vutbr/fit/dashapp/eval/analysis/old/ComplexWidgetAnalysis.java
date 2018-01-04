@@ -7,9 +7,9 @@ import java.util.List;
 
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
-import cz.vutbr.fit.dashapp.eval.metric.widget.basic.Area;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramBackgroundShare;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramIntensitiesCount;
+import cz.vutbr.fit.dashapp.eval.metric.widget.basic.WidgetUsedArea;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoCohesion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
@@ -18,7 +18,7 @@ import cz.vutbr.fit.dashapp.image.colorspace.HSB;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
-import cz.vutbr.fit.dashapp.eval.metric.raster.color.ColorShare;
+import cz.vutbr.fit.dashapp.eval.metric.raster.ColorShare;
 import cz.vutbr.fit.dashapp.eval.metric.raster.color.Colorfulness;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.BlackDensity;
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -51,17 +51,17 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 		if(dashboard != null) {
 			// TODO Metric API changed (it will not work)
 			GEType[] chartType = new GEType[] { GEType.CHART };
-			appendValue(buffer, df, new NgoCohesion().measure(dashboard, null), 0, false);
-			appendValue(buffer, df, new NgoCohesion().measure(dashboard, new GEType[] { GEType.CHART }), 1, false);
+			appendValue(buffer, df, new NgoCohesion().measure(dashboard), 0, false);
+			appendValue(buffer, df, new NgoCohesion(new GEType[] { GEType.CHART }).measure(dashboard), 1, false);
 			
-			appendValue(buffer, df, new NgoProportion().measure(dashboard, null), 2, false);
-			appendValue(buffer, df, new NgoProportion().measure(dashboard, new GEType[] { GEType.CHART }), 1, false);
+			appendValue(buffer, df, new NgoProportion().measure(dashboard), 2, false);
+			appendValue(buffer, df, new NgoProportion(new GEType[] { GEType.CHART }).measure(dashboard), 1, false);
 			
-			appendValue(buffer, df, new NgoRegularity().measure(dashboard, null), 2, false);
-			appendValue(buffer, df, new NgoRegularity().measure(dashboard, new GEType[] { GEType.CHART }), 1, false);
+			appendValue(buffer, df, new NgoRegularity().measure(dashboard), 2, false);
+			appendValue(buffer, df, new NgoRegularity(new GEType[] { GEType.CHART }).measure(dashboard), 1, false);
 			
-			appendValue(buffer, df, new Area().measure(dashboard, new GEType[] { GEType.BUTTON, GEType.HEADER, GEType.TOOLBAR, GEType.DECORATION } ), 2, false);
-			appendValue(buffer, df, new Area().measure(dashboard, new GEType[] { GEType.BUTTON, GEType.DECORATION, GEType.HEADER, GEType.TOOLBAR, GEType.LABEL } ), 1, false);
+			appendValue(buffer, df, new WidgetUsedArea(new GEType[] { GEType.BUTTON, GEType.HEADER, GEType.TOOLBAR, GEType.DECORATION }).measure(dashboard), 2, false);
+			appendValue(buffer, df, new WidgetUsedArea(new GEType[] { GEType.BUTTON, GEType.DECORATION, GEType.HEADER, GEType.TOOLBAR, GEType.LABEL }).measure(dashboard), 1, false);
 			
 			BufferedImage image = dashboardFile.getImage();
 			if(image != null) {
@@ -87,15 +87,15 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					// HSB
 					HSB matrixHSB[][] = HSB.fromRGB(matrix);
 					Colorfulness colorfunessMetric = new Colorfulness();
-					hsbSaturation.add(new Double((double) (colorfunessMetric.measure(matrixHSB, HSB.CHANNEL_SATURATION))[0].value));
+					hsbSaturation.add(new Double((double) (colorfunessMetric.setColorChannel(HSB.CHANNEL_SATURATION).setColorSpaceClass(HSB.class).measure(matrixHSB))[0].value));
 					
 					// CIE Lab/Lch
 					CIE matrixLCH[][] = CIE.fromRGB(matrix);
-					lchSaturation.add(new Double((double) (colorfunessMetric.measure(matrixLCH, CIE.CHANNEL_SATURATION))[0].value));
+					lchSaturation.add(new Double((double) (colorfunessMetric.setColorChannel(CIE.CHANNEL_SATURATION).setColorSpaceClass(CIE.class).measure(matrixLCH))[0].value));
 					
 					// RGB 12 bit
-					ColorShare colorShare = new ColorShare();
-					MetricResult[] result = colorShare.measure(matrix, 4);
+					ColorShare colorShare = new ColorShare(4);
+					MetricResult[] result = colorShare.measure(matrix);
 					rgb12amount.add(new Double((long) result[0].value));
 					rgb12first.add(new Double((double) result[3].value));
 					rgb12firstSecond.add(new Double((double) result[7].value));
@@ -105,13 +105,13 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					int matrixGrayValue[][] = ColorMatrix.toGrayScale(PosterizationUtils.posterizeMatrix(matrixGray, (int)(Math.pow(2, 4)), true), true, false);
 					int histogram[] = HistogramUtils.getGrayscaleHistogram(matrixGrayValue);
 					
-					result = (new IntensitiesCount()).measureGrayHistogram(histogram);
+					result = (new HistogramIntensitiesCount()).measureGrayHistogram(histogram);
 					rgb4amount.add(new Double((int) result[0].value));
 					rgb4amount10.add(new Double((int) result[2].value));
 					rgb4amount5.add(new Double((int) result[3].value));
 					rgb4amount1.add(new Double((int) result[4].value));
 					
-					result = (new BackgroundShare()).measureGrayHistogram(histogram);
+					result = (new HistogramBackgroundShare()).measureGrayHistogram(histogram);
 					rgb4firstSecond.add(new Double((double) result[0].value));
 					rgb4first.add(new Double((double) result[1].value));
 					

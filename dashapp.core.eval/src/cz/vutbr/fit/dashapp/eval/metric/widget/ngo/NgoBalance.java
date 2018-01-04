@@ -7,7 +7,20 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoBalance extends AbstractWidgetMetric {
+	
+	public NgoBalance() {
+		super();
+	}
+	
+	public NgoBalance(GEType[] geTypes) {
+		super(geTypes);
+	}
 	
 	public double getBalance(Dashboard dashboard, GEType[] types, int dimension) {
 		// vertical center of dashboard
@@ -36,9 +49,9 @@ public class NgoBalance extends AbstractWidgetMetric {
 	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
-		double BM_V = getBalance(dashboard, types, Constants.X);
-		double BM_H = getBalance(dashboard, types, Constants.Y);
+	public MetricResult[] measure(Dashboard dashboard) {
+		double BM_V = getBalance(dashboard, getGeTypes(), Constants.X);
+		double BM_H = getBalance(dashboard, getGeTypes(), Constants.Y);
 		return new MetricResult[] {
 				new MetricResult("Balance", "BM", 1-(Math.abs(BM_V)+Math.abs(BM_H))/2.0),
 				new MetricResult("Vertical Balance", "BM_v", BM_V),

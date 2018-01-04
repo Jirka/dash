@@ -15,6 +15,7 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils.WorkingCopy;
 
@@ -109,7 +110,7 @@ public class WandTool extends AbstractCanvasTool {
 				}
 			}
 		}
-		int x1 = matrix.length, x2 = 0, y1 = matrix[0].length, y2 = 0;
+		int x1 = MatrixUtils.width(matrix), x2 = 0, y1 = MatrixUtils.height(matrix), y2 = 0;
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[i].length; j++) {
 				if(matrix[i][j] == -2) {

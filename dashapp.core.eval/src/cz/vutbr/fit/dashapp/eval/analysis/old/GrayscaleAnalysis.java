@@ -3,8 +3,8 @@ package cz.vutbr.fit.dashapp.eval.analysis.old;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.BackgroundShare;
-import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.IntensitiesCount;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramBackgroundShare;
+import cz.vutbr.fit.dashapp.eval.metric.raster.gray.histogram.HistogramIntensitiesCount;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -31,8 +31,8 @@ public class GrayscaleAnalysis extends AbstractAnalysis implements IAnalysis {
 		int histogram[] = HistogramUtils.getGrayscaleHistogram(matrix);
 		
 		buffer.append("===== " + bit + " bit (" + (int)(Math.pow(2, bit)) + " colors) =====\n");
-		formatMetric(buffer, new BackgroundShare().measureGrayHistogram(histogram), df);
-		formatMetric(buffer, new IntensitiesCount().measureGrayHistogram(histogram), df);
+		formatMetric(buffer, new HistogramBackgroundShare().measureGrayHistogram(histogram), df);
+		formatMetric(buffer, new HistogramIntensitiesCount().measureGrayHistogram(histogram), df);
 		buffer.append("\n");
 	}
 

@@ -4,36 +4,61 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantMap;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantResolver;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantUpdater;
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantMap;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantResolver;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoSymmetry extends AbstractWidgetMetric {
 	
 	public static final int SUM = 0;
 	public static final int MAX = 1;
 	
-	private int normalizationType;
+	public static final int DEFAULT_NORM_TYPE = MAX;
 	
-	public NgoSymmetry(int normalizationType) {
-		this.normalizationType = normalizationType;
-	}
+	private int normalizationType = DEFAULT_NORM_TYPE;
+	private QuadrantMap<SymmetryValues> quadrants;
 	
 	public NgoSymmetry() {
-		this.normalizationType = MAX;
+		super();
+		setNormalizationType(DEFAULT_NORM_TYPE);
+	}
+	
+	public NgoSymmetry(GEType[] geTypes) {
+		super(geTypes);
+	}
+	
+	public NgoSymmetry(int normalizationType) {
+		super();
+		setNormalizationType(normalizationType);
+	}
+	
+	public NgoSymmetry(GEType[] geTypes, int normalizationType) {
+		super(geTypes);
+		setNormalizationType(normalizationType);
 	}
 	
 	@Override
 	public String getName() {
-		return (normalizationType == MAX ? "MAX_" : "SUM_") + super.getName();
+		return super.getName() + (normalizationType == MAX ? "_MAX" : "_SUM");
 	}
 	
-	private QuadrantMap<SymmetryValues> quadrants;
+	public NgoSymmetry setNormalizationType(int normalizationType) {
+		this.normalizationType = normalizationType;
+		return this;
+	}
+	
+	public int getNormalizationType() {
+		return normalizationType;
+	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		// initialize map of quadrants containing symmetry values
 		quadrants = new QuadrantMap<SymmetryValues>(new SymmetryValues());
 		
@@ -63,7 +88,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 				value.r += dsqrt;
 			};
 			
-		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getGeTypes(), QuadrantResolver.BY_CENTER, false);
 		// BY_AREA no
 		
 		// normalize symmetry values in each quadrant
@@ -115,7 +140,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 		double rr_min = min(new double[] { q1.r , q2.r , q3.r , q4.r });
 		double cc_min = min(new double[] { q1.c , q2.c , q3.c , q4.c });*/
 		
-		
+		int normalizationType = getNormalizationType();
 		if(normalizationType == SUM) {
 			double xx = sum(new double[] { q1.x , q2.x , q3.x , q4.x });
 			double yy = sum(new double[] { q1.y , q2.y , q3.y , q4.y });
@@ -195,6 +220,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 		return max;
 	}
 	
+	@SuppressWarnings("unused")
 	private double min(double[] ds) {
 		double min = Double.MAX_VALUE;
 		for (double d : ds) {
@@ -211,6 +237,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 		return Math.abs(a - b);
 	}
 	
+	@SuppressWarnings("unused")
 	private double normalize(double a, double max) {
 		if(max == 0) {
 			return 0;
@@ -218,7 +245,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 		return a/max;
 	}
 	
-	private static class SymmetryValues implements cz.vutbr.fit.dashapp.eval.util.Cloneable {
+	private static class SymmetryValues implements cz.vutbr.fit.dashapp.model.Cloneable {
 		public double n;
 		public double x;
 		public double y;
@@ -257,16 +284,18 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 			return copy;
 		}
 		
-		/*public void normalize(SymmetryValues min, SymmetryValues max) {
+		@SuppressWarnings("unused")
+		public void normalize(SymmetryValues min, SymmetryValues max) {
 			x = normalize(x, min.x, max.x);
 			y = normalize(y, min.y, max.y);
 			w = normalize(w, min.w, max.w);
 			h = normalize(h, min.h, max.h);
 			o = normalize(o, min.o, max.o);
 			r = normalize(r, min.r, max.r);
-		}*/
+		}
 		
-		/*public void normalize(Dashboard d) {
+		@SuppressWarnings("unused")
+		public void normalize(Dashboard d) {
 			double dx = d.halfSizeX();
 			double dy = d.halfSizeY();
 			double dn = d.n(GEType.ALL_TYPES);
@@ -276,7 +305,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 			h = normalize(h, 0, d.height*dn);
 			o = normalize(o, 0, dy*n);
 			r = normalize(r, 0, Math.sqrt(dx*dx+dy*dy)*dn);
-		}*/
+		}
 		
 		public void normalize(double xx, double yy, double ww, double hh, double oo, double rr, double cc) {
 			x = xx != 0 ? x/xx : 0;
@@ -288,6 +317,7 @@ public class NgoSymmetry extends AbstractWidgetMetric {
 			c = cc != 0 ? c/cc : 0;
 		}
 		
+		@SuppressWarnings("unused")
 		public void normalize(double xx_min, double yy_min, double ww_min, double hh_min, double oo_min, double rr_min, double cc_min,
 				double xx, double yy, double ww, double hh, double oo, double rr, double cc) {
 			x = normalize(x, xx_min, xx);

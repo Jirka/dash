@@ -3,6 +3,7 @@ package cz.vutbr.fit.dashapp.image.colorspace;
 import java.awt.Color;
 
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class HSB implements ColorSpace {
 	
@@ -42,15 +43,14 @@ public class HSB implements ColorSpace {
 	}
 	
 	public static HSB[][] fromRGB(int[][] matrix) {
-		if(matrix.length > 0) {
-			HSB[][] matrixHSB = new HSB[matrix.length][matrix[0].length];
-			for (int i = 0; i < matrix.length; i++) {
-				for (int j = 0; j < matrix[i].length; j++) {
-					matrixHSB[i][j] = new HSB(matrix[i][j]);
-				}
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		HSB[][] matrixHSB = new HSB[mW][mH];
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrixHSB[i][j] = new HSB(matrix[i][j]);
 			}
-			return matrixHSB;
 		}
-		return null;
+		return matrixHSB;
 	}
 }

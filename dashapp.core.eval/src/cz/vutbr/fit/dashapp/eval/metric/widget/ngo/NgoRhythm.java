@@ -4,35 +4,62 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
 import cz.vutbr.fit.dashapp.eval.metric.widget.AbstractWidgetMetric;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantMap;
-import cz.vutbr.fit.dashapp.eval.util.QuadrantResolver;
 import cz.vutbr.fit.dashapp.model.Constants.Quadrant;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantMap;
+import cz.vutbr.fit.dashapp.util.quadrant.QuadrantResolver;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NgoRhythm extends AbstractWidgetMetric {
 	
 	public static final int SUM = 0;
 	public static final int MAX = 1;
 	
-	private int normalizationType;
+	public static final int DEFAULT_NORM_TYPE = MAX;
 	
-	public NgoRhythm(int normalizationType) {
-		this.normalizationType = normalizationType;
-	}
+	private int normalizationType;
+	private QuadrantMap<RhythmValues> quadrants;
 	
 	public NgoRhythm() {
-		this.normalizationType = MAX;
+		super();
+		setNormalizationType(DEFAULT_NORM_TYPE);
+	}
+	
+	public NgoRhythm(GEType[] geTypes) {
+		super(geTypes);
+		setNormalizationType(MAX);
+	}
+	
+	public NgoRhythm(int normalizationType) {
+		super();
+		setNormalizationType(normalizationType);
+	}
+	
+	public NgoRhythm(GEType[] geTypes, int normalizationType) {
+		super(geTypes);
+		setNormalizationType(normalizationType);
 	}
 	
 	@Override
 	public String getName() {
-		return (normalizationType == MAX ? "MAX_" : "SUM_") + super.getName();
+		return super.getName() + (normalizationType == MAX ? "_MAX" : "_SUM");
 	}
 	
-	private QuadrantMap<RhythmValues> quadrants;
+	public NgoRhythm setNormalizationType(int normalizationType) {
+		this.normalizationType = normalizationType;
+		return this;
+	}
+	
+	public int getNormalizationType() {
+		return normalizationType;
+	}
 
 	@Override
-	public MetricResult[] measure(Dashboard dashboard, GEType[] types) {
+	public MetricResult[] measure(Dashboard dashboard) {
 		// initialize map of quadrants containing symmetry values
 		quadrants = new QuadrantMap<RhythmValues>(new RhythmValues());
 		
@@ -52,7 +79,7 @@ public class NgoRhythm extends AbstractWidgetMetric {
 				quadrants.get(Quadrant.IV).a += graphicalElement.area(Quadrant.IV);*/
 			};
 			
-		}.perform(dashboard, types, QuadrantResolver.BY_CENTER, false);
+		}.perform(dashboard, getGeTypes(), QuadrantResolver.BY_CENTER, false);
 		
 		// for shorter code
 		RhythmValues q1 = quadrants.get(Quadrant.I);
@@ -67,6 +94,7 @@ public class NgoRhythm extends AbstractWidgetMetric {
 		double yy = q1.y + q2.y + q3.y + q4.y;
 		double aa = dashboard.area()/4;//q1.a + q2.a + q3.a + q4.a;*/
 		
+		int normalizationType = getNormalizationType();
 		if(normalizationType == SUM) {
 			double xx = sum(new double[] { q1.x , q2.x , q3.x , q4.x });
 			double yy = sum(new double[] { q1.y , q2.y , q3.y , q4.y });
@@ -126,7 +154,7 @@ public class NgoRhythm extends AbstractWidgetMetric {
 		return max;
 	}
 	
-	private static class RhythmValues implements cz.vutbr.fit.dashapp.eval.util.Cloneable {
+	private static class RhythmValues implements cz.vutbr.fit.dashapp.model.Cloneable {
 		public double n;
 		public double x;
 		public double y;
