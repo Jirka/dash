@@ -75,6 +75,7 @@ public class AverageMetricAnalysisUI extends FolderAnalysisUI {
 		// metrics
 		selectedMetricTypes = averageMetricAnalysis.metricTypes;
 		metricsButton = new JButton(selectedMetricTypes.size() + " metrics selected");
+		metricsButton.setEnabled(averageMetricAnalysis.enable_custom_metrics);
 		metricsButton.addActionListener(new ActionListener() {
 			
 			@Override

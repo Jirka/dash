@@ -58,6 +58,7 @@ public class SimpleMetricAnalysisUI extends FolderAnalysisUI {
 		// metrics
 		selectedMetricTypes = simpleMetricAnalysis.metricTypes;
 		metricsButton = new JButton(selectedMetricTypes.size() + " metrics selected");
+		metricsButton.setEnabled(simpleMetricAnalysis.enable_custom_metrics);
 		metricsButton.addActionListener(new ActionListener() {
 			
 			@Override

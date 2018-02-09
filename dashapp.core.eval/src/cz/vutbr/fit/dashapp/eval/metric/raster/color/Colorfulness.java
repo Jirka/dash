@@ -28,6 +28,11 @@ public class Colorfulness extends AbstractColorSpaceMetric implements IColorSpac
 		setColorChannel(colorChannel);
 	}
 	
+	@Override
+	public String getName() {
+		return super.getName() + "_" + getColorChannel();
+	}
+	
 	public Colorfulness setColorChannel(int colorChannel) {
 		this.colorChannel = colorChannel;
 		return this;

@@ -48,6 +48,7 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 public enum MetricType {
 	// raster color
 	Colorfulness_HSB_s,
+	Colorfulness_HSB_h,
 	Colorfulness_CIE_s,
 	ColorShare,
 	
@@ -170,6 +171,7 @@ public enum MetricType {
 		
 			// raster color
 			case Colorfulness_HSB_s: return new Colorfulness(HSB.class, HSB.CHANNEL_SATURATION);
+			case Colorfulness_HSB_h: return new Colorfulness(HSB.class, HSB.CHANNEL_HUE);
 			case Colorfulness_CIE_s: return new Colorfulness(CIE.class, CIE.CHANNEL_SATURATION);
 			case ColorShare: return new ColorShare();
 			
@@ -285,6 +287,7 @@ public enum MetricType {
 		switch (this) {
 		// raster color
 		case Colorfulness_HSB_s:
+		case Colorfulness_HSB_h:
 		case Colorfulness_CIE_s:	
 		case ColorShare:
 		

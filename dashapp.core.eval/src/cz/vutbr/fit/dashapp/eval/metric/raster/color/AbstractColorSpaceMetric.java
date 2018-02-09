@@ -27,8 +27,13 @@ public abstract class AbstractColorSpaceMetric extends AbstractRasterMetric impl
 		setColorSpaceClass(colorSpaceClass);
 	}
 	
+	@Override
+	public String getName() {
+		return super.getName() + "_" +  getColorSpaceClass().getSimpleName();
+	}
+	
 	public AbstractColorSpaceMetric setColorSpaceClass(Class<?> colorSpaceClass) {
-		if(colorSpaceClass == null || !colorSpaceClass.isInstance(ColorSpace.class)) {
+		if(colorSpaceClass == null || !ColorSpace.class.isAssignableFrom(colorSpaceClass)) {
 			this.colorSpaceClass = DEFAULT_COLOR_SPACE;
 		} else {
 			this.colorSpaceClass = colorSpaceClass;

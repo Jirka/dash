@@ -8,7 +8,9 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 public class ColorSpaceUtils {
 	
 	public static ColorSpace[][] fromRGB(int[][] matrix, Class<?> colorSpaceClass) {
-		if(colorSpaceClass == CIE.class) {
+		if(colorSpaceClass == RGB.class) {
+			return RGB.fromRGB(matrix);
+		} else if(colorSpaceClass == CIE.class) {
 			return CIE.fromRGB(matrix);
 		} else if(colorSpaceClass == Gray.class) {
 			return Gray.fromRGB(matrix);
