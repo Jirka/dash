@@ -29,6 +29,7 @@ import cz.vutbr.fit.dashapp.view.tools.analysis.EdgesAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.EntropyAnalysisUI;
 //import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.HeatMapAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.SegmentationAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.SimpleMetricAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.ThresholdAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.WidgetAnalysisUI;
@@ -84,6 +85,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		heatmapActions.add(new AverageMetricAnalysisUI(metricTypes));
 		//heatmapActions.add(new FolderAnalysisUI(new WidgetMetricAnalysis()));
 		//heatmapActions.add(new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()));
+		heatmapActions.add(new SegmentationAnalysisUI());
 		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysisUI[heatmapActions.size()])));
 	}
 	

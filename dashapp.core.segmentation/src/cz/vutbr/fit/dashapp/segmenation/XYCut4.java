@@ -11,6 +11,7 @@ import java.util.Vector;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
@@ -20,7 +21,7 @@ import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import extern.ImagePreview;
 
-public class XYCut2 implements ISegmentationAlgorithm {
+public class XYCut4 implements ISegmentationAlgorithm {
 
 	@Override
 	public Dashboard processImage(BufferedImage image) {
@@ -29,18 +30,51 @@ public class XYCut2 implements ISegmentationAlgorithm {
 		
 		final int w = image.getWidth();
 		final int h = image.getHeight();
+		final int a = w*h;
 		
 		// image preprocessing
+		
+		// gray posterized
 		ColorMatrix.toGrayScale(matrix, false, false); // convert to gray scale
 		PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 6)), false); // 6 bits posterization
 		int[][] rawMatrix = ColorMatrix.toGrayScale(matrix, true, true); // convert to raw values (0-255) for simple use
+		
+		// edges
 		int[][] edgesMatrix = GrayMatrix.edges(rawMatrix);
 		GrayMatrix.inverse(edgesMatrix, false);
-		GrayMatrix.update(edgesMatrix, new ThresholdCalculator(GrayMatrix.WHITE-1), false); // threshold according to background
-		//edgesMatrix = GrayMatrix.emphasize(edgesMatrix, 1);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "edges matrix").openWindow(800,600,0.8);
-		int[][] filteredEdgesMatrix = GrayMatrix.lines(edgesMatrix, 10, 10);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, filteredEdgesMatrix), "filtered edges matrix").openWindow(800,600,0.8);
+		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "edges").openWindow(800,600,0.8);
+		
+		// threshold (most frequent value)
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(rawMatrix); // make histogram
+		
+		List<Integer> frequentValues = new ArrayList<>();
+		int mostFrequentValue = HistogramUtils.findMax(histogram, -1); // find most frequent value (possible background)
+		frequentValues.add(mostFrequentValue);
+		
+		mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
+		while((double) histogram[mostFrequentValue]/a >= 0.01) {
+			frequentValues.add(mostFrequentValue);
+			mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
+			if(frequentValues.size() > 5 && (double) histogram[mostFrequentValue]/a < 0.05) {
+				break;
+			}
+		}
+		double actColor = 255.0;
+		double colorInterval = actColor/frequentValues.size();
+		int[][] frequentColorMatrix = new int[w][h];
+		GrayMatrix.clearMatrix(frequentColorMatrix, GrayMatrix.BLACK);
+		for (Integer frequentValue : frequentValues) {
+			GrayMatrix.copyPixels(frequentColorMatrix, rawMatrix, frequentValue, (int) actColor);
+			actColor-=colorInterval;
+		}
+		new ImagePreview(GrayMatrix.printMatrixToImage(null, frequentColorMatrix), "histogram threshold").openWindow(800,600,0.8);
+		
+		// sharpen
+		/*int[][] sharpenMatrix = GrayMatrix.sharpen(rawMatrix);
+		int[][] edgesMatrix2 = GrayMatrix.edges(sharpenMatrix);
+		GrayMatrix.inverse(edgesMatrix2, false);
+		new ImagePreview(GrayMatrix.printMatrixToImage(null, sharpenMatrix), "sharpen").openWindow(800,600,0.8);
+		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "sharpen edges").openWindow(800,600,0.8);*/
 		
 		//int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 40, 40);
 		//new ImagePreview(GrayMatrix.printMatrixToImage(null, linesMatrix), "result 2").openWindow(800,600,0.8);

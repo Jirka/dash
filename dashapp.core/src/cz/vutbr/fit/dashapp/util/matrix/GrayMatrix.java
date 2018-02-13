@@ -13,6 +13,8 @@ public class GrayMatrix {
 	
 	public static final int BLACK = 0;
 	public static final int WHITE = 255;
+	public static final int SAME_COLOR = -1;
+	
 	
 	/**
 	 * Returns RGB value of selected intensity value.
@@ -106,6 +108,45 @@ public class GrayMatrix {
 		return to;
 	}
 	
+	public static void copyPixels(int[][] to, int[][] from, int x1, int y1, int x2, int y2) {
+		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
+		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
+		
+		for (int x = x1; x < x2 && x < mW_max; x++) {
+			for (int y = y1; y < y2 && y < mH_max; y++) {
+				to[x][y] = from[x][y];
+			}
+		}
+	}
+	
+	public static void copyPixels(int[][] to, int[][] from, int copyColor, int drawColor) {
+		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
+		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
+		
+		for (int x = 0; x < mW_max; x++) {
+			for (int y = 0; y < mH_max; y++) {
+				if(from[x][y] == copyColor) {
+					if(drawColor == SAME_COLOR) {
+						to[x][y] = from[x][y];
+					} else {
+						to[x][y] = drawColor;
+					}
+				}
+			}
+		}
+	}
+	
+	public static void drawPixels(int[][] matrix, int x1, int y1, int x2, int y2, int color) {
+		int mW_max = MatrixUtils.width(matrix);
+		int mH_max = MatrixUtils.height(matrix);
+		
+		for (int x = x1; x < x2 && x < mW_max; x++) {
+			for (int y = y1; y < y2 && y < mH_max; y++) {
+				matrix[x][y] = color;
+			}
+		}
+	}
+	
 	public static int[][] convolve(int[][] matrix, int[][] filter) {
 		return convolve(matrix, filter, 1);
 	}
@@ -174,71 +215,6 @@ public class GrayMatrix {
 		return inverseMatrix;
 	}
 	
-	public static int[][] lines(int[][] matrix, int minWidth, int minHeight) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		
-		int lineMatrix[][] = new int[mW][mH];
-		
-		// clear matrix
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				lineMatrix[i][j] = WHITE;
-			}
-		}
-		
-		// horizontal lines
-		int counter;
-		for (int i = 0; i < mW; i++) {
-			counter = 0;
-			for (int j = 0; j < mH; j++) {
-				if(matrix[i][j] != WHITE) {
-					counter++;
-					continue;
-				} else {
-					if(counter > minHeight) {
-						for (int k = j-counter; k < j; k++) {
-							lineMatrix[i][k] = matrix[i][k];
-						}
-					}
-					counter = 0;
-				}
-			}
-			
-			if(counter > minHeight) {
-				for (int k = mH-counter; k < mH; k++) {
-					lineMatrix[i][k] = matrix[i][k];
-				}
-			}
-		}
-		
-		// vertical lines
-		for (int i = 0; i < mH; i++) {
-			counter = 0;
-			for (int j = 0; j < mW; j++) {
-				if(matrix[j][i] != WHITE) {
-					counter++;
-					continue;
-				} else {
-					if(counter > minWidth) {
-						for (int k = j-counter; k < j; k++) {
-							lineMatrix[k][i] = matrix[k][i];
-						}
-					}
-					counter = 0;
-				}
-			}
-			
-			if(counter > minWidth) {
-				for (int k = mW-counter; k < mW; k++) {
-					lineMatrix[k][i] = matrix[k][i];
-				}
-			}
-		}
-		
-		return lineMatrix;
-	}
-	
 	public static int[][] medianFilter(int[][] matrix, int kernelDepth) {
 		int mW = MatrixUtils.width(matrix)-kernelDepth;
 		int mH = MatrixUtils.height(matrix)-kernelDepth;
@@ -288,6 +264,30 @@ public class GrayMatrix {
 				{ 1, 1, 1 },
 				{ 1, -8, 1 },
 				{ 1, 1, 1 }
+			};
+			
+		int edgesMatrix[][] = convolve(matrix, filter);
+		
+		return edgesMatrix;
+	}
+	
+	/**
+	 * Sharpens image
+	 * 
+	 * @param matrix
+	 * @param createNew
+	 * @return
+	 */
+	public static int[][] sharpen(int[][] matrix) {
+		
+		//int edgesMatrix[][] = inverse(matrix, true);
+		
+		// calculate edges
+		int[][] filter =
+			{
+				{ 0, -1, 0 },
+				{ -1, 5, -1 },
+				{ 0, -1, 0 }
 			};
 			
 		int edgesMatrix[][] = convolve(matrix, filter);
@@ -611,22 +611,91 @@ public class GrayMatrix {
 		int mW = Math.min(matrix.length, maskMatrix.length);
 		int mH = Math.min(matrix[0].length, maskMatrix[0].length);
 		
-		int ressultMatrix[][] = matrix;
+		int resultMatrix[][] = matrix;
 		if(createNew) {
-			ressultMatrix = new int[mW][mH];
+			resultMatrix = new int[mW][mH];
 		}
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
 				if(maskMatrix[i][j] == BLACK) {
-					ressultMatrix[i][j] = matrix[i][j];
+					resultMatrix[i][j] = matrix[i][j];
 				} else {
-					ressultMatrix[i][j] = WHITE;
+					resultMatrix[i][j] = WHITE;
 				}
 			}
 		}
 		
-		return ressultMatrix;
+		return resultMatrix;
+	}
+
+	public static int[][] lines(int[][] matrix, int verticalLineLength, int horizontalLineLength) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		int lastW = mW-1;
+		int lastH = mH-1;
+		
+		int lineMatrix[][] = new int[mW][mH];
+		clearMatrix(lineMatrix, WHITE);
+		
+		int start;
+		
+		// vertical lines
+		for (int x = 0; x < mW; x++) {
+			start = -1; // new column starts
+			for (int y = 0; y < mH; y++) {
+				if(matrix[x][y] != WHITE && y < lastH) {
+					// non-white pixel, not the last one
+					if(start < 0) {
+						// first non-white pixel
+						start = y;
+					}
+				} else {
+					// white or last pixel
+					if(start >= 0) {
+						if(y - start > verticalLineLength) {
+							// draw line
+							copyPixels(lineMatrix, matrix, x, start, x+1, y);
+							// only last pixel can be not-white
+							if(matrix[x][y] != WHITE) {
+								lineMatrix[x][y] = matrix[x][y];
+							}
+						}
+						start = -1;
+					}
+				}
+			}
+		}
+		
+		// vertical lines
+		for (int y = 0; y < mH; y++) {
+			start = -1; // new row starts
+			for (int x = 0; x < mW; x++) {
+				if(matrix[x][y] != WHITE && x < lastW) {
+					// non-white pixel, not the last one
+					if(start < 0) {
+						// first non-white pixel
+						start = x;
+					}
+				} else {
+					// white or last pixel
+					if(start >= 0) {
+						// long enough
+						if(x - start > horizontalLineLength) {
+							// draw line
+							copyPixels(lineMatrix, matrix, start, y, x, y+1);
+							// only last pixel can be not-white
+							if(matrix[x][y] != WHITE) {
+								lineMatrix[x][y] = matrix[x][y];
+							}
+						}
+						start = -1;
+					}
+				}
+			}
+		}
+		
+		return lineMatrix;
 	}
 	
 }
