@@ -31,5 +31,13 @@ public class MathUtils {
 		double a = max-min;
 		return a*act+(1-a);
 	}
+	
+	public static int roundInRange(int p, int min, int max) {
+		return Math.min(max, Math.max(min, p));
+	}
+	
+	public static boolean isInRange(int p, int min, int max) {
+		return p >= min && p <= max;
+	}
 
 }

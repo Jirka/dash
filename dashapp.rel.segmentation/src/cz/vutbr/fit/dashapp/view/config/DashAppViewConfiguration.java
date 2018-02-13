@@ -21,23 +21,22 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
+import cz.vutbr.fit.tools.segmentation.SegmentationImageActionFactory;
 import cz.vutbr.fit.tools.segmentation.SegmentationTool;
-import cz.vutbr.fit.view.tools.image.HistogramTool;
+import cz.vutbr.fit.view.tools.image.ImageActionFactory;
 import cz.vutbr.fit.view.tools.image.ImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
-	public static final String DEFAULT_WORKSPACE_PATH = "/home/jurij/work/dash/";
+	@Override
+	public String getDefaultWorkspacePath() {
+		return super.getDefaultWorkspacePath() + "/research/widget-based/gen/all/segmentation/color";
+	}
 	
 	/**
 	 * version
 	 */
 	public static final String VERSION = "rel-segmentation";
-	
-	@Override
-	public String getDefaultWorkspacePath() {
-		return DEFAULT_WORKSPACE_PATH;
-	}
 	
 	@Override
 	public String getVersion() {
@@ -72,8 +71,8 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		
 		guiTools.add(new GrayScaleTool());
 		
-		guiTools.add(new ImageTool());
-		guiTools.add(new HistogramTool());
+		guiTools.add(new ImageTool(ImageActionFactory.getRecommendedActions()));
+		guiTools.add(new ImageTool(SegmentationImageActionFactory.getRecommendedActions()));
 		
 		guiTools.add(new SegmentationTool());
 	}

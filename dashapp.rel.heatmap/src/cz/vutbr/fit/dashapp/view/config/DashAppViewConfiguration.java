@@ -29,6 +29,7 @@ import cz.vutbr.fit.dashapp.view.tools.analysis.EdgesAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.EntropyAnalysisUI;
 //import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.HeatMapAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.SegmentationAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.SimpleMetricAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.ThresholdAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.WidgetAnalysisUI;
@@ -36,10 +37,18 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import cz.vutbr.fit.view.tools.image.ImageTool;
+import cz.vutbr.fit.view.tools.image.old.OldImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
+	@Override
+	public String getDefaultWorkspacePath() {
+		return super.getDefaultWorkspacePath() + "/research/widget-based/gen/sort-id";
+	}
+	
+	/**
+	 * version
+	 */
 	public static final String EVAL_VERSION = "rel-heatmap";	
 	
 	protected void initTools() {
@@ -69,7 +78,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		
 		guiTools.add(new GrayScaleTool());
 		
-		guiTools.add(new ImageTool());
+		guiTools.add(new OldImageTool());
 		
 		// heat map tools
 		LinkedList<AbstractAnalysisUI> heatmapActions = new LinkedList<>();
@@ -84,6 +93,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		heatmapActions.add(new AverageMetricAnalysisUI(metricTypes));
 		//heatmapActions.add(new FolderAnalysisUI(new WidgetMetricAnalysis()));
 		//heatmapActions.add(new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()));
+		heatmapActions.add(new SegmentationAnalysisUI());
 		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysisUI[heatmapActions.size()])));
 	}
 	

@@ -1,18 +1,25 @@
 package cz.vutbr.fit.dashapp.image.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class HistogramUtils {
 	
 	public static int[] getGrayscaleHistogram(int[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
 		int histogram[] = new int[256];
 		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] = 0;
 		}
 		
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
 				histogram[matrix[i][j]]++;
 			}
 		}
@@ -73,15 +80,29 @@ public class HistogramUtils {
 	}
 	
 	public static int findMax(int[] histogram, int upperLimitIndex) {
-		int max = 0;
+		int max = -1;
+		int maxValue = -1; // we need to store value (problem with upperLimitIndex)
 		for (int i = 0; i < histogram.length; i++) {
-			if(histogram[i] > histogram[max]) {
-				if(upperLimitIndex < 0 || histogram[i] < histogram[upperLimitIndex]) {
+			if(histogram[i] >= maxValue) {
+				if(upperLimitIndex < 0 || histogram[i] < histogram[upperLimitIndex] || (histogram[i] == histogram[upperLimitIndex] && i < upperLimitIndex)) {
 					max = i;
+					maxValue = histogram[i];
 				}
 			}
 		}
 		return max;
+	}
+
+	public static List<Integer> getUsedValues(int[][] matrix) {
+		List<Integer> usedValues = new ArrayList<>();
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
+		for (int i = 0; i < histogram.length; i++) {
+			if(histogram[i] > 0) {
+				usedValues.add(i);
+			}
+		}
+		
+		return usedValues;
 	}
 
 }

@@ -13,6 +13,8 @@ public class GrayMatrix {
 	
 	public static final int BLACK = 0;
 	public static final int WHITE = 255;
+	public static final int SAME_COLOR = -1;
+	
 	
 	/**
 	 * Returns RGB value of selected intensity value.
@@ -76,6 +78,10 @@ public class GrayMatrix {
 		return resultMatrix;
 	}
 	
+	public static int[][] copy(int[][] matrix) {				
+		return copy(new int[MatrixUtils.width(matrix)][MatrixUtils.height(matrix)], matrix);
+	}
+	
 	public static int[][] copy(int[][] to, int[][] from) {
 		int mW = Math.min(to.length, from.length);
 		int mH = Math.min(to[0].length, from[0].length);
@@ -104,6 +110,132 @@ public class GrayMatrix {
 		}
 		
 		return to;
+	}
+	
+	public static int[][] copyPixels(int[][] to, int[][] from, int x1, int y1, int x2, int y2) {
+		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
+		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
+		
+		x1 = MathUtils.roundInRange(x1, 0, mW_max);
+		x2 = MathUtils.roundInRange(x2, 0, mW_max);
+		y1 = MathUtils.roundInRange(y1, 0, mH_max);
+		y2 = MathUtils.roundInRange(y2, 0, mH_max);
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				to[x][y] = from[x][y];
+			}
+		}
+		
+		return to;
+	}
+	
+	public static int[][] copyPixels(int[][] to, int[][] from, int copyColor, int drawColor) {
+		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
+		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
+		
+		for (int x = 0; x < mW_max; x++) {
+			for (int y = 0; y < mH_max; y++) {
+				if(from[x][y] == copyColor) {
+					if(drawColor == SAME_COLOR) {
+						to[x][y] = from[x][y];
+					} else {
+						to[x][y] = drawColor;
+					}
+				}
+			}
+		}
+		
+		return to;
+	}
+	
+	public static int[][] drawPixels(int[][] matrix, int x1, int y1, int x2, int y2, int color) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		x1 = MathUtils.roundInRange(x1, 0, mW);
+		x2 = MathUtils.roundInRange(x2, 0, mW);
+		y1 = MathUtils.roundInRange(y1, 0, mH);
+		y2 = MathUtils.roundInRange(y2, 0, mH);
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				matrix[x][y] = color;
+			}
+		}
+		
+		return matrix;
+	}
+	
+	public static int[][] drawRectangle(int[][] matrix, Rectangle r, int color, boolean onlyBorders) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int x1 = MathUtils.roundInRange(r.x, 0, mW);
+		int x2 = MathUtils.roundInRange(r.x + r.width, 0, mW);
+		int y1 = MathUtils.roundInRange(r.y, 0, mH);
+		int y2 = MathUtils.roundInRange(r.y + r.height, 0, mH);
+		
+		if(onlyBorders) {
+			// draw rectangle borders
+			boolean x1InRange = MathUtils.isInRange(r.x, 0, mW);
+			boolean x2InRange = MathUtils.isInRange(r.x + r.width, 0, mW);
+			boolean y1InRange = MathUtils.isInRange(r.y, 0, mH);
+			boolean y2InRange = MathUtils.isInRange(r.y + r.height, 0, mH);
+			
+			int x2_last = x2-1;
+			int y2_last = y2-1;
+			
+			//if(y2InRange == false) {
+			//	System.out.println("y2 is not in range");
+			//}
+			
+			// optimization
+			if(y1InRange) {
+				if(y2InRange) {
+					for (int x = x1; x < x2; x++) {
+						matrix[x][y1] = color;
+						matrix[x][y2_last] = color;
+					}
+				} else {
+					for (int x = x1; x < x2; x++) {
+						matrix[x][y1] = color;
+					}
+				}
+			} else if(y2InRange) {
+				for (int x = x1; x < x2; x++) {
+					matrix[x][y2_last] = color;
+				}
+			}
+			
+			if(x1InRange) {
+				if(x2InRange) {
+					for (int y = y1; y < y2; y++) {
+						matrix[x1][y] = color;
+						matrix[x2_last][y] = color;
+					}
+				} else {
+					for (int y = y1; y < y2; y++) {
+						matrix[x1][y] = color;
+						matrix[x2_last][y] = color;
+					}
+				}
+			} else if(x2InRange) {
+				for (int y = y1; y < y2; y++) {
+					matrix[x1][y] = color;
+					matrix[x2_last][y] = color;
+				}
+			}
+		} else {
+			// fill rectangle
+			for (int x = x1; x < x2; x++) {
+				for (int y = y1; y < y2; y++) {
+					matrix[x][y] = color;
+				}
+			}
+		}
+		
+		return matrix;
 	}
 	
 	public static int[][] convolve(int[][] matrix, int[][] filter) {
@@ -174,99 +306,73 @@ public class GrayMatrix {
 		return inverseMatrix;
 	}
 	
-	public static int[][] lines(int[][] matrix, int minWidth, int minHeight) {
-		int mW = matrix.length;
-		int mH = matrix[0].length;
-		
-		int lineMatrix[][] = new int[mW][mH];
-		
-		// clear matrix
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				lineMatrix[i][j] = WHITE;
-			}
-		}
-		
-		// horizontal lines
-		int counter;
-		for (int i = 0; i < mW; i++) {
-			counter = 0;
-			for (int j = 0; j < mH; j++) {
-				if(matrix[i][j] != WHITE) {
-					counter++;
-					continue;
-				} else {
-					if(counter > minHeight) {
-						for (int k = j-counter; k < j; k++) {
-							lineMatrix[i][k] = matrix[i][k];
-						}
-					}
-					counter = 0;
-				}
-			}
-			
-			if(counter > minHeight) {
-				for (int k = mH-counter; k < mH; k++) {
-					lineMatrix[i][k] = matrix[i][k];
-				}
-			}
-		}
-		
-		// vertical lines
-		for (int i = 0; i < mH; i++) {
-			counter = 0;
-			for (int j = 0; j < mW; j++) {
-				if(matrix[j][i] != WHITE) {
-					counter++;
-					continue;
-				} else {
-					if(counter > minWidth) {
-						for (int k = j-counter; k < j; k++) {
-							lineMatrix[k][i] = matrix[k][i];
-						}
-					}
-					counter = 0;
-				}
-			}
-			
-			if(counter > minWidth) {
-				for (int k = mW-counter; k < mW; k++) {
-					lineMatrix[k][i] = matrix[k][i];
-				}
-			}
-		}
-		
-		return lineMatrix;
+	public static int[][] medianFilter(int[][] matrix, int kernelDepth) {
+		return medianFilter(matrix, kernelDepth, false);
 	}
 	
-	public static int[][] medianFilter(int[][] matrix, int kernelDepth) {
-		int mW = MatrixUtils.width(matrix)-kernelDepth;
-		int mH = MatrixUtils.height(matrix)-kernelDepth;
+	public static int[][] medianFilter(int[][] matrix, int kernelDepth, boolean noiseOnly) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		int mW_crop = mW-kernelDepth;
+		int mH_crop = mH-kernelDepth;
 		
-		int resultMatrix[][] = new int[matrix.length][matrix[0].length];
+		int resultMatrix[][] = copy(matrix);
 		
 		int kernelWidth = kernelDepth*2+1;
 		int middle = (kernelWidth*kernelWidth)/2;
 		int[] kernel = new int[kernelWidth*kernelWidth];
 		int k; // kernel iterator
+		boolean allowFilter = false;
+		int imageX, imageY;
+		int x1, x2, y1, y2;
 		
-		for (int x = kernelDepth; x < mW; x++) {
-			for (int y = kernelDepth; y < mH; y++) {
-				k = 0;
-				for (int i = 0; i < kernelWidth; i++) {
-					for (int j = 0; j < kernelWidth; j++) {
-						// save pixel of kernel
-						// border pixels use pixels from the other side
-						int imageX = (x - kernelDepth + i + mW) % mW;
-					    int imageY = (y - kernelDepth + j + mH) % mH;
-					    kernel[k] = matrix[imageX][imageY];
-					    k++;
+		int sum = 0;
+		for (int x = kernelDepth; x < mW_crop; x++) {
+			for (int y = kernelDepth; y < mH_crop; y++) {
+				
+				allowFilter = true;
+				if(noiseOnly) {
+					x1 = x-1;
+					x2 = x+1;
+					y1 = y-1;
+					y2 = y+1;
+					for (int i = x1; i <= x2 && allowFilter; i++) {
+						if(i >= 0 && i < mW) {
+							for (int j = y1; j <= y2 && allowFilter; j++) {
+								if(j >= 0 && j < mH) {
+									if(matrix[x][y] == matrix[i][j] && (i != x || j != y)) {
+										allowFilter = false;
+										//System.out.println("GrayMatrix.medianFilter()");
+										sum++;
+										// pixel is different from all neighbors
+									}
+								}
+							}
+						}
 					}
 				}
-				Arrays.sort(kernel);
-				resultMatrix[x][y] = kernel[middle];
+				
+				if(allowFilter) {
+					k = 0;
+					for (int i = 0; i < kernelWidth; i++) {
+						for (int j = 0; j < kernelWidth; j++) {
+							// save pixel of kernel
+							// border pixels use pixels from the other side
+							imageX = (x - kernelDepth + i + mW_crop) % mW_crop;
+						    imageY = (y - kernelDepth + j + mH_crop) % mH_crop;
+						    kernel[k] = matrix[imageX][imageY];
+						    k++;
+						}
+					}
+					Arrays.sort(kernel);
+					resultMatrix[x][y] = kernel[middle];
+				}/* else {
+					// keep same pixel
+					resultMatrix[x][y] = matrix[x][y];
+				}*/
 			}
 		}
+		System.out.println((double)sum/(mW*mH));
 		
 		return resultMatrix;
 	}
@@ -288,6 +394,30 @@ public class GrayMatrix {
 				{ 1, 1, 1 },
 				{ 1, -8, 1 },
 				{ 1, 1, 1 }
+			};
+			
+		int edgesMatrix[][] = convolve(matrix, filter);
+		
+		return edgesMatrix;
+	}
+	
+	/**
+	 * Sharpens image
+	 * 
+	 * @param matrix
+	 * @param createNew
+	 * @return
+	 */
+	public static int[][] sharpen(int[][] matrix) {
+		
+		//int edgesMatrix[][] = inverse(matrix, true);
+		
+		// calculate edges
+		int[][] filter =
+			{
+				{ 0, -1, 0 },
+				{ -1, 5, -1 },
+				{ 0, -1, 0 }
 			};
 			
 		int edgesMatrix[][] = convolve(matrix, filter);
@@ -413,6 +543,18 @@ public class GrayMatrix {
 		return cmpMatrix;
 	}
 	
+	public static int[][] newMatrix(int mW, int mH, int color) {
+		int[][] matrix = new int[mW][mH];
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrix[i][j] = color;
+			}
+		}
+		
+		return matrix;
+	}
+	
 	public static void clearMatrix(int[][] matrix, int color) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);
@@ -526,7 +668,7 @@ public class GrayMatrix {
 		int color = -1;
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
-				if(rectangleMatrix[i][j] == BLACK) {
+				if(rectangleMatrix[i][j] != WHITE) {
 					processSeedPixel(i, j, color, rectangleMatrix);
 					color--;
 				}
@@ -611,22 +753,113 @@ public class GrayMatrix {
 		int mW = Math.min(matrix.length, maskMatrix.length);
 		int mH = Math.min(matrix[0].length, maskMatrix[0].length);
 		
-		int ressultMatrix[][] = matrix;
+		int resultMatrix[][] = matrix;
 		if(createNew) {
-			ressultMatrix = new int[mW][mH];
+			resultMatrix = new int[mW][mH];
 		}
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
 				if(maskMatrix[i][j] == BLACK) {
-					ressultMatrix[i][j] = matrix[i][j];
+					resultMatrix[i][j] = matrix[i][j];
 				} else {
-					ressultMatrix[i][j] = WHITE;
+					resultMatrix[i][j] = WHITE;
 				}
 			}
 		}
 		
-		return ressultMatrix;
+		return resultMatrix;
+	}
+
+	public static int[][] lines(int[][] matrix, int verticalLineLength, int horizontalLineLength) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		int lastW = mW-1;
+		int lastH = mH-1;
+		
+		int lineMatrix[][] = new int[mW][mH];
+		clearMatrix(lineMatrix, WHITE);
+		
+		int start;
+		
+		// vertical lines
+		for (int x = 0; x < mW; x++) {
+			start = -1; // new column starts
+			for (int y = 0; y < mH; y++) {
+				if(matrix[x][y] != WHITE && y < lastH) {
+					// non-white pixel, not the last one
+					if(start < 0) {
+						// first non-white pixel
+						start = y;
+					}
+				} else {
+					// white or last pixel
+					if(start >= 0) {
+						if(y - start > verticalLineLength) {
+							// draw line
+							copyPixels(lineMatrix, matrix, x, start, x+1, y);
+							// only last pixel can be not-white
+							if(matrix[x][y] != WHITE) {
+								lineMatrix[x][y] = matrix[x][y];
+							}
+						}
+						start = -1;
+					}
+				}
+			}
+		}
+		
+		// vertical lines
+		for (int y = 0; y < mH; y++) {
+			start = -1; // new row starts
+			for (int x = 0; x < mW; x++) {
+				if(matrix[x][y] != WHITE && x < lastW) {
+					// non-white pixel, not the last one
+					if(start < 0) {
+						// first non-white pixel
+						start = x;
+					}
+				} else {
+					// white or last pixel
+					if(start >= 0) {
+						// long enough
+						if(x - start > horizontalLineLength) {
+							// draw line
+							copyPixels(lineMatrix, matrix, start, y, x, y+1);
+							// only last pixel can be not-white
+							if(matrix[x][y] != WHITE) {
+								lineMatrix[x][y] = matrix[x][y];
+							}
+						}
+						start = -1;
+					}
+				}
+			}
+		}
+		
+		return lineMatrix;
+	}
+	
+	public static int[][] posterizeMatrix(int[][] matrix, int bit, boolean createCopy) {
+		return posterizeMatrix_mod(matrix, 256/(int)(Math.pow(2, bit)), createCopy);
+	}
+	
+	public static int[][] posterizeMatrix_mod(int[][] matrix, int mod, boolean createCopy) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int[][] posterizedMatrix = matrix;
+		if(createCopy) {
+			posterizedMatrix = new int[mW][mH];
+		}
+		
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
+				posterizedMatrix[x][y] = (matrix[x][y] - (matrix[x][y] % mod));
+			}
+		}
+		
+		return posterizedMatrix;
 	}
 	
 }

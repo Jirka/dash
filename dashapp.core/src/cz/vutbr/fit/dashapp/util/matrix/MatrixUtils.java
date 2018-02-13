@@ -46,5 +46,50 @@ public class MatrixUtils {
 	public static int area(Object[][] matrix) {
 		return width(matrix)*height(matrix);
 	}
+	
+	public static int amount(int[][] matrix, int value) {
+		int n = 0;
+		
+		int mW = width(matrix);
+		int mH = height(matrix);
+		
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
+				if(matrix[x][y] == value) {
+					n++;
+				}
+			}
+		}
+		
+		return n;
+	}
+	
+	public static int amount(boolean[][] matrix, boolean value) {
+		int n = 0;
+		
+		for (int x = 0; x < matrix.length; x++) {
+			for (int y = 0; y < matrix.length; y++) {
+				if(matrix[x][y] == value) {
+					n++;
+				}
+			}
+		}
+		
+		return n;
+	}
+	
+	public static int amount(Object[][] matrix, Object value) {
+		int n = 0;
+		
+		for (int x = 0; x < matrix.length; x++) {
+			for (int y = 0; y < matrix.length; y++) {
+				if(value.equals(matrix[x][y])) {
+					n++;
+				}
+			}
+		}
+		
+		return n;
+	}
 
 }
