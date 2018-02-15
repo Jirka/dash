@@ -5,6 +5,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
@@ -76,6 +77,10 @@ public class GrayMatrix {
 			}
 		}
 		return resultMatrix;
+	}
+	
+	public static int[][] copy(int[][] matrix) {				
+		return copy(new int[MatrixUtils.width(matrix)][MatrixUtils.height(matrix)], matrix);
 	}
 	
 	public static int[][] copy(int[][] to, int[][] from) {

@@ -5,7 +5,11 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Vector;
 
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
@@ -22,6 +26,42 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import extern.ImagePreview;
 
 public class XYCut4 implements ISegmentationAlgorithm {
+	
+	// ----------------- internal for debugging
+	
+	private DebugMode debugMode;
+	private Map<String, BufferedImage> debugMatrices;
+	
+	public static enum DebugMode {
+		NONE,
+		SILENT,
+		INTERACTIVE
+	}
+	
+	public XYCut4() {
+		this(DebugMode.INTERACTIVE);
+	}
+	
+	public XYCut4(DebugMode debugMode) {
+		this.debugMode = debugMode;
+		if(debugMode == DebugMode.SILENT) {
+			debugMatrices = new LinkedHashMap<>();
+		}
+	}
+	
+	private void debug(String name, BufferedImage image) {
+		if(debugMode == DebugMode.INTERACTIVE) {
+			new ImagePreview(image, name).openWindow(800,600,0.8);
+		} else if(debugMode == DebugMode.SILENT) {
+			debugMatrices.put(name, image);
+		}
+	}
+	
+	public Map<String, BufferedImage> getDebugImages() {
+		return debugMatrices;
+	}
+	
+	// ----------------------------------------------------------------------
 
 	@Override
 	public Dashboard processImage(BufferedImage image) {
@@ -32,42 +72,40 @@ public class XYCut4 implements ISegmentationAlgorithm {
 		final int h = image.getHeight();
 		final int a = w*h;
 		
-		// image preprocessing
-		
-		// gray posterized
+		// ------ gray posterized
 		ColorMatrix.toGrayScale(matrix, false, false); // convert to gray scale
 		PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 6)), false); // 6 bits posterization
 		int[][] rawMatrix = ColorMatrix.toGrayScale(matrix, true, true); // convert to raw values (0-255) for simple use
 		
-		// edges
-		int[][] edgesMatrix = GrayMatrix.edges(rawMatrix);
-		GrayMatrix.inverse(edgesMatrix, false);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "edges").openWindow(800,600,0.8);
+		// ------ edges
+		//int[][] edgesMatrix = GrayMatrix.edges(rawMatrix);
+		//GrayMatrix.inverse(edgesMatrix, false);
+		//debug("edges", GrayMatrix.printMatrixToImage(null, edgesMatrix));
 		
-		// threshold (most frequent value)
-		int[] histogram = HistogramUtils.getGrayscaleHistogram(rawMatrix); // make histogram
+		// ------ lines
+		//int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 20, 20);
+		//debug("lines", GrayMatrix.printMatrixToImage(null, linesMatrix));
 		
-		List<Integer> frequentValues = new ArrayList<>();
-		int mostFrequentValue = HistogramUtils.findMax(histogram, -1); // find most frequent value (possible background)
-		frequentValues.add(mostFrequentValue);
+		// ------ median filter
+		//int[][] blurMatrix = GrayMatrix.medianFilter(rawMatrix, 1);
+		//debug("blur", GrayMatrix.printMatrixToImage(null, blurMatrix));
 		
-		mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
-		while((double) histogram[mostFrequentValue]/a >= 0.01) {
-			frequentValues.add(mostFrequentValue);
-			mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
-			if(frequentValues.size() > 5 && (double) histogram[mostFrequentValue]/a < 0.05) {
-				break;
-			}
-		}
-		double actColor = 255.0;
-		double colorInterval = actColor/frequentValues.size();
-		int[][] frequentColorMatrix = new int[w][h];
-		GrayMatrix.clearMatrix(frequentColorMatrix, GrayMatrix.BLACK);
-		for (Integer frequentValue : frequentValues) {
-			GrayMatrix.copyPixels(frequentColorMatrix, rawMatrix, frequentValue, (int) actColor);
-			actColor-=colorInterval;
-		}
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, frequentColorMatrix), "histogram threshold").openWindow(800,600,0.8);
+		// ------ threshold according to histogram (the most frequent values)
+		// matrix can contain several color values (mostly 2 - 5)
+		List<Integer> frequentValues = findFrequentValues(rawMatrix);
+		int[][] frequentColorMatrix = threshold(rawMatrix, frequentValues);
+		debug("histogram_70", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		
+		// ------ histogram threshold + edges + lines 
+		//int[][] frequentColorMatrixEdges = GrayMatrix.edges(frequentColorMatrix);
+		//GrayMatrix.inverse(frequentColorMatrixEdges, false);
+		//frequentColorMatrixEdges = GrayMatrix.lines(frequentColorMatrixEdges, 20, 20);
+		//debug("histogram_70_edges", GrayMatrix.printMatrixToImage(null, frequentColorMatrixEdges));
+		
+		// find large rectangles
+		int[][] rectangleMatrix = findRectangles(frequentColorMatrix);
+		
+		
 		
 		// sharpen
 		/*int[][] sharpenMatrix = GrayMatrix.sharpen(rawMatrix);
@@ -134,6 +172,131 @@ public class XYCut4 implements ISegmentationAlgorithm {
 		}
 		
 		return dashboard;
+	}
+
+	/**
+	 * 
+	 * @param matrix
+	 * @return
+	 */
+	private List<Integer> findFrequentValues(int[][] matrix) {
+		int a = MatrixUtils.area(matrix);
+		
+		 // make histogram
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
+		
+		// find the most frequent value (possible background)
+		int mostFrequentValue = HistogramUtils.findMax(histogram, -1);
+		//System.out.println(mostFrequentValue + " " + (double) histogram[mostFrequentValue]/a);
+		
+		// store frequent value
+		List<Integer> frequentValues = new ArrayList<>();
+		frequentValues.add(mostFrequentValue);
+		int sum = histogram[mostFrequentValue];
+		
+		// find another frequent values
+		mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
+		while(
+				(double) histogram[mostFrequentValue]/a >= 0.001 && (double) sum/a < 0.5 ||
+				(double) histogram[mostFrequentValue]/a >= 0.05 && (double) sum/a < 0.6 ||
+				(double) histogram[mostFrequentValue]/a >= 0.1 && (double) sum/a < 0.7
+		) {
+			frequentValues.add(mostFrequentValue);
+			sum += histogram[mostFrequentValue];
+			mostFrequentValue = HistogramUtils.findMax(histogram, mostFrequentValue); // find next frequent value
+		}
+		
+		//System.out.println((double) sum/a);
+		//int colorAmount=frequentValues.size()+1;
+		//System.out.println(colorAmount);
+		
+		return frequentValues;
+	}
+	
+	/**
+	 * 
+	 * @param matrix
+	 * @param frequentValues
+	 * @return
+	 */
+	private int[][] threshold(int[][] matrix, List<Integer> frequentValues) {
+		final int w = MatrixUtils.width(matrix);
+		final int h = MatrixUtils.height(matrix);
+		double actColor = 255.0;
+		double colorInterval = actColor/frequentValues.size();
+		int[][] frequentColorMatrix = new int[w][h];
+		GrayMatrix.clearMatrix(frequentColorMatrix, GrayMatrix.BLACK);
+		for (Integer frequentValue : frequentValues) {
+			GrayMatrix.copyPixels(frequentColorMatrix, matrix, frequentValue, (int) actColor);
+			actColor-=colorInterval;
+		}
+		
+		//int colorAmount=frequentValues.size()+1;
+		//debug("sort/" + (colorAmount > 4 ? "x" : colorAmount) + "/histogram_70", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		
+		return frequentColorMatrix;
+	}
+	
+	private int[][] findRectangles(int[][] matrix) {		
+		// get used values
+		List<Integer> usedValues = HistogramUtils.getUsedValues(matrix);
+		for (Integer usedValue : usedValues) {
+			findRectangles(matrix, usedValue);
+		}
+		
+		return null;
+	}
+
+	private void findRectangles(int[][] matrix, int color) {
+		final int mW = MatrixUtils.width(matrix);
+		final int mH = MatrixUtils.height(matrix);
+		
+		// working copy
+		matrix = GrayMatrix.copy(matrix);
+		
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
+				if(matrix[x][y] == color) {
+					
+				}
+			}
+		}
+	}
+	
+	private void processSeedPixel(int[][] matrix, int i, int j, int color) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		// do flood fill algorithm
+		Queue<Point> queue = new LinkedList<Point>();
+        queue.add(new Point(i, j));
+        int x1 = i, x2 = i, y1 = j, y2 = j;
+        while (!queue.isEmpty()) {
+            Point p = queue.remove();
+            if ((p.x >= 0) && (p.x < mW && (p.y >= 0) && (p.y < mH))) {
+                if (matrix[p.x][p.y] == GrayMatrix.BLACK) {
+                	matrix[p.x][p.y] = color;
+                	
+                	// update min/max points 
+                	if(p.x < x1) {
+                		x1 = p.x;
+                	} else if(p.x > x2) {
+                		x2 = p.x;
+                	}
+                	if(p.y < y1) {
+                		y1 = p.y;
+                	} else if(p.y > y2) {
+                		y2 = p.y;
+                	}
+
+                	// add neighbour points
+                    queue.add(new Point(p.x + 1, p.y));
+                    queue.add(new Point(p.x - 1, p.y));
+                    queue.add(new Point(p.x, p.y + 1));
+                    queue.add(new Point(p.x, p.y - 1));
+                }
+            }
+        }
 	}
 
 	private void XYstep(int[][] matrix, Rectangle rect, List<Rectangle> rectangles, boolean bAlternate) {

@@ -41,6 +41,14 @@ import cz.vutbr.fit.view.tools.image.ImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
+	@Override
+	public String getDefaultWorkspacePath() {
+		return super.getDefaultWorkspacePath() + "/research/widget-based/gen/sort-id";
+	}
+	
+	/**
+	 * version
+	 */
 	public static final String EVAL_VERSION = "rel-heatmap";	
 	
 	protected void initTools() {
