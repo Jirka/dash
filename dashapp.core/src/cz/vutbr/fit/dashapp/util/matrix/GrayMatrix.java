@@ -5,7 +5,6 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
@@ -117,8 +116,13 @@ public class GrayMatrix {
 		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
 		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
 		
-		for (int x = x1; x < x2 && x < mW_max; x++) {
-			for (int y = y1; y < y2 && y < mH_max; y++) {
+		x1 = MathUtils.roundInRange(x1, 0, mW_max);
+		x2 = MathUtils.roundInRange(x2, 0, mW_max);
+		y1 = MathUtils.roundInRange(y1, 0, mH_max);
+		y2 = MathUtils.roundInRange(y2, 0, mH_max);
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
 				to[x][y] = from[x][y];
 			}
 		}
@@ -142,12 +146,86 @@ public class GrayMatrix {
 	}
 	
 	public static void drawPixels(int[][] matrix, int x1, int y1, int x2, int y2, int color) {
-		int mW_max = MatrixUtils.width(matrix);
-		int mH_max = MatrixUtils.height(matrix);
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
 		
-		for (int x = x1; x < x2 && x < mW_max; x++) {
-			for (int y = y1; y < y2 && y < mH_max; y++) {
+		x1 = MathUtils.roundInRange(x1, 0, mW);
+		x2 = MathUtils.roundInRange(x2, 0, mW);
+		y1 = MathUtils.roundInRange(y1, 0, mH);
+		y2 = MathUtils.roundInRange(y2, 0, mH);
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
 				matrix[x][y] = color;
+			}
+		}
+	}
+	
+	public static void drawRectangle(int[][] matrix, Rectangle r, int color, boolean onlyBorders) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int x1 = MathUtils.roundInRange(r.x, 0, mW);
+		int x2 = MathUtils.roundInRange(r.x + r.width, 0, mW);
+		int y1 = MathUtils.roundInRange(r.y, 0, mH);
+		int y2 = MathUtils.roundInRange(r.y + r.height, 0, mH);
+		
+		if(onlyBorders) {
+			// draw rectangle borders
+			boolean x1InRange = MathUtils.isInRange(r.x, 0, mW);
+			boolean x2InRange = MathUtils.isInRange(r.x + r.width, 0, mW);
+			boolean y1InRange = MathUtils.isInRange(r.y, 0, mH);
+			boolean y2InRange = MathUtils.isInRange(r.y + r.height, 0, mH);
+			
+			int x2_last = x2-1;
+			int y2_last = y2-1;
+			
+			if(y2InRange == false) {
+				System.out.println("y2 is not in range");
+			}
+			
+			// optimization
+			if(y1InRange) {
+				if(y2InRange) {
+					for (int x = x1; x < x2; x++) {
+						matrix[x][y1] = color;
+						matrix[x][y2_last] = color;
+					}
+				} else {
+					for (int x = x1; x < x2; x++) {
+						matrix[x][y1] = color;
+					}
+				}
+			} else if(y2InRange) {
+				for (int x = x1; x < x2; x++) {
+					matrix[x][y2_last] = color;
+				}
+			}
+			
+			if(x1InRange) {
+				if(x2InRange) {
+					for (int y = y1; y < y2; y++) {
+						matrix[x1][y] = color;
+						matrix[x2_last][y] = color;
+					}
+				} else {
+					for (int y = y1; y < y2; y++) {
+						matrix[x1][y] = color;
+						matrix[x2_last][y] = color;
+					}
+				}
+			} else if(x2InRange) {
+				for (int y = y1; y < y2; y++) {
+					matrix[x1][y] = color;
+					matrix[x2_last][y] = color;
+				}
+			}
+		} else {
+			// fill rectangle
+			for (int x = x1; x < x2; x++) {
+				for (int y = y1; y < y2; y++) {
+					matrix[x][y] = color;
+				}
 			}
 		}
 	}
@@ -416,6 +494,18 @@ public class GrayMatrix {
 		}
 		
 		return cmpMatrix;
+	}
+	
+	public static int[][] newMatrix(int mW, int mH, int color) {
+		int[][] matrix = new int[mW][mH];
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrix[i][j] = color;
+			}
+		}
+		
+		return matrix;
 	}
 	
 	public static void clearMatrix(int[][] matrix, int color) {

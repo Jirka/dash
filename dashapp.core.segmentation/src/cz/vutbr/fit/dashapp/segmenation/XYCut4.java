@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Vector;
 
+import com.tree.TreeNode;
+
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
@@ -19,6 +21,8 @@ import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.segmenation.Region.HierarchyComparator;
+import cz.vutbr.fit.dashapp.util.MathUtils;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
@@ -77,59 +81,29 @@ public class XYCut4 implements ISegmentationAlgorithm {
 		PosterizationUtils.posterizeMatrix(matrix, 256/(int)(Math.pow(2, 6)), false); // 6 bits posterization
 		int[][] rawMatrix = ColorMatrix.toGrayScale(matrix, true, true); // convert to raw values (0-255) for simple use
 		
-		// ------ edges
+		// ------ edges (experiment)
 		//int[][] edgesMatrix = GrayMatrix.edges(rawMatrix);
 		//GrayMatrix.inverse(edgesMatrix, false);
 		//debug("edges", GrayMatrix.printMatrixToImage(null, edgesMatrix));
 		
-		// ------ lines
+		// ------ lines (experiment)
 		//int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 20, 20);
 		//debug("lines", GrayMatrix.printMatrixToImage(null, linesMatrix));
 		
-		// ------ median filter
+		// ------ median filter (experiment)
 		//int[][] blurMatrix = GrayMatrix.medianFilter(rawMatrix, 1);
-		//debug("blur", GrayMatrix.printMatrixToImage(null, blurMatrix));
+		//debug("blur", GrayMatrix.printMatrixToImage(null, blurMatrix));		
 		
-		// ------ threshold according to histogram (the most frequent values)
-		// matrix can contain several color values (mostly 2 - 5)
-		List<Integer> frequentValues = findFrequentValues(rawMatrix);
-		int[][] frequentColorMatrix = threshold(rawMatrix, frequentValues);
-		debug("histogram_70", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		// ------ sharpen (experiment)
+		//int[][] sharpenMatrix = GrayMatrix.sharpen(rawMatrix);
+		//int[][] sharpenEdgesMatrix = GrayMatrix.edges(sharpenMatrix);
+		//GrayMatrix.inverse(sharpenEdgesMatrix, false);
+		//new ImagePreview(GrayMatrix.printMatrixToImage(null, sharpenMatrix), "sharpen").openWindow(800,600,0.8);
+		//new ImagePreview(GrayMatrix.printMatrixToImage(null, sharpenEdgesMatrix), "sharpen edges").openWindow(800,600,0.8);
 		
-		// ------ histogram threshold + edges + lines 
-		//int[][] frequentColorMatrixEdges = GrayMatrix.edges(frequentColorMatrix);
-		//GrayMatrix.inverse(frequentColorMatrixEdges, false);
-		//frequentColorMatrixEdges = GrayMatrix.lines(frequentColorMatrixEdges, 20, 20);
-		//debug("histogram_70_edges", GrayMatrix.printMatrixToImage(null, frequentColorMatrixEdges));
-		
-		// find large rectangles
-		int[][] rectangleMatrix = findRectangles(frequentColorMatrix);
-		
-		
-		
-		// sharpen
-		/*int[][] sharpenMatrix = GrayMatrix.sharpen(rawMatrix);
-		int[][] edgesMatrix2 = GrayMatrix.edges(sharpenMatrix);
-		GrayMatrix.inverse(edgesMatrix2, false);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, sharpenMatrix), "sharpen").openWindow(800,600,0.8);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "sharpen edges").openWindow(800,600,0.8);*/
-		
-		//int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 40, 40);
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, linesMatrix), "result 2").openWindow(800,600,0.8);
-		
-		//int[][] edgesMatrix2 = new int[edgesMatrix.length][edgesMatrix[0].length];
-		//GrayMatrix.clearMatrix(edgesMatrix2, GrayMatrix.WHITE);
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(305, 0, 3, edgesMatrix[0].length));
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(0, 0, 308, edgesMatrix[0].length));
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(311, 0, edgesMatrix.length-311, edgesMatrix[0].length));
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "result 2").openWindow(800,600,0.8);
-		
-		/*int[][] edgesMatrix2 = new int[MatrixUtils.width(edgesMatrix)][MatrixUtils.height(edgesMatrix)];
-		GrayMatrix.copy(edgesMatrix2, edgesMatrix);
-		
-		// use Hough Transform to detect lines
-		int[][] lineMatrix = new int[w][h];
-		GrayMatrix.clearMatrix(lineMatrix, GrayMatrix.WHITE);
+		// ------ Hough Transform to detect lines (experiment)
+		/*int[][] edgesMatrix2 = GrayMatrix.copy(edgesMatrix); // debug
+		int[][] lineMatrix = GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE); // debug
 		HoughTransform t = new HoughTransform(w, h);
 		t.addPoints(edgesMatrix);
 		Vector<HoughLine> lines = t.getLines((int) (w/4.0));
@@ -152,22 +126,58 @@ public class XYCut4 implements ISegmentationAlgorithm {
 				line.draw(edgesMatrix2, Color.RED.getRGB(), true);
 			}
 		}
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, matrix), "result 3").openWindow(800,600,0.8);
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "result 3").openWindow(800,600,0.8);
-		
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, lineMatrix), "line matrix").openWindow(800,600,0.8);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "line matrix").openWindow(800,600,0.8);
+		debug("hough_lines", GrayMatrix.printMatrixToImage(null, lineMatrix));
+		debug("hough_lines_edges", GrayMatrix.printMatrixToImage(null, edgesMatrix2));
 		int[][] houghFileterMatrix = GrayMatrix.filterPixels(edgesMatrix, lineMatrix, true);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, houghFileterMatrix), "hough filtered matrix").openWindow(800,600,0.8);*/
+		debug("hough_lines_filtered", GrayMatrix.printMatrixToImage(null, houghFileterMatrix));*/
 		
-		List<Rectangle> rectangles = new ArrayList<>(); // result rectangles
-		XYstep(rawMatrix, new Rectangle(0, 0, w, h), rectangles, true); // first step of recursive XY-cut
+		// ------ threshold according to histogram (the most frequent values)
+		// matrix can contain several color values (mostly 2 - 5)
+		List<Integer> frequentValues = findFrequentValues(rawMatrix);
+		int[][] frequentColorMatrix = threshold(rawMatrix, frequentValues);
+		debug("histogram_70", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		
+		// ------ histogram threshold + edges + lines (experiment)
+		//int[][] frequentColorMatrixEdges = GrayMatrix.edges(frequentColorMatrix);
+		//GrayMatrix.inverse(frequentColorMatrixEdges, false);
+		//frequentColorMatrixEdges = GrayMatrix.lines(frequentColorMatrixEdges, 20, 20);
+		//debug("histogram_70_edges", GrayMatrix.printMatrixToImage(null, frequentColorMatrixEdges));
+		
+		// ------ find rectangle regions
+		List<Region> regions = findRegions(frequentColorMatrix);
+		
+		// debug
+		int[][] rectanglesMatrix = GrayMatrix.newMatrix(MatrixUtils.width(matrix), MatrixUtils.height(matrix), GrayMatrix.WHITE);
+		int[][] rectangleTypesMatrix = GrayMatrix.newMatrix(MatrixUtils.width(matrix), MatrixUtils.height(matrix), GrayMatrix.WHITE);
+		drawRegions(rectanglesMatrix, regions);
+		drawRegionTypes(rectangleTypesMatrix, regions);
+		debug("rectangles", GrayMatrix.printMatrixToImage(null, rectanglesMatrix));
+		debug("rectangle types", GrayMatrix.printMatrixToImage(null, rectangleTypesMatrix));
+		
+		// ------ construct tree
+		Region rootRegion = new Region(0, 0, w, h, -1);
+		TreeNode<Region> root = constructTree(regions, rootRegion);
+		
+		// debug
+		int[][] treeRectanglesMatrix = GrayMatrix.newMatrix(MatrixUtils.width(matrix), MatrixUtils.height(matrix), GrayMatrix.WHITE);
+		for (TreeNode<Region> node : root) {
+			//System.out.println(node.getIndent() + node.data);
+			if(node.getLevel() < 4) {
+				//System.out.println(node.data);
+				drawRegionType(treeRectanglesMatrix, node.data);
+			}
+		}
+		debug("tree rectangle types", GrayMatrix.printMatrixToImage(null, treeRectanglesMatrix));
+		
+		List<Region> mainRegions = getMainRegions(root); // result rectangles
+		
+		//XYstep(rawMatrix, new Rectangle(0, 0, w, h), rectangles, true); // first step of recursive XY-cut
 		
 		// create dashboard (represents graphical regions)
 		Dashboard dashboard = new Dashboard();
 		dashboard.setDimension(0, 0, w, h);
 		
-		for (Rectangle r : rectangles) {
+		for (Rectangle r : mainRegions) {
 			dashboard.addChildGE(new GraphicalElement(dashboard, r.x, r.y, r.width, r.height));
 		}
 		
@@ -222,7 +232,7 @@ public class XYCut4 implements ISegmentationAlgorithm {
 	private int[][] threshold(int[][] matrix, List<Integer> frequentValues) {
 		final int w = MatrixUtils.width(matrix);
 		final int h = MatrixUtils.height(matrix);
-		double actColor = 255.0;
+		double actColor = 225.0; // white color (255.0) is not appropriate for further debug purposes
 		double colorInterval = actColor/frequentValues.size();
 		int[][] frequentColorMatrix = new int[w][h];
 		GrayMatrix.clearMatrix(frequentColorMatrix, GrayMatrix.BLACK);
@@ -237,33 +247,74 @@ public class XYCut4 implements ISegmentationAlgorithm {
 		return frequentColorMatrix;
 	}
 	
-	private int[][] findRectangles(int[][] matrix) {		
+	/**
+	 * 
+	 * @param matrix
+	 * @return
+	 */
+	private List<Region> findRegions(int[][] matrix) {		
 		// get used values
 		List<Integer> usedValues = HistogramUtils.getUsedValues(matrix);
+		List<Region> regions = new ArrayList<>();
 		for (Integer usedValue : usedValues) {
-			findRectangles(matrix, usedValue);
+			List<Region> actRegions = findRegions(matrix, usedValue);
+			regions.addAll(actRegions);
 		}
 		
-		return null;
+		return regions;
 	}
 
-	private void findRectangles(int[][] matrix, int color) {
+	/**
+	 * 
+	 * @param matrix
+	 * @param color
+	 * @return
+	 */
+	private List<Region> findRegions(int[][] matrix, int color) {
 		final int mW = MatrixUtils.width(matrix);
 		final int mH = MatrixUtils.height(matrix);
 		
 		// working copy
-		matrix = GrayMatrix.copy(matrix);
+		int[][] workingCopy = GrayMatrix.copy(matrix);
+		int[][] edgesMatrix = GrayMatrix.inverse(GrayMatrix.edges(matrix), false);
 		
+		// debug
+		//int[][] workingCopy = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
+		//GrayMatrix.copyPixels(workingCopy, matrix, color, GrayMatrix.BLACK);
+		//debug("debug", GrayMatrix.printMatrixToImage(null, workingCopy));
+		
+		int markColor = -1;
+		List<Region> regions = new ArrayList<>();
 		for (int x = 0; x < mW; x++) {
 			for (int y = 0; y < mH; y++) {
-				if(matrix[x][y] == color) {
+				if(workingCopy[x][y] == color) {
+					Region region = processSeedPixel(workingCopy, x, y, color, markColor);
 					
+					// analyze region
+					analyzeRegion(region, workingCopy, edgesMatrix, markColor);
+					
+					if((region.width > 2 && region.height > 2 && color == GrayMatrix.BLACK) ||
+							region.width > 9 && region.height > 9 && color != GrayMatrix.BLACK) {
+						//System.out.println(region);
+						regions.add(region);
+					}
+					markColor--;
 				}
 			}
 		}
+		return regions;
 	}
-	
-	private void processSeedPixel(int[][] matrix, int i, int j, int color) {
+
+	/**
+	 * 
+	 * @param matrix
+	 * @param i
+	 * @param j
+	 * @param color
+	 * @param markColor
+	 * @return
+	 */
+	private Region processSeedPixel(int[][] matrix, int i, int j, int color, int markColor) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);
 		
@@ -273,9 +324,9 @@ public class XYCut4 implements ISegmentationAlgorithm {
         int x1 = i, x2 = i, y1 = j, y2 = j;
         while (!queue.isEmpty()) {
             Point p = queue.remove();
-            if ((p.x >= 0) && (p.x < mW && (p.y >= 0) && (p.y < mH))) {
-                if (matrix[p.x][p.y] == GrayMatrix.BLACK) {
-                	matrix[p.x][p.y] = color;
+            if ((p.x >= 0) && (p.x < mW) && (p.y >= 0) && (p.y < mH)) {
+                if (matrix[p.x][p.y] == color) {
+                	matrix[p.x][p.y] = markColor;
                 	
                 	// update min/max points 
                 	if(p.x < x1) {
@@ -294,9 +345,200 @@ public class XYCut4 implements ISegmentationAlgorithm {
                     queue.add(new Point(p.x - 1, p.y));
                     queue.add(new Point(p.x, p.y + 1));
                     queue.add(new Point(p.x, p.y - 1));
+                    
+                    queue.add(new Point(p.x + 1, p.y + 1));
+                    queue.add(new Point(p.x + 1, p.y - 1));
+                    queue.add(new Point(p.x - 1, p.y + 1));
+                    queue.add(new Point(p.x - 1, p.y - 1));
                 }
             }
         }
+        
+        x2++; y2++;
+        
+        return new Region(x1, y1, x2-x1, y2-y1, color);
+	}
+	
+	/**
+	 * 
+	 * @param r
+	 * @param matrix
+	 * @param edgesMatrix
+	 * @param markColor
+	 */
+	private void analyzeRegion(Region r, int[][] matrix, int[][] edgesMatrix, int markColor) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		int mA = mW*mH;
+		
+		int x1 = MathUtils.roundInRange(r.x, 0, mW);
+		int x2 = MathUtils.roundInRange(r.x + r.width, 0, mW);
+		int y1 = MathUtils.roundInRange(r.y, 0, mH);
+		int y2 = MathUtils.roundInRange(r.y + r.height, 0, mH);
+		int rA = r.width*r.height;
+		int rO = 2*(r.width+r.height);
+		
+		int x2_last = x2-1;
+		int y2_last = y2-1;
+		
+		int realArea = 0;
+		int edgesCount = 0;
+		
+		// copy region to the special matrix representing borders (black) and area (mark color)
+		//int[][] regionMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
+		//boolean edgeFound;
+		
+		for (int x = x1; x < x2; x++) {
+			for (int y = y1; y < y2; y++) {
+				
+				// real area increment
+				if(matrix[x][y] == markColor) {
+					realArea++;
+					
+					//regionMatrix[x][y] = markColor;
+					
+					// edges
+					/*edgeFound = false;
+					for (int i = x-1; i <= x+1 && !edgeFound; i++) {
+						if(i >= 0 && i < mW) {
+							for (int j = y-1; j <= y+1 && !edgeFound; j++) {
+								// it is border pixel
+								if(j >= 0 && j < mH) {
+									if(matrix[i][j] != markColor) {
+										edgeFound = true;
+									}
+								} else {
+									edgeFound = true;
+								}
+							}
+						} else {
+							edgeFound = true;
+						}
+					}
+					
+					if(edgeFound) {
+						regionMatrix[x][y] = GrayMatrix.BLACK;
+					}*/
+					
+					// border edges
+					if(x == x1 || x == x2_last || y == y1 || y == y2_last) {
+						edgesCount++;
+					}
+				}
+			}
+		}
+		
+		// test left region border
+		// TODO add heuristics for alignment of non-rectangle objects
+		/*int borderCount = 0;
+		int limit = mH/4;
+		int x;
+		for (x = x1; x < x2 && borderCount < limit; x++) {
+			borderCount = 0;
+			for(int y = y1; y < y2; y++) {
+				if(matrix[x][y] == markColor) {
+					borderCount++;
+				}
+			}	
+		}*/		
+		
+		double usedArea = (double) realArea/rA;
+		double usedEdges = (double) edgesCount/rO;
+		
+		// debug
+		// System.out.println(r);
+		// System.out.println("used area: " + (double) realArea/rA);
+		// System.out.println("used edges: " + (double) edgesCount/rO);
+		
+		// heuristics to split and categorize regions
+		if(usedEdges >= 0.7) {
+			if(usedArea > 0.5) {
+				// fill rectangle
+				r.type = Region.R_FILL;
+			} else if(usedArea > 0.1) {
+				// medium rectangle
+				r.type = Region.R_MEDIUM;
+			} else {
+				// border rectangle
+				r.type = Region.R_BORDER;
+			}
+		} else {
+			if((double) rA/mA > 0.01) {
+				// larger ambiguous rectangles
+				r.type = Region.AMBIGUOUS;
+				// TODO possible split
+			} else {
+				// small data rectangles
+				r.type = Region.DATA;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param matrix
+	 * @param regions
+	 */
+	private void drawRegions(int[][] matrix, List<Region> regions) {
+		for (Region region : regions) {
+			GrayMatrix.drawRectangle(matrix, region, region.color, true);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param matrix
+	 * @param regions
+	 */
+	private void drawRegionTypes(int[][] matrix, List<Region> regions) {
+		for (Region region : regions) {
+			drawRegionType(matrix, region);
+		}
+	}
+	
+	private void drawRegionType(int[][] matrix, Region region) {
+		if(region.type == Region.R_FILL) {
+			GrayMatrix.drawRectangle(matrix, region, 0, true);
+		} else if(region.type == Region.R_MEDIUM) {
+			GrayMatrix.drawRectangle(matrix, region, 0, true);
+		} else if(region.type == Region.R_BORDER) {
+			GrayMatrix.drawRectangle(matrix, region, 0, true);
+		} else if(region.type == Region.DATA) {
+			GrayMatrix.drawRectangle(matrix, region, 225, true);
+		} else {
+			GrayMatrix.drawRectangle(matrix, region, 125, true);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param regions
+	 * @return
+	 */
+	private TreeNode<Region> constructTree(List<Region> regions, Region rootRegion) {
+		TreeNode<Region> rootNode = new TreeNode<>(rootRegion);
+		
+		HierarchyComparator regionComparator = new HierarchyComparator(null);
+		
+		for (Region region : regions) {
+			regionComparator.setRegion(region);
+			rootNode.insertToTree(region, regionComparator);
+		}
+		
+		return rootNode;
+	}
+	
+	private List<Region> getMainRegions(TreeNode<Region> root) {
+		List<Region> mainRegions = new ArrayList<>(); // result rectangles
+		
+		Queue<TreeNode<Region>> queue = new LinkedList<>();
+		queue.add(root);
+		
+		/*while (!queue.isEmpty()) {
+			
+		}*/
+		
+		return mainRegions;
 	}
 
 	private void XYstep(int[][] matrix, Rectangle rect, List<Rectangle> rectangles, boolean bAlternate) {
@@ -415,7 +657,6 @@ public class XYCut4 implements ISegmentationAlgorithm {
 	}
 
 	private void normalizeHistogram(int[] histogram, Rectangle rect) {
-		
 		int frequencyThreshold = 0;//rect.width/20;
 		for (int i = 0; i < histogram.length; i++) {
 			// threshold of object frequency
