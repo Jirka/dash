@@ -60,4 +60,8 @@ public class Region extends Rectangle {
 		
 	}
 
+	public int area() {
+		return width*height;
+	}
+
 }
