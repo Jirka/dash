@@ -1,4 +1,4 @@
-package cz.vutbr.fit.view.tools.image;
+package cz.vutbr.fit.view.tools.image.old;
 
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;

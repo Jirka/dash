@@ -7,7 +7,7 @@ import java.util.Map;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.segmenation.XYCut4;
-import cz.vutbr.fit.dashapp.segmenation.XYCut4.DebugMode;
+import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
 
 public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	

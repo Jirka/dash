@@ -37,7 +37,7 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import cz.vutbr.fit.view.tools.image.ImageTool;
+import cz.vutbr.fit.view.tools.image.old.OldImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
@@ -78,7 +78,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		
 		guiTools.add(new GrayScaleTool());
 		
-		guiTools.add(new ImageTool());
+		guiTools.add(new OldImageTool());
 		
 		// heat map tools
 		LinkedList<AbstractAnalysisUI> heatmapActions = new LinkedList<>();

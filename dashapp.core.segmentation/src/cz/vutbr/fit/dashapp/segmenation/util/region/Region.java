@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.segmenation;
+package cz.vutbr.fit.dashapp.segmenation.util.region;
 
 import java.awt.Rectangle;
 

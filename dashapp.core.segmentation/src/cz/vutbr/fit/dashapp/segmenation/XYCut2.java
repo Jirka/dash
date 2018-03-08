@@ -1,26 +1,29 @@
 package cz.vutbr.fit.dashapp.segmenation;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
+import cz.vutbr.fit.dashapp.segmenation.util.HoughLineUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.XYCutUtil;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
-import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
-import extern.ImagePreview;
 
-public class XYCut2 implements ISegmentationAlgorithm {
+public class XYCut2 extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
+	
+	public XYCut2(DebugMode debugMode) {
+		super(debugMode);
+	}
+	
+	public XYCut2() {
+		super();
+	}
 
 	@Override
 	public Dashboard processImage(BufferedImage image) {
@@ -38,58 +41,22 @@ public class XYCut2 implements ISegmentationAlgorithm {
 		GrayMatrix.inverse(edgesMatrix, false);
 		GrayMatrix.update(edgesMatrix, new ThresholdCalculator(GrayMatrix.WHITE-1), false); // threshold according to background
 		//edgesMatrix = GrayMatrix.emphasize(edgesMatrix, 1);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "edges matrix").openWindow(800,600,0.8);
+		debug("edges matrix", GrayMatrix.printMatrixToImage(null, edgesMatrix));
 		int[][] filteredEdgesMatrix = GrayMatrix.lines(edgesMatrix, 10, 10);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, filteredEdgesMatrix), "filtered edges matrix").openWindow(800,600,0.8);
+		debug("filtered edges matrix", GrayMatrix.printMatrixToImage(null, filteredEdgesMatrix));
 		
-		//int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 40, 40);
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, linesMatrix), "result 2").openWindow(800,600,0.8);
+		int[][] linesMatrix = GrayMatrix.lines(edgesMatrix, 40, 40);
+		debug("lines matrix", GrayMatrix.printMatrixToImage(null, linesMatrix));
 		
-		//int[][] edgesMatrix2 = new int[edgesMatrix.length][edgesMatrix[0].length];
-		//GrayMatrix.clearMatrix(edgesMatrix2, GrayMatrix.WHITE);
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(305, 0, 3, edgesMatrix[0].length));
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(0, 0, 308, edgesMatrix[0].length));
-		//GrayMatrix.copy(edgesMatrix2, edgesMatrix, new Rectangle(311, 0, edgesMatrix.length-311, edgesMatrix[0].length));
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "result 2").openWindow(800,600,0.8);
-		
-		/*int[][] edgesMatrix2 = new int[MatrixUtils.width(edgesMatrix)][MatrixUtils.height(edgesMatrix)];
-		GrayMatrix.copy(edgesMatrix2, edgesMatrix);
-		
-		// use Hough Transform to detect lines
-		int[][] lineMatrix = new int[w][h];
-		GrayMatrix.clearMatrix(lineMatrix, GrayMatrix.WHITE);
-		HoughTransform t = new HoughTransform(w, h);
-		t.addPoints(edgesMatrix);
-		Vector<HoughLine> lines = t.getLines((int) (w/4.0));
-		for (HoughLine line : lines) {
-			Orientation orientation = line.getOrientation();
-			if(orientation == Orientation.H) {
-				//line.draw(matrix, Color.RED.getRGB());
-				//line.draw(edgesMatrix, Color.RED.getRGB());
-				line.draw(lineMatrix, GrayMatrix.BLACK, true);
-				line.draw(edgesMatrix2, Color.RED.getRGB(), true);
-			}
-		}
-		lines = t.getLines((int) (h/4.0));
-		for (HoughLine line : lines) {
-			Orientation orientation = line.getOrientation();
-			if(orientation == Orientation.V) {
-				//line.draw(matrix, Color.RED.getRGB());
-				//line.draw(edgesMatrix, Color.RED.getRGB());
-				line.draw(lineMatrix, GrayMatrix.BLACK, true);
-				line.draw(edgesMatrix2, Color.RED.getRGB(), true);
-			}
-		}
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, matrix), "result 3").openWindow(800,600,0.8);
-		//new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix), "result 3").openWindow(800,600,0.8);
-		
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, lineMatrix), "line matrix").openWindow(800,600,0.8);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, edgesMatrix2), "line matrix").openWindow(800,600,0.8);
-		int[][] houghFileterMatrix = GrayMatrix.filterPixels(edgesMatrix, lineMatrix, true);
-		new ImagePreview(GrayMatrix.printMatrixToImage(null, houghFileterMatrix), "hough filtered matrix").openWindow(800,600,0.8);*/
+		// ------ Hough Transform to detect lines (experiment)
+		int[][] edgesMatrix2 = GrayMatrix.copy(edgesMatrix); // debug
+		int[][] houghLineMatrix = HoughLineUtil.process(edgesMatrix2, 0.5, 0.5);
+		debug("hough_lines", GrayMatrix.printMatrixToImage(null, houghLineMatrix));
+		debug("hough_lines_edges", GrayMatrix.printMatrixToImage(null, GrayMatrix.copyPixels(GrayMatrix.copy(edgesMatrix), houghLineMatrix, GrayMatrix.BLACK, Color.RED.getRGB())));
+		debug("hough_lines_filtered", GrayMatrix.printMatrixToImage(null, GrayMatrix.filterPixels(edgesMatrix, houghLineMatrix, true)));
 		
 		List<Rectangle> rectangles = new ArrayList<>(); // result rectangles
-		XYstep(rawMatrix, new Rectangle(0, 0, w, h), rectangles, true); // first step of recursive XY-cut
+		XYCutUtil.xyStep(rawMatrix, new Rectangle(0, 0, w, h), rectangles, true); // first step of recursive XY-cut
 		
 		// create dashboard (represents graphical regions)
 		Dashboard dashboard = new Dashboard();
@@ -101,174 +68,6 @@ public class XYCut2 implements ISegmentationAlgorithm {
 		
 		return dashboard;
 	}
-
-	private void XYstep(int[][] matrix, Rectangle rect, List<Rectangle> rectangles, boolean bAlternate) {
-		
-		List<Rectangle> stepRectangles;
-		
-		if(bAlternate) {
-			stepRectangles = XYvertical(matrix, rect);
-		} else {
-			stepRectangles = XYhorizontal(matrix, rect);
-		}
-		
-		if(stepRectangles == null || stepRectangles.isEmpty()) {
-			rectangles.add(rect);
-		} else {
-			for (Rectangle stepRectangle : stepRectangles) {
-				XYstep(matrix, stepRectangle, rectangles, !bAlternate);
-			}
-		}
-	}
-	
-	private List<Rectangle> XYvertical(int[][] matrix, Rectangle rect) {
-		List<Rectangle> result = null;
-		
-		// minimum rectangle height threshold
-		if(rect.height > 10) {
-			// boundary
-			int left = rect.x;
-			int right = rect.x+rect.width;
-			int up = rect.y;
-			int down = rect.y+rect.height;
-			
-			// histogram of object frequency
-			int[] histogram = new int[rect.height];
-			
-			// iterate over vertical axis and for line calculate object frequency 
-			for (int i = up, hi = 0; i < down; i++, hi++) {
-				histogram[hi] = 0;
-				// go through line
-				for (int j = left; j < right; j++) {
-					// check simple pixel color threshold
-					if(matrix[j][i] == GrayMatrix.BLACK) {
-						histogram[hi]++;
-					}
-				}
-			}
-			
-			// analyze histogram and find borders of new rectangles
-			normalizeHistogram(histogram, rect);
-			
-			// find the the biggest gap
-			Point biggestGap = findBiggestGap(histogram);
-			
-			if(biggestGap.y > 0) {
-				result = new ArrayList<>();
-				
-				if(biggestGap.x > 0) {
-					result.add(new Rectangle(rect.x, rect.y, rect.width, biggestGap.x));
-				}
-				int secondSize = rect.height-(biggestGap.x+biggestGap.y);
-				if(secondSize > 0) {
-					result.add(new Rectangle(rect.x, rect.y+biggestGap.x+biggestGap.y, rect.width, secondSize));
-				}
-			}
-		}
-		
-		return result;
-	}
-	
-	private List<Rectangle> XYhorizontal(int[][] matrix, Rectangle rect) {
-		List<Rectangle> result = null;
-		
-		// minimum rectangle height threshold
-		if(rect.height > 10) {
-			// boundary
-			int left = rect.x;
-			int right = rect.x+rect.width;
-			int up = rect.y;
-			int down = rect.y+rect.height;
-			
-			// histogram of object frequency
-			int[] histogram = new int[rect.width];
-			
-			// iterate over vertical axis and for line calculate object frequency 
-			for (int i = left, hi = 0; i < right; i++, hi++) {
-				histogram[hi] = 0;
-				// go through line
-				for (int j = up; j < down; j++) {
-					// check simple pixel color threshold
-					if(matrix[i][j] == GrayMatrix.BLACK) {
-						histogram[hi]++;
-					}				
-				}
-			}
-			
-			// analyze histogram and find borders of new rectangles
-			normalizeHistogram(histogram, rect);
-			
-			// find the the biggest gap
-			Point biggestGap = findBiggestGap(histogram);
-			
-			if(biggestGap.y > 0) {
-				result = new ArrayList<>();
-				
-				if(biggestGap.x > 0) {
-					result.add(new Rectangle(rect.x, rect.y, biggestGap.x, rect.height));
-				}
-				int secondSize = rect.width-(biggestGap.x+biggestGap.y);
-				if(secondSize > 0) {
-					result.add(new Rectangle(rect.x+biggestGap.x+biggestGap.y, rect.y, secondSize, rect.height));
-				}
-			}
-		}
-		
-		return result;
-	}
-
-	private void normalizeHistogram(int[] histogram, Rectangle rect) {
-		
-		int frequencyThreshold = 0;//rect.width/20;
-		for (int i = 0; i < histogram.length; i++) {
-			// threshold of object frequency
-			if(histogram[i] > frequencyThreshold) {
-				histogram[i] = 1;
-			} else {
-				histogram[i] = 0;
-			}
-		}
-	}
-
-	private Point findBiggestGap(int[] histogram) {
-		int biggestGapStart = -1, biggestGapSize = 0;
-		int actGapStart = 0, actGapSize = 0;
-		int actWidgetSize = 0;
-		int prev = 1;
-		for (int i = 0; i < histogram.length; i++) {
-			if(histogram[i] == 0) {
-				if(prev == 1) {
-					if(actWidgetSize < 3) {
-						// ignore small widgets
-						actGapSize += actWidgetSize+1;
-					} else {
-						// start of new gap
-						actGapSize = 1;
-						actGapStart = i;
-					}
-				} else {
-					// continuation of gap
-					actGapSize++;
-				}
-			} else {
-				if(prev == 0) {
-					actWidgetSize = 1;
-				} else {
-					actWidgetSize++;
-					if(actWidgetSize >= 3) {
-						if(actGapSize > biggestGapSize) {
-							biggestGapStart = actGapStart;
-							biggestGapSize = actGapSize;
-						}
-					}
-				}
-			}
-			prev=histogram[i];
-		}
-		
-		return new Point(biggestGapStart, biggestGapSize);
-	}
-	
 	
 
 	@Override

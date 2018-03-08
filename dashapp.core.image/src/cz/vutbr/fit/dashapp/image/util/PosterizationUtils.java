@@ -6,6 +6,10 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class PosterizationUtils {
 	
+	public static int[][] posterizeMatrix_BitSize(int[][] matrix, int bitSize, boolean createCopy) {
+		return posterizeMatrix(matrix, 256/(int)(Math.pow(2, bitSize)), createCopy);
+	}
+	
 	public static int[][] posterizeMatrix(int[][] matrix, int mod, boolean createCopy) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);
@@ -21,6 +25,10 @@ public class PosterizationUtils {
 			}
 		}
 		return workingCopy;
+	}
+	
+	public static Gray[][] posterizeMatrix_BitSize(Gray[][] matrix, int bitSize, boolean createCopy) {
+		return posterizeMatrix(matrix, 256/(int)(Math.pow(2, bitSize)), createCopy);
 	}
 	
 	public static Gray[][] posterizeMatrix(Gray[][] matrix, int mod, boolean createCopy) {
