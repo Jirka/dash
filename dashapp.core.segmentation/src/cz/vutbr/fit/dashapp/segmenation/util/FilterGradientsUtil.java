@@ -1,7 +1,10 @@
 package cz.vutbr.fit.dashapp.segmenation.util;
 
 import java.awt.Point;
-import java.util.HashMap;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,23 +24,26 @@ public class FilterGradientsUtil {
 	}
 
 	public static int[][] process(int[][] matrix, int filterLevel, boolean useColor) {
+		if(filterLevel <= 0) {
+			return matrix;
+		}
 		final int mW = MatrixUtils.width(matrix);
 		final int mH = MatrixUtils.height(matrix);
 		int[][] workingCopy = GrayMatrix.copy(matrix);
-		int[][] gradientMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
+		int[][] nonGradientMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		int[][] markMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		
 		int color = -256;
 		for (int x = 0; x < mW; x++) {
 			for (int y = 0; y < mH; y++) {
 				if(markMatrix[x][y] > 0) {
-					processSeedPixel(workingCopy, gradientMatrix, x, y, color, useColor, markMatrix, filterLevel);
+					processSeedPixel(workingCopy, nonGradientMatrix, x, y, color, useColor, markMatrix, filterLevel);
 					color--;
 				}
 			}
 		}
 		
-		return gradientMatrix;
+		return nonGradientMatrix;
 	}
 	
 	private static void processSeedPixel(int[][] matrix, int[][] resultMatrix, int i, int j, int markColor, boolean useColor, int[][] markMatrix, int filterLevel) {
@@ -131,6 +137,293 @@ public class FilterGradientsUtil {
 				}
 			}
 		}
+	}
+	
+	public static int recommendGradientLimitCombined(int[][] matrix) {
+		// init
+		int filterLevel = 0;
+		int[][] nonGradientMatrix = process(matrix, filterLevel);
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
+		int max = HistogramUtils.findMax(histogram, -1);
+		HistogramPoint[] histogramPoints = getHistogramPoints(histogram, max);
+		List<HistogramRange> ranges = HistogramRange.getRanges(histogramPoints);		
+		
+		while(filterLevel <= 4 && ranges != null) {
+			
+			
+			// increment variables
+			filterLevel++;
+		};
+		
+		return filterLevel;
+	}
+	
+	public static int recommendGradientLimitIterative(int[][] matrix) {
+		
+		// init variables
+		final int filterLevelLimit = 4;
+		int filterLevel = 0;
+		
+		int[] histogram;
+		int max;
+		HistogramPoint[] histogramPoints;
+		List<HistogramRange> ranges;
+		boolean isAllowed = true;
+		int a = MatrixUtils.area(matrix);
+		
+		int amounts[] = new int[] { 0, 0, 0, 0, 0 };
+		int weights[] = new int[] { 0, 0, 0, 0, 0 };
+		
+		do {
+			histogram = HistogramUtils.getGrayscaleHistogram(process(matrix, filterLevel)); // histogram
+			max = HistogramUtils.findMax(histogram, -1); // maximal value
+			histogramPoints = getHistogramPoints(histogram, max);
+			ranges = HistogramRange.getRanges(histogramPoints);
+			
+			amounts[filterLevel] = totalAmount(ranges);
+			weights[filterLevel] = totalWeight(ranges);
+			
+			// next iteration
+			filterLevel++;
+			
+			// is recommended to continue (close max points)
+			isAllowed = isRecommendedToContiue(histogramPoints, ranges, filterLevel, a);
+		} while(!ranges.isEmpty() && filterLevel <= filterLevelLimit && isAllowed);
+		
+		System.out.println("amounts " + Arrays.toString(amounts));
+		System.out.println("weights " + Arrays.toString(weights));
+		
+		for (int i = 0; i < filterLevelLimit+1; i++) {
+			
+			if(weights[i] <= 6) {
+				filterLevel = i;
+				break;
+			}
+			
+			if(i == filterLevelLimit) {
+				filterLevel = i;
+			}
+		}
+		
+		return filterLevel;
+		
+	}
+	
+	private static boolean isRecommendedToContiue(HistogramPoint[] histogramPoints, List<HistogramRange> ranges, int filterLevel, int a) {
+		histogramPoints = Arrays.copyOf(histogramPoints, histogramPoints.length);
+		Arrays.sort(histogramPoints);
+		HistogramPoint maxPoint = histogramPoints[histogramPoints.length-1];
+		System.out.println((double)maxPoint.value()/a);
+		double maxValueLimit = maxPoint.value()*0.2;
+		int minDistance = 256;
+		for (int i = histogramPoints.length-1; i >= 0; i--) {
+			//if(histogramPoints[i].type == HistogramPoint.SMALL) {
+			if(histogramPoints[i].value() < maxValueLimit) {
+				break;
+			}
+			
+			if(histogramPoints[i].isLocalMax()) {
+				for (int j = 0; j < histogramPoints.length; j++) {
+					if(i != j && histogramPoints[j].isLocalMax()
+							&& histogramPoints[j].value() > maxValueLimit
+							//&& histogramPoints[j].type != HistogramPoint.SMALL
+					) {
+						int distance = Math.abs(histogramPoints[i].i - histogramPoints[j].i);
+						if(distance < minDistance) {
+							//minDistance = distance;
+							if(distance <= 4 ||
+									(distance <= 10 && areInSameRange(ranges, histogramPoints[i], histogramPoints[j]))) {
+								System.out.println("distance!");
+								return false;
+							} else if(distance <= 10) {
+								System.out.println("distance <= 10");
+								return filterLevel <= 2;
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
+		
+	}
+
+	private static int totalAmount(List<HistogramRange> ranges) {
+		int sum = 0;
+		for (HistogramRange range : ranges) {
+			sum += range.size();
+		}
+		return sum;
+	}
+	
+	private static int totalWeight(List<HistogramRange> ranges) {
+		int sum = 0;
+		for (HistogramRange range : ranges) {
+			sum += range.allPointsWeight();
+		}
+		return sum;
+	}
+
+	private static HistogramRange getMostImportantRange(List<HistogramRange> ranges) {
+		if(ranges.isEmpty()) {
+			return null;
+		}
+		HistogramRange maxRange = ranges.get(0);
+		int maxWeight = maxRange.maxPointWeight();
+		int weight;
+		for (HistogramRange range : ranges) {
+			weight = range.maxPointWeight();
+			if(range.maxPointWeight() > maxWeight) {
+				maxRange = range;
+				maxWeight = weight;
+			}
+		}
+		return maxRange;
+	}
+
+	public static int recommendGradientLimit(int[][] matrix) {
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
+		
+		// analyze max value
+		int max = HistogramUtils.findMax(histogram, -1);
+		int a = MatrixUtils.area(matrix);
+		double maxValueShare = (double) histogram[max]/a;
+		
+		System.out.println("max: " + max + " " + (double) histogram[max]/a);
+		
+		if(maxValueShare < 0.2) {
+			// a lot of small values - gradients expected
+			System.out.println("gradient 4: small values");
+			return 4;
+		}
+		
+		// analyze important histogram points
+		HistogramPoint[] histogramPoints = getHistogramPoints(histogram, max);
+		System.out.println(Arrays.toString(histogramPoints));
+		
+		// analyze ranges of important points
+		List<HistogramRange> ranges = HistogramRange.getRanges(histogramPoints);
+		if(!ranges.isEmpty()) {
+			Collections.sort(ranges);
+			Collections.reverse(ranges);
+			HistogramRange biggestRange = ranges.get(0);
+			if(biggestRange.size() <= 3) {
+				return 2;
+			}
+			
+			Arrays.sort(histogramPoints);
+			HistogramPoint maxPoint = histogramPoints[histogramPoints.length-1];
+			double maxValueLimit = maxPoint.value()*0.2;
+			
+			int minDistance = 256;
+			for (int i = histogramPoints.length-1; i >= 0; i--) {
+				//if(histogramPoints[i].type == HistogramPoint.SMALL) {
+				if(histogramPoints[i].value() < maxValueLimit) {
+					break;
+				}
+				
+				if(histogramPoints[i].isLocalMax()) {
+					for (int j = 0; j < histogramPoints.length; j++) {
+						if(i != j && histogramPoints[j].isLocalMax()
+								&& histogramPoints[j].value() > maxValueLimit
+								//&& histogramPoints[j].type != HistogramPoint.SMALL
+						) {
+							int distance = Math.abs(histogramPoints[i].i - histogramPoints[j].i);
+							if(distance < minDistance) {
+								//minDistance = distance;
+								if(distance <= 4 ||
+										(distance <= 10 && areInSameRange(ranges, histogramPoints[i], histogramPoints[j]))) {
+									System.out.println("distance!");
+									return 0;
+								} else if(distance <= 10) {
+									System.out.println("distance <= 10");
+									return 2;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			return 4;
+			
+			/*int returnValue = 4;
+			int pointsSize = histogramPoints.length;
+			int start, end = 0;
+			int minDistance = 256;
+			for (HistogramRange range : ranges) {
+				//double[] diffVector = range.getDiffVector();
+				HistogramPoint[] points = range.points;
+				Arrays.sort(points);
+				
+				//maxValueShare = points[points.length-1].value();
+				double valueLimit = points[points.length-1].value()*0.5;
+				for (int i = points.length-1; i >= 0; i--) {
+					if(points[i].value() < valueLimit) {
+						break;
+					}
+					
+					for (int j = 0; j < points.length; j++) {
+						if(i != j && points[j].isLocalMax()) {
+							int distance = Math.abs(points[j].i - points[j].i);
+							if(distance < minDistance) {
+								minDistance = distance;
+								if(minDistance < 6) {
+									return 
+								}
+							}
+						}
+					}
+					
+				}
+				
+				
+				// analyze range
+				System.out.println("range: " + range);
+				if(range.size() <= 3) {
+					break;
+				}
+			}
+			return returnValue;*/
+		}
+		
+		
+		//if(maxValueShare > 0.35) {
+			// one very dominant color
+			//return 4;
+		//}
+		
+		return 1;
+	}
+
+	private static boolean areInSameRange(List<HistogramRange> ranges, HistogramPoint histogramPoint, HistogramPoint histogramPoint2) {
+		for (HistogramRange range : ranges) {
+			if(range.containsBoth(histogramPoint, histogramPoint2)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static HistogramPoint[] getHistogramPoints(int[] histogram, int max) {
+		List<HistogramPoint> histogramPoints = new ArrayList<>();
+		
+		double maxValue = histogram[max];
+		double share;
+		//DecimalFormat df = new DecimalFormat("#.0000");
+		for (int i = 0; i < histogram.length; i++) {
+			//System.out.println(i + " " + histogram[i] + " " + df.format((double) histogram[i]/a));
+			share = histogram[i]/maxValue;
+			if(share > 0.1) {
+				histogramPoints.add(new HistogramPoint(histogram, i, HistogramPoint.BIG));
+			} else if(share > 0.04) {
+				histogramPoints.add(new HistogramPoint(histogram, i, HistogramPoint.MEDIUM));
+			} else if(share > 0.015) {
+				histogramPoints.add(new HistogramPoint(histogram, i, HistogramPoint.SMALL));
+			}
+		}
+		
+		return histogramPoints.toArray(new HistogramPoint[histogramPoints.size()]);
 	}
 
 	public static int recommendLimit(int[][] matrix) {

@@ -63,7 +63,7 @@ public class XYCut4 extends AbstractSegmentationAlgorithm implements ISegmentati
 		//debug("gradient removal", ColorMatrix.printMatrixToImage(null, nonGradientMatrixColor));
 		
 		// posterization is needed after gradient removal
-		GrayMatrix.posterizeMatrix(nonGradientMatrix, 256/(int)(Math.pow(2, 6)), false); // 6 bits posterization
+		GrayMatrix.posterizeMatrix_mod(nonGradientMatrix, 256/(int)(Math.pow(2, 6)), false); // 6 bits posterization
 		debug("gradient removal post", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
 		
 		// ------ edges (experiment)

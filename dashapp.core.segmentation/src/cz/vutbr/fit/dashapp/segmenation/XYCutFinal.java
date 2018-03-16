@@ -1,14 +1,22 @@
 package cz.vutbr.fit.dashapp.segmenation;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.text.DecimalFormat;
+import java.util.List;
 
-import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
+import com.tree.TreeNode;
+
 import cz.vutbr.fit.dashapp.model.Dashboard;
-import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
+import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.segmenation.util.FilterGradientsUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.FindFrequentValuesUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.FrequentValuesThresholdUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.PosterizeUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtils;
+import cz.vutbr.fit.dashapp.segmenation.util.region.ProcessRegionsUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.region.Region;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
-import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 
 public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
 
@@ -33,19 +41,50 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		int[][] rawMatrix = ColorMatrix.toGrayScale(matrix, true, true);
 		
 		// remove gradients
-		int a = MatrixUtils.area(rawMatrix);
-		System.out.println(a);
-		DecimalFormat df = new DecimalFormat("#.0000");
-		int[] histogram = HistogramUtils.getGrayscaleHistogram(rawMatrix);
-		for (int i = 0; i < histogram.length; i++) {
-			System.out.println(i + " " + histogram[i] + " " + df.format((double) histogram[i]/a));
-		}
+		int gradientLimit = FilterGradientsUtil.recommendGradientLimitIterative(rawMatrix);
+		System.out.println(gradientLimit);
+		int[][] nonGradientMatrix = rawMatrix;
+		/*if(gradientLimit > 2) {
+			nonGradientMatrix = FilterGradientsUtil.process(rawMatrix, 2);
+		}*/
+		nonGradientMatrix = FilterGradientsUtil.process(nonGradientMatrix, gradientLimit);
 		
-		//System.out.println(FilterGradientsUtil.recommendLimit(rawMatrix));
-		//int[][] nonGradientMatrix = FilterGradientsUtil.process(rawMatrix, FilterGradientsUtil.recommendLimit(rawMatrix));
+		// experiment
+		//GrayMatrix.printMatrixToImage(image, nonGradientMatrix);
+		//nonGradientMatrix = ColorMatrix.toGrayScale(ColorMatrix.printImageToMatrix(image), true, true);
 		
+		// experiment
+		//int[][] nonGradientMatrix = FilterGradientsUtil.process(matrix, FilterGradientsUtil.recommendGradientLimit(rawMatrix), true);
+		//ColorMatrix.toGrayScale(nonGradientMatrix, true, false);
+		
+		
+		//debug("non-gradient", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
+		//debugHistogram("non-gradient", nonGradientMatrix);
+		
+		// posterization
+		System.out.println(PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix));
+		GrayMatrix.posterizeMatrix(nonGradientMatrix, PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix), false);
+		//debug("post. non-gradient", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
+		//debugHistogram("post. non-gradient", nonGradientMatrix);
+		
+		// max values threshold
+		List<Integer> frequentValues = FindFrequentValuesUtil.find(nonGradientMatrix);
+		int[][] frequentColorMatrix = FrequentValuesThresholdUtil.threshold(nonGradientMatrix, frequentValues);
+		//debug("frequent", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		//debugHistogram("frequent", frequentColorMatrix);
+		
+		// get regions
+		List<Region> regions = FindSameColorRegionsUtils.findRegions(frequentColorMatrix);
+		TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, w, h);
+		List<Region> mainRegions = ProcessRegionsUtil.getMainRegions(root); // result rectangles*/
+		
+		// create dashboard
 		Dashboard dashboard = new Dashboard();
 		dashboard.setDimension(0, 0, w, h);
+		
+		for (Rectangle r : mainRegions) {
+			dashboard.addChildGE(new GraphicalElement(dashboard, r.x, r.y, r.width, r.height));
+		}
 		
 		return dashboard;
 	}

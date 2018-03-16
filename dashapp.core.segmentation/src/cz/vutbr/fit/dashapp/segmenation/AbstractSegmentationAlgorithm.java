@@ -4,7 +4,9 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import extern.ImagePreview;
+import tmp.Histogram;
 
 public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {	
 
@@ -40,6 +42,11 @@ public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgo
 	
 	public Map<String, BufferedImage> getDebugImages() {
 		return debugMatrices;
+	}
+	
+	protected void debugHistogram(String name, int[][] matrix) {
+		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
+		new Histogram(name, histogram).openWindow();
 	}
 	
 	// ----------------------------------------------------------------------

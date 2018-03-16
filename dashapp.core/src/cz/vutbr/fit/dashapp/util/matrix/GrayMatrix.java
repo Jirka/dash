@@ -840,7 +840,11 @@ public class GrayMatrix {
 		return lineMatrix;
 	}
 	
-	public static int[][] posterizeMatrix(int[][] matrix, int mod, boolean createCopy) {
+	public static int[][] posterizeMatrix(int[][] matrix, int bit, boolean createCopy) {
+		return posterizeMatrix_mod(matrix, 256/(int)(Math.pow(2, bit)), createCopy);
+	}
+	
+	public static int[][] posterizeMatrix_mod(int[][] matrix, int mod, boolean createCopy) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);
 		

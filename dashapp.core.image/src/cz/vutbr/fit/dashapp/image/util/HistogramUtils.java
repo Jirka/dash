@@ -5,18 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class HistogramUtils {
 	
 	public static int[] getGrayscaleHistogram(int[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
 		int histogram[] = new int[256];
 		for (int i = 0; i < histogram.length; i++) {
 			histogram[i] = 0;
 		}
 		
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[i].length; j++) {
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
 				histogram[matrix[i][j]]++;
 			}
 		}

@@ -45,8 +45,7 @@ public class BasicImageToolActions {
 		@Override
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, false, false);
-			ColorMatrix.printMatrixToImage(image, matrix, dashboard);
-			return image;
+			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -66,8 +65,7 @@ public class BasicImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			int range = askForInteger("color bit width", "Posterization option", 6);
 			PosterizationUtils.posterizeMatrix_BitSize(matrix, range, false);
-			ColorMatrix.printMatrixToImage(image, matrix, dashboard);
-			return image;
+			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -87,8 +85,7 @@ public class BasicImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.edges(matrix);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -108,8 +105,7 @@ public class BasicImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.inverse(matrix, false);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -130,8 +126,7 @@ public class BasicImageToolActions {
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.edges(matrix);
 			GrayMatrix.inverse(matrix, false);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -152,8 +147,7 @@ public class BasicImageToolActions {
 			int limit = askForInteger("minimal line length", "Minimal line length", 40);
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.lines(matrix, limit, limit);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -174,8 +168,7 @@ public class BasicImageToolActions {
 			int kernelDepth = askForInteger("kernel depth", "Kernel depth", 1);
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.medianFilter(matrix, kernelDepth);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -195,8 +188,7 @@ public class BasicImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.sharpen(matrix);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -226,8 +218,7 @@ public class BasicImageToolActions {
 				threshold = mostFrequentValue-1;
 			}
 			GrayMatrix.update(matrix, new ThresholdCalculator((int) threshold), false); // threshold according to background
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	
@@ -247,8 +238,7 @@ public class BasicImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = GrayMatrix.createRectangles(matrix, false);
-			GrayMatrix.printMatrixToImage(image, matrix);
-			return image;
+			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 	

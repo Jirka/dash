@@ -25,8 +25,7 @@ public class ThresholdActions {
 			int s = askForInteger("Select s", "Threshold option", 8);
 			int t = askForInteger("Select t", "Threshold option", 6);
 			AdaptiveThreshold.adaptiveThreshold(matrix, false, s, t, false);
-			ColorMatrix.printMatrixToImage(image, matrix, dashboard);
-			return image;
+			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 
@@ -47,8 +46,7 @@ public class ThresholdActions {
 			int s = askForInteger("Select s", "Threshold option", 8);
 			int t = askForInteger("Select t", "Threshold option", 6);
 			AdaptiveThreshold.adaptiveThreshold(matrix, true, s, t, false);
-			ColorMatrix.printMatrixToImage(image, matrix, dashboard);
-			return image;
+			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}
 

@@ -18,6 +18,10 @@ public class ColorMatrix {
 		return rgb = ((rgb << 8) + b)/* | -16777216*/;
 	}
 	
+	public static int getAlpha(int rgb) {
+		return (rgb >> 24) & 0xFF;
+	}
+	
 	public static int getRed(int rgb) {
 		return (rgb >> 16) & 0xFF;
 	}
