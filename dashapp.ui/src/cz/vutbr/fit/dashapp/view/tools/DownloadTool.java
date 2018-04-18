@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -14,6 +16,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -29,10 +32,12 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
+import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
+import cz.vutbr.fit.dashapp.util.XMLUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
@@ -94,6 +99,8 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 			panel.add(fileChooserPanel);
 		    
 			JTextField chosenPathHidden = new JTextField("");
+			JTextField resultPathHidden = new JTextField("");
+			
 			
 			openButton.addActionListener(new ActionListener() {
 				
@@ -116,11 +123,9 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 		    JButton button = new JButton("Send");
 		    
 		    button.addActionListener(new ActionListener() {
-
+		    	
 				@Override
-				public void actionPerformed(ActionEvent e) {
-					System.out.println();
-					
+				public void actionPerformed(ActionEvent e) {			
 					runPhantomScript();
 				}
 
@@ -141,39 +146,69 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 						
 						String line;
 						String resultPath = "";
+						String fileName = "";
+						String imageFormat = "";
 						BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 					    while ((line = reader.readLine()) != null) {
-					    	String stringToFind = "absoluteResultPath::";
-					    	int index = line.indexOf(stringToFind);
-					        if(index != -1) {
-					        	resultPath = line.substring(index+stringToFind.length());
+					    	String resultPathToFind = "resultPath::";					    	
+					    	int resultPathindex = line.indexOf(resultPathToFind);
+					        if(resultPathindex != -1) {
+					        	resultPath = line.substring(resultPathindex + resultPathToFind.length());
+					        	resultPathHidden.setText(resultPath);
+					        }
+
+					        String fileNameToFind = "fileName::";
+					        int fileNameIndex = line.indexOf(fileNameToFind);
+					        if(fileNameIndex != -1) {
+					        	fileName = line.substring(fileNameIndex + fileNameToFind.length());
+					        }
+					        
+					        String imageFormatToFind = "imageFormat::";
+					        int imageFormatIndex = line.indexOf(imageFormatToFind);
+					        if(imageFormatIndex != -1) {
+					        	imageFormat = line.substring(imageFormatIndex + imageFormatToFind.length());
 					        }
 				        }
 					    
 					    int status = p.waitFor();
-					    String statusText = (status == 0) ? "Success" : "Error"; 	
+					    
+					    String statusText = (status == 0) ? "Success" : "Error";
 					    statusBar.setText(statusText);
 					    
-					    File filee = new File(resultPath);
-					    DashAppController.getEventManager().updateWorkspaceFolder(
-			        		new WorkspaceFolder(DashAppModel.getInstance(), new File(resultPath)), true
-			        	);
-					    
-//					    File file = new File(resultPath + "/datapine.jpg");
-//					    if(file.exists()) {
-//					    	System.out.println(file.getAbsolutePath() + "yeeey exists");
-//					    	
-//					    	DashboardFile dashfile = new DashboardFile(DashAppModel.getInstance());
-//						    dashfile.setFile(file);
-//						    
-//						    DashAppController.getEventManager().reloadDashboardFromFile(dashfile);
-//						    
-////						    DashAppController.getEventManager().updateSelectedWorkspaceFile(
-////					    		dashfile
-////				    		);
-//					    }
-					    
-						
+					    if(status == 0) {
+						    File filee = new File(resultPath);
+						    DashAppController.getEventManager().updateWorkspaceFolder(
+					    		/*
+					    		 * set folder where downloaded image and xml are located
+					    		 */
+				        		new WorkspaceFolder(DashAppModel.getInstance(), new File(resultPath)), true
+					        );
+
+				    		File file = new File(resultPath + "/"+ fileName + "."+ imageFormat);
+						    File xmlFile = new File(resultPath + "/" + fileName +".xml");
+						    if(file.exists() && xmlFile.exists()) {
+						    	/*
+						    	 * should show downloaded image to canvas
+						    	 */
+						    	DashAppModel model = DashAppModel.getInstance();
+						    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(true);
+						    	DashboardFile df = null;
+						    	for (IWorkspaceFile child : children) {
+									if(child.getFileName().equals(fileName + "." + imageFormat) && child instanceof DashboardFile) {
+										df = (DashboardFile) child;
+										break;
+									}
+								}
+						    	if(df != null ) {
+						    		DashAppController.getEventManager().updateSelectedWorkspaceFile(df);
+						    	}					    
+						    }
+						    
+						    /*
+						     * should format generated xml to proper structure
+						     */
+						    
+					    }	
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
