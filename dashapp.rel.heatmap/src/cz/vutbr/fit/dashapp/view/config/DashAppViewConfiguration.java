@@ -14,6 +14,7 @@ import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
 //import cz.vutbr.fit.dashapp.eval.analysis.heatmap.TestOfGEBoundariesAnalysis;
 //import cz.vutbr.fit.dashapp.eval.analysis.heatmap.old.WidgetMetricAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricType;
+import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 import cz.vutbr.fit.dashapp.view.tools.AnalysisTool;
 import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
 import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
@@ -24,6 +25,7 @@ import cz.vutbr.fit.dashapp.view.tools.XMLTool;
 import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
 import cz.vutbr.fit.dashapp.view.tools.analysis.AbstractAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.AverageMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.CompareAllAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.CompareAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.EdgesAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.analysis.EntropyAnalysisUI;
@@ -88,12 +90,14 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		heatmapActions.add(new EdgesAnalysisUI());
 		heatmapActions.add(new WidgetAnalysisUI());
 		heatmapActions.add(new CompareAnalysisUI());
+		heatmapActions.add(new CompareAllAnalysisUI());
 		MetricType[] metricTypes = MetricType.values();
 		heatmapActions.add(new SimpleMetricAnalysisUI(metricTypes));
 		heatmapActions.add(new AverageMetricAnalysisUI(metricTypes));
 		//heatmapActions.add(new FolderAnalysisUI(new WidgetMetricAnalysis()));
 		//heatmapActions.add(new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()));
-		heatmapActions.add(new SegmentationAnalysisUI());
+		SegmentationType[] segmentationTypes = SegmentationType.values();
+		heatmapActions.add(new SegmentationAnalysisUI(segmentationTypes));
 		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysisUI[heatmapActions.size()])));
 	}
 	

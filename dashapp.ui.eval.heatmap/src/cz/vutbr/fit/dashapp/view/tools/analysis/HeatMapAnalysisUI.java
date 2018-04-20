@@ -102,7 +102,7 @@ public class HeatMapAnalysisUI extends FolderAnalysisUI {
 		}
 		heatMapAnalysis.outputFolderPath = chosenOuputPath;
 		
-		// output 'all' relative path
+		// output file prefix
 		String chosenOuputFilePrefix = (String) outputFilePrefixTextField.getText();
 		if(chosenOuputFilePrefix == null || chosenOuputFilePrefix.isEmpty()) {
 			// TODO test validity

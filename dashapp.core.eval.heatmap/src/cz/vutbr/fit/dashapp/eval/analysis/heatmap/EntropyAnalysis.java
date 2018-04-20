@@ -7,14 +7,12 @@ import java.util.Map;
 
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.DashboardCollection;
-import cz.vutbr.fit.dashapp.util.MathUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
-import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.PixelCalculator;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 	
-public class EntropyAnalysis extends AbstractHeatMapAnalysis implements PixelCalculator {
+public class EntropyAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Entrophy Analysis";
 	public static final String NAME = "enthropy";
@@ -130,11 +128,5 @@ public class EntropyAnalysis extends AbstractHeatMapAnalysis implements PixelCal
 			}
 			printTextFile(actWorkspaceFolder, sb.toString(), actWorkspaceFolder.getPath() + "/" + outputFolderPath + "/" + NAME + suffix, outputFile + suffix);
 		}
-	}
-
-	@Override
-	public int calculateValue(int value) {
-		double probabilty = (double) value/this.actDashboardsCount;
-		return GrayMatrix.toGray(MathUtils.entrophy(probabilty));
 	}
 }

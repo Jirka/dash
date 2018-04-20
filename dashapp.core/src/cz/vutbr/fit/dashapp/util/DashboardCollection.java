@@ -79,7 +79,7 @@ public class DashboardCollection {
 		return matrix;
 	}
 
-	public int size() {
+	public int area() {
 		return this.width*this.height;
 	}
 

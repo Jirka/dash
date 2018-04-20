@@ -7,7 +7,7 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import extern.ImagePreview;
 
-public class SegmentationAlgorithm1 implements ISegmentationAlgorithm {
+public class SegmentationAlgorithm1 extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
 	
 	public static final String NAME = "Algorithm 1";
 

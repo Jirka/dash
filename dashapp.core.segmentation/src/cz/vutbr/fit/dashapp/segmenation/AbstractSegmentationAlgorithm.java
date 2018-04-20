@@ -26,6 +26,11 @@ public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgo
 	}
 	
 	public AbstractSegmentationAlgorithm(DebugMode debugMode) {
+		setDebugMode(debugMode);
+	}
+	
+	@Override
+	public void setDebugMode(DebugMode debugMode) {
 		this.debugMode = debugMode;
 		if(debugMode == DebugMode.SILENT) {
 			debugMatrices = new LinkedHashMap<>();

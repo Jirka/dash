@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.eval.heatmap"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.eval.heatmap"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.segmentation"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

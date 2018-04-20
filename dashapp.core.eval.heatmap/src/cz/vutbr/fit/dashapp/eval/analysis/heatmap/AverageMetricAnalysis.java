@@ -38,7 +38,7 @@ public class AverageMetricAnalysis extends AbstractHeatMapAnalysis {
 	//public String outputFileSuffix = DEFAULT_FILE;
 	public String inputFilesRegex = DEFAULT_FILE_REGEX;
 	
-	public boolean enable_custom_metrics = true;	
+	public boolean enable_custom_metrics = true;
 	public List<MetricType> metricTypes = Arrays.asList(DEFAULT_METRICS);
 	public boolean enable_image_cache = true;
 	public int filter_extreme_results = DEFAULT_FILTER_EXTREME_RESULTS;

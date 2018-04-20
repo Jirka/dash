@@ -1,5 +1,6 @@
 package cz.vutbr.fit.dashapp.util.matrix;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -7,6 +8,58 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
 public class BooleanMatrix {
+	
+	public static int getRGB(boolean boolValue) {
+		int value = boolValue ? 0 : 255;
+		int rgb = 255;
+		rgb = (rgb << 8) + value;
+		rgb = (rgb << 8) + value;
+		return rgb = ((rgb << 8) + value)/* | -16777216*/;
+	}
+	
+	public static BufferedImage printMatrixToImage(BufferedImage image, boolean[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		if(image == null) {
+			image = new BufferedImage(mW, mH, BufferedImage.TYPE_INT_RGB);
+		}
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				image.setRGB(i, j, getRGB(matrix[i][j]));
+			}
+		}
+		return image;
+	}
+	
+	public static int[][] toColorMatrix(boolean[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int[][] resultMatrix = new int[mW][mH];
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				resultMatrix[i][j] = getRGB(matrix[i][j]);
+			}
+		}
+		return resultMatrix;
+	}
+	
+	public static int[][] toGrayMatrix(boolean[][] matrix) {
+		int mW = MatrixUtils.width(matrix);
+		int mH = MatrixUtils.height(matrix);
+		
+		int[][] resultMatrix = new int[mW][mH];
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				resultMatrix[i][j] = matrix[i][j] ? 0 : 255;
+			}
+		}
+		return resultMatrix;
+	}
 	
 	public static int count(boolean[][] matrix) {
 		int sum = 0;

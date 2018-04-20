@@ -1,21 +1,42 @@
 package cz.vutbr.fit.dashapp.eval.analysis.heatmap;
 
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
-import cz.vutbr.fit.dashapp.segmenation.XYCut4;
+import cz.vutbr.fit.dashapp.segmenation.XYCutFinal;
+import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
 import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
+import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
+import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 
 public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Segmentation Analysis";
 	public static final String NAME = "segmentation";
 	public static final String FILE = "_" + NAME;
+	public static final String RECTANGLES_SUFFIX = "-r";
 	
+	public static final SegmentationType[] DEFAULT_SEGMENTATIONS = new SegmentationType[] { 
+			SegmentationType.XYCutFinal,
+	};
+	
+	public boolean enable_act_folder_output = true;
+	public boolean enable_all_folder_output = true;
+	public boolean enable_debug_output = false;
 	public String outputFolderPath = DEFAULT_OUTPUT_PATH + NAME;
+	public String outputFile = FILE;
+	public boolean enable_basic_input = true;
+	public boolean enable_basic_body_input = false;
+	public List<SegmentationType> segmentationTypes = Arrays.asList(DEFAULT_SEGMENTATIONS);
+	public boolean enable_custom_segmentations = true;
+	private ISegmentationAlgorithm[] segmentations = null;
+	public DebugMode debugMode = DebugMode.SILENT;
 
 	@Override
 	public String getLabel() {
@@ -24,23 +45,87 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 
 	@Override
 	public void init() {
-		
+		segmentations = null;
+	}
+	
+	private ISegmentationAlgorithm[] getSegmentations() {
+		if(segmentations == null) {
+			if(enable_custom_segmentations) {
+				segmentations = new ISegmentationAlgorithm[segmentationTypes.size()];
+				int i = 0;
+				for (SegmentationType segmentationType : segmentationTypes) {
+					try {
+						segmentations[i] = (ISegmentationAlgorithm) segmentationType.createAlgorithm();
+						segmentations[i].setDebugMode(debugMode);
+					} catch (Exception e) {
+						System.err.println("Unable to create segmentation algorithm: " + segmentationType);
+					}
+					i++;
+				}
+			} else {
+				// specify own metrics if required
+				segmentations = new ISegmentationAlgorithm[] {
+						new XYCutFinal(DebugMode.SILENT)
+				};
+			}
+		}
+		return segmentations;
 	}
 
 	@Override
 	public void processFolder(WorkspaceFolder actWorkspaceFolder) {
+		if(enable_act_folder_output || enable_all_folder_output) {
+			if(enable_basic_input) {
+				processFolder(actWorkspaceFolder, FILE_SUFFIX_BASIC);
+			}
+			
+			if(enable_basic_body_input) {
+				processFolder(actWorkspaceFolder, FILE_SUFFIX_BASIC);
+			}
+		}
+	}
+	
+	public void processFolder(WorkspaceFolder actWorkspaceFolder, String suffix) {
 		List<DashboardFile> dashboardCandidates = actWorkspaceFolder.getChildren(
-				DashboardFile.class, actWorkspaceFolder.getFileName(), false
+				DashboardFile.class, actWorkspaceFolder.getFileName() + suffix, false
 		);
 		if(dashboardCandidates != null && dashboardCandidates.size() == 1) {
 			BufferedImage image = dashboardCandidates.get(0).getImage();
-			XYCut4 xyCut4 = new XYCut4(DebugMode.SILENT);
-			xyCut4.processImage(image);
-			Map<String, BufferedImage> debugImages = xyCut4.getDebugImages();
-			for (Map.Entry<String, BufferedImage> debugImage : debugImages.entrySet()) {
-				printImage(actWorkspaceFolder, debugImage.getValue(), actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + debugImage.getKey(), actWorkspaceFolder.getFileName());
+			if(image != null) {
+				Map<String, BufferedImage> debugImages;
+				ISegmentationAlgorithm[] segmentationAlgorithms = getSegmentations();
+				String algName;
+				for (ISegmentationAlgorithm segmentationAlgorithm : segmentationAlgorithms) {
+					algName = segmentationAlgorithm.getClass().getSimpleName();
+					Dashboard dashboard = segmentationAlgorithm.processImage(image);
+					if(enable_debug_output) {
+						debugImages = segmentationAlgorithm.getDebugImages();
+						for (Map.Entry<String, BufferedImage> debugImage : debugImages.entrySet()) {
+							if(enable_act_folder_output) {
+								printImage(actWorkspaceFolder, debugImage.getValue(), actWorkspaceFolder.getPath(), outputFile + "_" + algName + "_" + debugImage.getKey());
+							}
+							if(enable_all_folder_output) {
+								printImage(actWorkspaceFolder, debugImage.getValue(), actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName + "/" + debugImage.getKey(), actWorkspaceFolder.getFileName());
+							}
+						}
+						debugImages.clear();
+					}
+					
+					if(dashboard != null) {
+						BufferedImage rectanglesImage = BooleanMatrix.printMatrixToImage(null, BooleanMatrix.printDashboard(dashboard, true, GEType.ALL_TYPES));
+						if(enable_act_folder_output) {
+							printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath(), outputFile + "_" + algName);
+							printImage(actWorkspaceFolder, rectanglesImage, actWorkspaceFolder.getPath(), outputFile + "_" + algName + RECTANGLES_SUFFIX);
+							printDashboard(actWorkspaceFolder, dashboard, actWorkspaceFolder.getPath(), outputFile + "_" + algName);
+						}
+						if(enable_all_folder_output) {
+							printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName, actWorkspaceFolder.getFileName());
+							printImage(actWorkspaceFolder, rectanglesImage, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName, actWorkspaceFolder.getFileName() + RECTANGLES_SUFFIX);
+							printDashboard(actWorkspaceFolder, dashboard, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName, actWorkspaceFolder.getFileName());
+						}
+					}
+				}
 			}
-			debugImages.clear();
 		}
 	}
 

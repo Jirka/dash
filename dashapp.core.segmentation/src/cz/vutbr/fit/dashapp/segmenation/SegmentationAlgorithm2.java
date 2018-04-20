@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
 
-public class SegmentationAlgorithm2 implements ISegmentationAlgorithm {
+public class SegmentationAlgorithm2 extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
 	
 	public static final String NAME = "Algorithm 2";
 

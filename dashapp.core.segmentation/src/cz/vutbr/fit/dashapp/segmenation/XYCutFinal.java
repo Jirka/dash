@@ -42,7 +42,7 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		
 		// remove gradients
 		int gradientLimit = FilterGradientsUtil.recommendGradientLimitIterative(rawMatrix);
-		System.out.println(gradientLimit);
+		//System.out.println(gradientLimit);
 		int[][] nonGradientMatrix = rawMatrix;
 		/*if(gradientLimit > 2) {
 			nonGradientMatrix = FilterGradientsUtil.process(rawMatrix, 2);
@@ -62,7 +62,7 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		//debugHistogram("non-gradient", nonGradientMatrix);
 		
 		// posterization
-		System.out.println(PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix));
+		//System.out.println(PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix));
 		GrayMatrix.posterizeMatrix(nonGradientMatrix, PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix), false);
 		//debug("post. non-gradient", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
 		//debugHistogram("post. non-gradient", nonGradientMatrix);
