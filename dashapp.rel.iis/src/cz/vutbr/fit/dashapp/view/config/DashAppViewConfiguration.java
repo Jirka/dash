@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
-import cz.vutbr.fit.dashapp.view.tools.DownloadTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
 import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
 import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
@@ -40,7 +39,6 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools.add(new HistoryTool());
 		guiTools.add(new ZoomTool());
 		guiTools.add(new FullScreenTool());
-		guiTools.add(new DownloadTool());
 		
 		guiTools.add(new FolderTool());
 		guiTools.add(new XMLTool());
