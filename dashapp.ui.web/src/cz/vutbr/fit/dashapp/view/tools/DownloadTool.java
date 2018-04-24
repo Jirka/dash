@@ -1,47 +1,42 @@
 package cz.vutbr.fit.dashapp.view.tools;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.Label;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.controller.EventManager.EventKind;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
-import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
-import cz.vutbr.fit.dashapp.util.XMLUtils;
+import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
+import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog;
+import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog.DashAppTask;
+import cz.vutbr.fit.dashapp.web.DownloadPage;
+import cz.vutbr.fit.dashapp.web.DownloadPageUtils;
+import cz.vutbr.fit.dashapp.web.PhantomConfiguration;
 
+
+/**
+ * Download tool UI.
+ * 
+ * @author Adriana Jelencikova
+ * @author Jiri Hynek
+ *
+ */
 public class DownloadTool extends AbstractGUITool implements IGUITool {
+	
+	private static final String LABEL = "Download";
+	private static final String ICON = "/icons/Globe.png";
 	
 	DownloadAction downloadAction;
 	
@@ -51,7 +46,7 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 	
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
-		menuBar.addItem(subMenu, "Download", downloadAction);
+		menuBar.addItem(subMenu, LABEL, downloadAction);
 	}
 	
 
@@ -60,10 +55,22 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 		if (toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addButton("Download", "/icons/Document.png", downloadAction, 0);
+		toolbar.addButton(LABEL, ICON, downloadAction, 0);
 	}
 	
+	/**
+	 * 
+	 * @author Jiri Hynek
+	 *
+	 */
 	public class DownloadAction extends AbstractAction {
+		
+		PhantomConfiguration phantomConfiguration;
+		
+		SimpleFileChooser configFile;
+		SimpleFileChooser phantomBin;
+		SimpleFileChooser phantomMain;
+		SimpleFileChooser outputFolder;
 
 		/**
 		 * UID
@@ -75,165 +82,179 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 
 		@Override
 		public void actionPerformed(ActionEvent e) 
-		{	
-			JFrame frame = new JFrame();
-			frame.setSize(700, 300);
-			frame.setLocationRelativeTo(null);
+		{
+			// open modal dialog to get configuration settings
+			if(getSettings()) {
+				// perform task on background
+				DownloadTask task = new DownloadTask(phantomConfiguration);
+				DashAppProgressDialog monitor = new DashAppProgressDialog(DashAppView.getInstance().getFrame(), task);
+				monitor.execute();
+			}
+		}
+
+		/**
+		 * Ask user to fill a phantom configuration form.
+		 * 
+		 * @return
+		 */
+		private boolean getSettings() {
+			// dialog panel
+			JPanel panel = new JPanel(); // TODO use better layout
+			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+			//panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 			
-			JPanel panel = new JPanel();
-			panel.setLayout(new GridLayout(3,0));
-			
-			JLabel statusBar = new JLabel("");
-			panel.add(statusBar);
+			// UI
+			createDialogUI(panel);
 		    
-			JPanel fileChooserPanel = new JPanel();
-			JTextField chosenFile = new JTextField("");
-			chosenFile.setEditable(false);
-			chosenFile.setPreferredSize(new Dimension(400, 60));
-			JButton openButton = new JButton("Open Config");
-			openButton.setPreferredSize(new Dimension(200, 60));
+			// wait for result (modal dialog)
+		    int option = JOptionPane.showConfirmDialog(null, panel, "Download settings", JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				phantomConfiguration = new PhantomConfiguration();
+				phantomConfiguration.setConfigPath(configFile.getResultText());
+				phantomConfiguration.setPhantomBinPath(phantomBin.getResultText());
+				phantomConfiguration.setPhantomMainPath(phantomMain.getResultText());
+				phantomConfiguration.setOutputFolder(outputFolder.getResultText());
+				// TODO validate inputs...
+				return true;
+			}
 			
-			fileChooserPanel.add(chosenFile);
-			fileChooserPanel.add(openButton);
+			// cancel action
+			return false;
+		}
+
+		/**
+		 * form elements
+		 * 
+		 * @param panel
+		 */
+		private void createDialogUI(JPanel panel) {
 			
-			panel.add(fileChooserPanel);
-		    
-			JTextField chosenPathHidden = new JTextField("");
-			JTextField resultPathHidden = new JTextField("");
+			// ------ phantom bin
+			phantomBin = new SimpleFileChooser();
+			panel.add(phantomBin.createPanel("Phantom.js bin:", DownloadPageUtils.getPreferredPhantomBin(), JFileChooser.FILES_ONLY, null));
 			
+			// ------ phantom main
+			phantomMain = new SimpleFileChooser();
+			panel.add(phantomMain.createPanel("Phantom.js main:", DownloadPageUtils.getPreferredPhantomMain(), JFileChooser.FILES_ONLY, new FileNameExtensionFilter("Javascript files", "js")));
 			
-			openButton.addActionListener(new ActionListener() {
+			// ------ configuration file
+			configFile = new SimpleFileChooser();
+			panel.add(configFile.createPanel("Config file:", DownloadPageUtils.getPreferredConfigFile(), JFileChooser.FILES_ONLY, new FileNameExtensionFilter("JSON files", "json")));
+			
+			// ------ output file
+			outputFolder = new SimpleFileChooser();
+			panel.add(outputFolder.createPanel("Output folder:", DownloadPageUtils.getPreferredOutputfolder(), JFileChooser.DIRECTORIES_ONLY, null));
+			
+			// TODO add fields for other settings
+		}
+		
+		/**
+		 * Help widget
+		 * 
+		 * @author Jiri Hynek
+		 *
+		 */
+		private class SimpleFileChooser {
+			
+			JTextField textField;
+			
+			public SimpleFileChooser() {
+			}
+			
+			public JPanel createPanel(String label, String preferredText, int selectionMode, FileNameExtensionFilter filter) {
+				JPanel panel = new JPanel();
+				panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+				//configPanel.setLayout(new FlowLayout());
+				//configPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+				panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
 				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser fc = new JFileChooser();
-					fc.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
+				// chosen file text field
+				panel.add(new JLabel(label));
+				textField = new JTextField("", 30);
+				if(preferredText != null) {
+					textField.setText(preferredText);
+				}
+				panel.add(textField);
+				
+				// open button
+				JButton openButton = new JButton("...");
+				openButton.addActionListener(new ActionListener() {
 					
-					fc.showOpenDialog(null);
-					try {
-						File selectedFile = fc.getSelectedFile();
-						chosenFile.setText(selectedFile.getName());
-						chosenPathHidden.setText(selectedFile.getAbsolutePath());
-					} catch(Exception ex) {
-						//do nothing
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						JFileChooser fc = new JFileChooser();
+						fc.setFileSelectionMode(selectionMode);
+						if(filter != null) {
+							fc.setFileFilter(filter);
+						}
+						fc.showOpenDialog(null);
+						try {
+							File selectedFile = fc.getSelectedFile();
+							if(selectedFile != null) {
+								textField.setText(selectedFile.getAbsolutePath());
+							}
+						} catch(Exception ex) {
+							//do nothing
+						}
 					}
-				}
-			});			
-			
-		    JButton button = new JButton("Send");
-		    
-		    button.addActionListener(new ActionListener() {
-		    	
-				@Override
-				public void actionPerformed(ActionEvent e) {			
-					runPhantomScript();
-				}
-
-				private void runPhantomScript() {
-					try {
-						String repositoryPath= getAbsolutePathOfScriptRepository();
-						String relativePath = "/dash.samples/phantom/src/";
-						String absolutePath = repositoryPath + relativePath;
-						
-						//setting paths for subprocess
-						String phantomJs = absolutePath + "main.js";
-						String phantomBin = absolutePath + "phantomjs ";
-						String configFile = chosenPathHidden.getText();
-						
-						String subprocess = phantomBin + phantomJs + " -c " + configFile + " -a " + absolutePath;
-						
-						Process p = Runtime.getRuntime().exec(subprocess);
-						
-						String line;
-						String resultPath = "";
-						String fileName = "";
-						String imageFormat = "";
-						BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-					    while ((line = reader.readLine()) != null) {
-					    	String resultPathToFind = "resultPath::";					    	
-					    	int resultPathindex = line.indexOf(resultPathToFind);
-					        if(resultPathindex != -1) {
-					        	resultPath = line.substring(resultPathindex + resultPathToFind.length());
-					        	resultPathHidden.setText(resultPath);
-					        }
-
-					        String fileNameToFind = "fileName::";
-					        int fileNameIndex = line.indexOf(fileNameToFind);
-					        if(fileNameIndex != -1) {
-					        	fileName = line.substring(fileNameIndex + fileNameToFind.length());
-					        }
-					        
-					        String imageFormatToFind = "imageFormat::";
-					        int imageFormatIndex = line.indexOf(imageFormatToFind);
-					        if(imageFormatIndex != -1) {
-					        	imageFormat = line.substring(imageFormatIndex + imageFormatToFind.length());
-					        }
-				        }
-					    
-					    int status = p.waitFor();
-					    
-					    String statusText = (status == 0) ? "Success" : "Error";
-					    statusBar.setText(statusText);
-					    
-					    if(status == 0) {
-						    File filee = new File(resultPath);
-						    DashAppController.getEventManager().updateWorkspaceFolder(
-					    		/*
-					    		 * set folder where downloaded image and xml are located
-					    		 */
-				        		new WorkspaceFolder(DashAppModel.getInstance(), new File(resultPath)), true
-					        );
-
-				    		File file = new File(resultPath + "/"+ fileName + "."+ imageFormat);
-						    File xmlFile = new File(resultPath + "/" + fileName +".xml");
-						    if(file.exists() && xmlFile.exists()) {
-						    	/*
-						    	 * should show downloaded image to canvas
-						    	 */
-						    	DashAppModel model = DashAppModel.getInstance();
-						    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(true);
-						    	DashboardFile df = null;
-						    	for (IWorkspaceFile child : children) {
-									if(child.getFileName().equals(fileName + "." + imageFormat) && child instanceof DashboardFile) {
-										df = (DashboardFile) child;
-										break;
-									}
-								}
-						    	if(df != null ) {
-						    		DashAppController.getEventManager().updateSelectedWorkspaceFile(df);
-						    	}					    
-						    }
-						    
-						    /*
-						     * should format generated xml to proper structure
-						     */
-						    
-					    }	
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch(InterruptedException e) {
-						//TODO
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-
-				private String getAbsolutePathOfScriptRepository() {
-					File currentDirFile = new File(".");
-					String absolutePath = currentDirFile.getAbsolutePath();
-					int index = absolutePath.indexOf("/dash/");
-					absolutePath = absolutePath.substring(0, index);
+				});
+				panel.add(openButton);
 				
-					return absolutePath;
-				}
-		    	
-		    } );
-		    
-		    panel.add(button);
-		    frame.add(panel);
-		    frame.setVisible(true);
+				return panel;
+			}
+			
+			public String getResultText() {
+				return textField.getText();
+			}
+		}
+	}
+	
+	/**
+	 * Task which downloads a dashboard. It runs on background.
+	 * 
+	 * @author Jiri Hynek
+	 *
+	 */
+	public static class DownloadTask extends DashAppTask {
+		
+		private String message = "";
+		private PhantomConfiguration phantomConfiguration;
+		
+		public DownloadTask(PhantomConfiguration phantomConfiguration) {
+			this.phantomConfiguration = phantomConfiguration;
+		}
+
+		@Override
+		protected Void doInBackground() throws Exception {			
+			// build command
+			message = "preparing";
+			setProgress(1);
+			String command = DownloadPage.buildCommand(phantomConfiguration);
+			
+			// execute command
+			message = "downloading";
+			setProgress(2);
+			DownloadPage.runPhantomScript(command);
+			
+			// update workspace
+			message = "updating workspace";
+			setProgress(99);
+			// TODO switch to output folder and refresh workspace
+			
+			// done
+			setProgress(100);
+			
+			return null;
+		}
+
+		@Override
+		public Object getMainLabel() {
+			return "Downloading dashoard";
+		}
+
+		@Override
+		public Object getMessage() {
+			return message;
 		}
 		
 	}

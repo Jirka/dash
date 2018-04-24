@@ -8,6 +8,7 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
+import cz.vutbr.fit.dashapp.util.PathUtils;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
@@ -59,16 +60,6 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	 * version
 	 */
 	public static final String VERSION = "rel-master";
-	
-	/**
-	 * default project home path
-	 */
-	public static final String DEFAULT_WORKSPACE_HOME_PATH = System.getProperty("user.home");
-	
-	/**
-	 * default workspace dashboard.samples path
-	 */
-	public static final String DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH = System.getProperty("user.dir") + "/../../dash.samples";
 	
 	public BasicViewConfiguration() {
 		// set workspace path
@@ -147,11 +138,12 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	
 	@Override
 	public String getDefaultWorkspacePath() {
-		File dash_samples_dir = new File(DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH);
-		if(dash_samples_dir.exists() && dash_samples_dir.isDirectory()) {
-			return DEFAULT_WORKSPACE_DASHBOARD_SAMPLES_PATH;
+		// for debug purposes
+		String dashSamplesPath = PathUtils.getDashSamplesPath();
+		if(dashSamplesPath != null) {
+			return dashSamplesPath;
 		}
-		return DEFAULT_WORKSPACE_HOME_PATH;
+		return PathUtils.DEFAULT_WORKSPACE_HOME_PATH;
 	}
 
 }
