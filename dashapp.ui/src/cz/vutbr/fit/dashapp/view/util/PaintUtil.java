@@ -40,6 +40,22 @@ public class PaintUtil {
 		}
 	}
 	
+	public void paintGraphicalElementsTree(Graphics2D g1, Dashboard dashboard, GraphicalElement selectedElement) {
+		List<GraphicalElement> elements = dashboard.getChildren(GEType.ALL_TYPES);
+		g1.setColor(LIGHT_BLUE);
+		g1.setStroke(new BasicStroke(1));
+		paintGraphicalElementsTree(g1, elements);
+	}
+	
+	public void paintGraphicalElementsTree(Graphics2D g1, List<GraphicalElement> elements) {
+		if(elements != null) {
+			for (GraphicalElement element : elements) {			
+				g1.drawRect(element.absoluteX(), element.absoluteY(), element.width, element.height);
+				paintGraphicalElementsTree(g1, element.getChildren());
+			}
+		}
+	}
+	
 	public void paintCandidateElement(Graphics2D g1, WorkingCopy candidateElement) {
 		g1.setColor(Color.RED);
 		g1.setBackground(Color.RED);

@@ -46,6 +46,8 @@ public class XMLUtils {
 		Dashboard newDashboard = null;
 		try {
 			newDashboard = serializer.read(Dashboard.class, xml);
+			// set missing parent attributes
+			newDashboard.refreshParents();
 		} catch (Exception e) {
 			System.err.println("Unable to deserialize dashboard\n" + e);
 		}

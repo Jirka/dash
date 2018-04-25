@@ -25,6 +25,7 @@ import cz.vutbr.fit.dashapp.view.tools.XMLTool;
 import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
+import cz.vutbr.fit.dashapp.view.tools.canvas.RectanglesTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
 
@@ -91,6 +92,7 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		guiTools.add(new BoundTool(false, false, buttonGroup));
 		guiTools.add(new SelectTool(false, false, buttonGroup));
 		guiTools.add(new InsertTool(false, false, buttonGroup));
+		guiTools.add(new RectanglesTool(false, false, buttonGroup));
 		
 		guiTools.add(new AttachTool());
 		guiTools.add(new GETypeTool());

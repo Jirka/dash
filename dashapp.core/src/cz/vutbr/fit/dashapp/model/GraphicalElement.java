@@ -136,6 +136,18 @@ public class GraphicalElement {
 	GraphicalElement parent;
 	
 	/**
+	 * Method used after deserialization of XML.
+	 */
+	public void refreshParents() {
+		if(children != null) {
+			for (GraphicalElement child : children) {
+				child.setParent(this);
+				child.refreshParents();
+			}
+		}
+	}
+	
+	/**
 	 * children
 	 */
 	@ElementList(inline=true, required=false)
