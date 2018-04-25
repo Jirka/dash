@@ -15,9 +15,13 @@ public class Region extends Rectangle {
 	public static final int R_BORDER = 3;
 	public static final int DATA = 4;
 	public static final int AMBIGUOUS = 5;
+	public static final int JOIN = 6;
 	
 	public int color;
 	public int type = OTHER;
+	public int intersects = 0;
+
+	public int tmpIntersectArea;
 	
 	public Region(int x, int y, int w, int h, int color) {
 		super(x, y, w, h);
