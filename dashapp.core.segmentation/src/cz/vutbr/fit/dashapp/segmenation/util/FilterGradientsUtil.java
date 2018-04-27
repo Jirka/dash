@@ -158,6 +158,10 @@ public class FilterGradientsUtil {
 		return filterLevel;
 	}
 	
+	public static final int OK = 0;
+	public static final int STOP = 1;
+	public static final int WARNING = 2;
+	
 	public static int recommendGradientLimitIterative(int[][] matrix) {
 		
 		// init variables
@@ -168,40 +172,64 @@ public class FilterGradientsUtil {
 		int max;
 		HistogramPoint[] histogramPoints;
 		List<HistogramRange> ranges;
-		boolean isAllowed = true;
+		int isAllowed = OK;
 		int a = MatrixUtils.area(matrix);
 		
 		int amounts[] = new int[] { 0, 0, 0, 0, 0 };
 		int weights[] = new int[] { 0, 0, 0, 0, 0 };
+		int recommend[] = new int[] { OK, OK, OK, OK, OK };
+		double maxShares[] = new double[] { 0, 0, 0, 0, 0 };
 		
 		do {
 			histogram = HistogramUtils.getGrayscaleHistogram(process(matrix, filterLevel)); // histogram
 			max = HistogramUtils.findMax(histogram, -1); // maximal value
-			histogramPoints = getHistogramPoints(histogram, max);
+			histogramPoints = getHistogramPoints(histogram, max); // histogram important points
 			ranges = HistogramRange.getRanges(histogramPoints);
 			
 			amounts[filterLevel] = totalAmount(ranges);
 			weights[filterLevel] = totalWeight(ranges);
+			maxShares[filterLevel] = (double) max/a;
+			
+			// is recommended to continue (close max points)
+			isAllowed = isRecommendedToContiue(histogram, histogramPoints, ranges, filterLevel, a);
+			recommend[filterLevel] = isAllowed;
+			if(filterLevel > 0 && recommend[filterLevel-1] == WARNING) {
+				if(maxShares[filterLevel] >= maxShares[filterLevel-1]*1.5) {
+					isAllowed = STOP;
+					filterLevel--;
+				}
+			}
 			
 			// next iteration
 			filterLevel++;
-			
-			// is recommended to continue (close max points)
-			isAllowed = isRecommendedToContiue(histogramPoints, ranges, filterLevel, a);
-		} while(!ranges.isEmpty() && filterLevel <= filterLevelLimit && isAllowed);
+		} while(!ranges.isEmpty() && filterLevel <= filterLevelLimit && isAllowed == OK);
+		
+		filterLevel--; // last filter level
+		int lastFilterLevel = filterLevel;
 		
 		System.out.println("amounts " + Arrays.toString(amounts));
 		System.out.println("weights " + Arrays.toString(weights));
 		
-		for (int i = 0; i < filterLevelLimit+1; i++) {
+		for (int i = 0; i < filterLevelLimit+1 && i <= lastFilterLevel; i++) {
 			
 			if(weights[i] <= 6) {
 				filterLevel = i;
 				break;
 			}
 			
-			if(i == filterLevelLimit) {
+			if(i < filterLevelLimit && (weights[i]-weights[i+1] < 0 || amounts[i]-amounts[i+1] < 0)) {
 				filterLevel = i;
+				break;
+			}
+			
+			//if(i == filterLevelLimit) {
+				filterLevel = i;
+			//}
+		}
+		
+		if(filterLevel == 0) {
+			if(weights[0] > 4 && amounts[0]-amounts[1] >= 0) {
+				filterLevel = 1;
 			}
 		}
 		
@@ -209,12 +237,14 @@ public class FilterGradientsUtil {
 		
 	}
 	
-	private static boolean isRecommendedToContiue(HistogramPoint[] histogramPoints, List<HistogramRange> ranges, int filterLevel, int a) {
+	private static int isRecommendedToContiue(int[] histogram, HistogramPoint[] histogramPoints, List<HistogramRange> ranges, int filterLevel, int a) {
 		histogramPoints = Arrays.copyOf(histogramPoints, histogramPoints.length);
 		Arrays.sort(histogramPoints);
 		HistogramPoint maxPoint = histogramPoints[histogramPoints.length-1];
-		System.out.println((double)maxPoint.value()/a);
-		double maxValueLimit = maxPoint.value()*0.2;
+		double maxPointShare = (double)maxPoint.value()/a;
+		double maxValueLimitShare = Math.max(maxPointShare*0.2, 0.08);
+		System.out.println("maxPointShare: " + maxPointShare + ", maxValueLimitShare: " + maxValueLimitShare);
+		double maxValueLimit = maxValueLimitShare*a;
 		int minDistance = 256;
 		for (int i = histogramPoints.length-1; i >= 0; i--) {
 			//if(histogramPoints[i].type == HistogramPoint.SMALL) {
@@ -230,22 +260,57 @@ public class FilterGradientsUtil {
 					) {
 						int distance = Math.abs(histogramPoints[i].i - histogramPoints[j].i);
 						if(distance < minDistance) {
+							boolean areInSameRange = areInSameRange(ranges, histogramPoints[i], histogramPoints[j]);
+							int minGapI = minGap(histogram, histogramPoints[i], histogramPoints[j]);
+							double minGapShare = (double) histogram[minGapI]/Math.max(histogramPoints[i].value(), histogramPoints[i].value());
+							
+							if(minGapShare >= 0.7) {
+								// OK
+							} else if(minGapShare <= 0.2) {
+								if(distance <= 4) {
+									System.out.println("distance!");
+									return STOP;
+								} else if(distance <= 10) {
+									System.out.println("warning");
+									return WARNING;
+								}
+							} else {
+								/*if(distance <= 10 && areInSameRange) {
+									System.out.println("distance <= 10");
+									return false;
+								}*/
+							}
+							
 							//minDistance = distance;
-							if(distance <= 4 ||
-									(distance <= 10 && areInSameRange(ranges, histogramPoints[i], histogramPoints[j]))) {
+							/*if(distance <= 4 ||
+									(distance <= 10 && areInSameRange)) {
 								System.out.println("distance!");
 								return false;
 							} else if(distance <= 10) {
 								System.out.println("distance <= 10");
-								return filterLevel <= 2;
-							}
+								if(filterLevel > 1) {
+									return false;
+								}
+							}*/
 						}
 					}
 				}
 			}
 		}
-		return true;
+		return OK;
 		
+	}
+
+	private static int minGap(int[] histogram, HistogramPoint p1, HistogramPoint p2) {
+		int i1 = Math.min(p1.i, p2.i);
+		int i2 = Math.max(p1.i, p2.i);
+		int min = p1.i;
+		for (int i = i1; i < i2; i++) {
+			if(histogram[i] < histogram[min]) {
+				min = i;
+			}
+		}
+		return min;
 	}
 
 	private static int totalAmount(List<HistogramRange> ranges) {

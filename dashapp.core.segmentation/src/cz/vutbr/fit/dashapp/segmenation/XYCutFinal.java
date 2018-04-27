@@ -42,7 +42,7 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		
 		// remove gradients
 		int gradientLimit = FilterGradientsUtil.recommendGradientLimitIterative(rawMatrix);
-		//System.out.println(gradientLimit);
+		System.out.println("gradient limit: " + gradientLimit);
 		int[][] nonGradientMatrix = rawMatrix;
 		/*if(gradientLimit > 2) {
 			nonGradientMatrix = FilterGradientsUtil.process(rawMatrix, 2);
@@ -62,7 +62,7 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		//debugHistogram("non-gradient", nonGradientMatrix);
 		
 		// posterization
-		//System.out.println(PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix));
+		System.out.println("posterization: " + PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix));
 		GrayMatrix.posterizeMatrix(nonGradientMatrix, PosterizeUtil.recommendPosterizationLimit(nonGradientMatrix), false);
 		//debug("post. non-gradient", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
 		//debugHistogram("post. non-gradient", nonGradientMatrix);
@@ -78,7 +78,7 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, w, h);
 		List<Region> mainRegions = ProcessRegionsUtil.getMainRegions(root); // result rectangles*/
 		
-		mainRegions = ProcessRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
+		//mainRegions = ProcessRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
 		
 		// create dashboard
 		Dashboard dashboard = new Dashboard();
