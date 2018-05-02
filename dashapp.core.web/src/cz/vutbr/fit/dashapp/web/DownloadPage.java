@@ -29,17 +29,39 @@ public class DownloadPage {
 		String phantomBin = phantomConfiguration.getPhantomBinPath();
 		String phantomMain = phantomConfiguration.getPhantomMainPath();
 		String configFile = phantomConfiguration.getConfigPath();
-		String outputFolder = phantomConfiguration.getOutputFolder(); // TODO
+		String outputFolder = phantomConfiguration.getOutputFolder();
+		String url = phantomConfiguration.getUrlAddress();
+		String fileName = phantomConfiguration.getFileName();
+		String selector = phantomConfiguration.getSelector();
+		Integer height = phantomConfiguration.getHeight();
+		Integer width = phantomConfiguration.getWidth();
+		Integer timeout = phantomConfiguration.getTimeout();
+		Integer maximumHierarchyLevel = phantomConfiguration.getMaximumHierarchyLevel();
+		Boolean isOnlyScreen = phantomConfiguration.isOnlyScreen();
+		Boolean isGenerateWidetScreenshots = phantomConfiguration.isGenerateWidetScreenshots();
 		
-		String command = phantomBin + " " + phantomMain + " -c " + configFile;
+		String command = phantomBin + " " + phantomMain;
 		
-		// TODO workspace path should be part of phantom main script and this should be removed
-		String workspaceDirectory = phantomMain.substring(0, phantomMain.length()-DownloadPageUtils.PHANTOM_MAIN.length());
-		command += " -a " + workspaceDirectory;
+		// configuration file can be missing and parameters can be specified manually (or they can override configuration file)
+		command += isValueSet(configFile) ? " -c " + configFile  : "";
+		command += isValueSet(outputFolder) ? " -resultPath " + outputFolder : "";
+		command += isValueSet(url) ? " -url " + url  : "";
+		command += isValueSet(fileName) ? " -fileName " + fileName : "";
+		command += isValueSet(selector)? " -selector " + selector : "";
 		
-		// TODO configuration file can be missing and parameters can be specified manually (or they can override configuration file)
+		command += height != null ? " -heigth " + height : "";
+		command += width != null ? " -width " + width : "";
+		command += timeout != null ?  " -timeout " + timeout : "";
+		command += maximumHierarchyLevel != null ? " -maximumHierarchyLevel " + Integer.toString(maximumHierarchyLevel) : "";
+		
+		command += isOnlyScreen ? " -onlyScreen true " : "";
+		command += isGenerateWidetScreenshots ? " -generateWidetScreenshots true " : "";
 		
 		return command;
+	}
+	
+	private static boolean isValueSet(String value) {
+		return !value.isEmpty() && value != null;
 	}
 	
 	/**
