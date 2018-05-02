@@ -52,7 +52,7 @@ public class DownloadPage {
 		command += height != null ? " -heigth " + height : "";
 		command += width != null ? " -width " + width : "";
 		command += timeout != null ?  " -timeout " + timeout : "";
-		command += maximumHierarchyLevel != null ? " -maximumHierarchyLevel " + Integer.toString(maximumHierarchyLevel) : "";
+		command += maximumHierarchyLevel != null ? " -maximumHierarchyLevel " + maximumHierarchyLevel : "";
 		
 		command += isOnlyScreen ? " -onlyScreen true " : "";
 		command += isGenerateWidetScreenshots ? " -generateWidetScreenshots true " : "";

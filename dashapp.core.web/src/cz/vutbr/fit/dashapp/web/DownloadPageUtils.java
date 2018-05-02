@@ -30,16 +30,21 @@ public class DownloadPageUtils {
 	public static String getPreferredPhantomBin() {
 		String preferredPhantomBin = PHANTOM_BIN;
 		
-		// TODO check if Phantom.js installed
-		
-		// TODO else check actual folder
-		
-		// else take dash.samples installation (only for debug purposes if exists)
-		String dashSamplesPath = PathUtils.getDashSamplesPath();
-		if(dashSamplesPath != null) {
-			String candidatePhantomBin = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_BIN;
+		// TODO check if Phantom.js installed		
+		if(!isPhantomInstalled()) {
+			// TODO else check actual folder
+			String candidatePhantomBin = "./" + PHANTOM_BIN;
 			if(isExistingFile(candidatePhantomBin)) {
-				preferredPhantomBin = candidatePhantomBin;
+				preferredPhantomBin = new File(candidatePhantomBin).getAbsolutePath();
+			} else {
+				// else take dash.samples installation (only for debug purposes if exists)
+				String dashSamplesPath = PathUtils.getDashSamplesPath();
+				if(dashSamplesPath != null) {
+					candidatePhantomBin = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_BIN;
+					if(isExistingFile(candidatePhantomBin)) {
+						preferredPhantomBin = candidatePhantomBin;
+					}
+				}
 			}
 		}
 		
@@ -50,13 +55,17 @@ public class DownloadPageUtils {
 		String preferredPhantomMain = PHANTOM_MAIN;
 		
 		// TODO check actual folder
-		
-		// else take dash.samples installation (only for debug purposes if exists)
-		String dashSamplesPath = PathUtils.getDashSamplesPath();
-		if(dashSamplesPath != null) {
-			String candidatePhantomMain = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_MAIN;
-			if(isExistingFile(candidatePhantomMain)) {
-				preferredPhantomMain = candidatePhantomMain;
+		String candidatePhantomMain = "./" + PHANTOM_MAIN;
+		if(isExistingFile(candidatePhantomMain)) {
+			preferredPhantomMain = new File(candidatePhantomMain).getAbsolutePath();
+		} else {
+			// else take dash.samples installation (only for debug purposes if exists)
+			String dashSamplesPath = PathUtils.getDashSamplesPath();
+			if(dashSamplesPath != null) {
+				candidatePhantomMain = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_MAIN;
+				if(isExistingFile(candidatePhantomMain)) {
+					preferredPhantomMain = candidatePhantomMain;
+				}
 			}
 		}
 		
@@ -67,17 +76,28 @@ public class DownloadPageUtils {
 		String preferredConfigFile = CONFIG_FILE;
 		
 		// TODO check actual folder
-		
-		// else take dash.samples configuration file (only for debug purposes if exists)
-		String dashSamplesPath = PathUtils.getDashSamplesPath();
-		if(dashSamplesPath != null) {
-			String candidateConfigFile = dashSamplesPath + DASH_SAMPLES_CONFIG_LOCATION + CONFIG_FILE;
-			if(isExistingFile(candidateConfigFile)) {
-				preferredConfigFile = candidateConfigFile;
+		String candidateConfigFile = "./" + CONFIG_FILE;
+		if(isExistingFile(preferredConfigFile)) {
+			preferredConfigFile = new File(candidateConfigFile).getAbsolutePath();
+		} else {
+			// else take dash.samples configuration file (only for debug purposes if exists)
+			String dashSamplesPath = PathUtils.getDashSamplesPath();
+			if(dashSamplesPath != null) {
+				candidateConfigFile = dashSamplesPath + DASH_SAMPLES_CONFIG_LOCATION + CONFIG_FILE;
+				if(isExistingFile(candidateConfigFile)) {
+					preferredConfigFile = candidateConfigFile;
+				}
 			}
 		}
 		
 		return preferredConfigFile;
+	}
+	
+	private static boolean isPhantomInstalled() {
+		//TODO
+//		System.out.println(System.getenv("PATH"));
+
+		return false;
 	}
 	
 	public static String getPreferredOutputfolder() {

@@ -4,10 +4,15 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -15,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.transform.URIResolver;
 
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.MenuBar;
@@ -71,7 +77,16 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 		SimpleFileChooser phantomBin;
 		SimpleFileChooser phantomMain;
 		SimpleFileChooser outputFolder;
-
+		SimpleTextField urlAddress;
+		SimpleTextField maximumHierarchyLevel;
+		SimpleTextField fileName;
+		SimpleTextField selector;
+		SimpleTextField height;
+		SimpleTextField width;
+		SimpleTextField timeout;
+		SimpleCheckBox onlyScreen;
+		SimpleCheckBox generateWidetScreenshots;
+		
 		/**
 		 * UID
 		 */
@@ -84,11 +99,16 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 		public void actionPerformed(ActionEvent e) 
 		{
 			// open modal dialog to get configuration settings
-			if(getSettings()) {
-				// perform task on background
-				DownloadTask task = new DownloadTask(phantomConfiguration);
-				DashAppProgressDialog monitor = new DashAppProgressDialog(DashAppView.getInstance().getFrame(), task);
-				monitor.execute();
+			try {
+				if(getSettings()) {
+					// perform task on background
+					DownloadTask task = new DownloadTask(phantomConfiguration);
+					DashAppProgressDialog monitor = new DashAppProgressDialog(DashAppView.getInstance().getFrame(), task);
+					monitor.execute();
+				}
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 		}
 
@@ -96,8 +116,9 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 		 * Ask user to fill a phantom configuration form.
 		 * 
 		 * @return
+		 * @throws Exception 
 		 */
-		private boolean getSettings() {
+		private boolean getSettings() throws Exception {
 			// dialog panel
 			JPanel panel = new JPanel(); // TODO use better layout
 			panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -109,12 +130,45 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 			// wait for result (modal dialog)
 		    int option = JOptionPane.showConfirmDialog(null, panel, "Download settings", JOptionPane.OK_CANCEL_OPTION);
 			if (option == JOptionPane.OK_OPTION) {
+				
+				// TODO validate inputs...
+				if(!validateInput()) {
+					throw new Exception("Input fields are not valid");
+				}
+				
 				phantomConfiguration = new PhantomConfiguration();
 				phantomConfiguration.setConfigPath(configFile.getResultText());
 				phantomConfiguration.setPhantomBinPath(phantomBin.getResultText());
 				phantomConfiguration.setPhantomMainPath(phantomMain.getResultText());
 				phantomConfiguration.setOutputFolder(outputFolder.getResultText());
-				// TODO validate inputs...
+				phantomConfiguration.setUrlAddress(urlAddress.getResultText());
+				phantomConfiguration.setFileName(fileName.getResultText());
+				phantomConfiguration.setSelector(selector.getResultText());
+				
+				//not sure if it all following values should be integer or string
+				String heightInput = height.getResultText();
+				if(!heightInput.isEmpty()) {
+					phantomConfiguration.setHeight(Integer.parseInt(heightInput));
+				}
+				
+				String widthInput = width.getResultText();
+				if(!widthInput.isEmpty()) {
+					phantomConfiguration.setHeight(Integer.parseInt(widthInput));
+				}
+				
+				String timeoutInput = timeout.getResultText();
+				if(!timeoutInput.isEmpty()) {
+					phantomConfiguration.setTimeout(Integer.parseInt(timeoutInput));
+				}
+				
+				String maximumHierarchyLevelInput = maximumHierarchyLevel.getResultText();
+				if(!maximumHierarchyLevelInput.isEmpty()) {
+					phantomConfiguration.setTimeout(Integer.parseInt(maximumHierarchyLevelInput));
+				}
+				
+				phantomConfiguration.setOnlyScreen(onlyScreen.isCheckBoxSet());
+				phantomConfiguration.setGenerateWidetScreenshots(generateWidetScreenshots.isCheckBoxSet());
+				
 				return true;
 			}
 			
@@ -122,6 +176,63 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 			return false;
 		}
 
+		private boolean validateInput() {
+			boolean isValid = true;
+			
+			String configFileInput = configFile.getResultText();
+			if(!isExistingFileOrDirectory(configFileInput) && !configFileInput.isEmpty()) {
+				isValid = false;
+			}
+			
+			String phantomBinInput = phantomBin.getResultText();
+			if(!isExistingFileOrDirectory(phantomBinInput) || phantomBinInput.isEmpty()) {
+				isValid = false;
+			}
+			
+			String phantomMainInput = phantomMain.getResultText();
+			if(!isExistingFileOrDirectory(phantomMainInput) || phantomMainInput.isEmpty()) {
+				isValid = false;
+			}
+			
+			String outputFolderInput = outputFolder.getResultText();
+			if(!isExistingFileOrDirectory(outputFolderInput) && !outputFolderInput.isEmpty()) {
+				isValid = false;
+			}
+			
+			try {
+				validateValueAsInteger(maximumHierarchyLevel.getResultText());
+				validateValueAsInteger(height.getResultText());
+				validateValueAsInteger(width.getResultText());
+				validateValueAsInteger(timeout.getResultText());
+			} catch (NumberFormatException e) {
+				isValid = false;
+			}
+			
+			try {
+				String urlAddressInput = urlAddress.getResultText();
+				if(!urlAddressInput.isEmpty()) {
+					URL url = new URL(urlAddressInput);
+					url.toURI();
+				}
+			} catch (MalformedURLException e) {
+				isValid = false;
+			} catch (URISyntaxException e) {
+				isValid = false;
+			}
+			
+			return isValid;
+		}
+		
+		private void validateValueAsInteger(String value) throws NumberFormatException {
+			if(!value.isEmpty()) {
+				Integer.parseInt(value);
+			}
+		}
+		
+		private boolean isExistingFileOrDirectory(String path) {
+			return new File(path).exists();
+		}
+		
 		/**
 		 * form elements
 		 * 
@@ -146,6 +257,41 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 			panel.add(outputFolder.createPanel("Output folder:", DownloadPageUtils.getPreferredOutputfolder(), JFileChooser.DIRECTORIES_ONLY, null));
 			
 			// TODO add fields for other settings
+			// ------  url address
+			urlAddress = new SimpleTextField();
+			panel.add(urlAddress.createPanel("Url address:", "http://"));
+			
+			// ------ reslut file name
+			fileName = new SimpleTextField();
+			panel.add(fileName.createPanel("Result filename:", ""));
+			
+			// ------ element selector
+			selector = new SimpleTextField();
+			panel.add(selector.createPanel("Selector:", ""));
+			
+			// ------ window height
+			height = new SimpleTextField();
+			panel.add(height.createPanel("Height:", ""));
+			
+			// ------ window width
+			width = new SimpleTextField();
+			panel.add(width.createPanel("Width:", ""));
+			
+			// ------ timeout
+			timeout = new SimpleTextField();
+			panel.add(timeout.createPanel("Timeout", ""));
+			
+			// ------ maximum hierarchy level
+			maximumHierarchyLevel = new SimpleTextField();
+			panel.add(maximumHierarchyLevel.createPanel("Maximum hierarchy level", "1"));
+			
+			// ------ only screen flag
+			onlyScreen = new SimpleCheckBox();
+			panel.add(onlyScreen.createPanel("Generate only screen"));
+			
+			generateWidetScreenshots = new SimpleCheckBox();
+			panel.add(generateWidetScreenshots.createPanel("Generate Widget screenshots"));
+			
 		}
 		
 		/**
@@ -206,6 +352,49 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 			public String getResultText() {
 				return textField.getText();
 			}
+		}
+	}
+
+	private class SimpleTextField {
+		JTextField textField;
+		
+		public JPanel createPanel(String label, String preferredText) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			
+			panel.add(new JLabel(label));
+			textField = new JTextField("", 30);
+			if(preferredText != null) {
+				textField.setText(preferredText);
+			}
+			panel.add(textField);
+			
+			return panel;
+		}
+		
+		public String getResultText() {
+			return textField.getText();
+		}
+	}
+	
+	private class SimpleCheckBox {
+		JCheckBox checkBox;
+		
+		public JPanel createPanel(String label) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			panel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			
+			checkBox = new JCheckBox();
+			panel.add(new JLabel(label));
+			panel.add(checkBox);
+			
+			return panel;
+		}
+		
+		public boolean isCheckBoxSet() {
+			return checkBox.isSelected();
 		}
 	}
 	
