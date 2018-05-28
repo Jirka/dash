@@ -78,7 +78,11 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, w, h);
 		List<Region> mainRegions = ProcessRegionsUtil.getMainRegions(root); // result rectangles*/
 		
-		//mainRegions = ProcessRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
+		// some regions overlap other
+		mainRegions = ProcessRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
+		
+		// find small regions located in empty spaces and construct main regions from them
+		mainRegions = ProcessRegionsUtil.completeEmptySpaces(mainRegions, root);
 		
 		// create dashboard
 		Dashboard dashboard = new Dashboard();

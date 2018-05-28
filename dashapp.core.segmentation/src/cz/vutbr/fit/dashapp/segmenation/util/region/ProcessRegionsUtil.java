@@ -51,9 +51,24 @@ public class ProcessRegionsUtil {
 		
 		// ------ go through main frames
 		TreeNode<Region> actNode = root;
+		Region sidebar = null;
+		Region topbar = null;
 		List<TreeNode<Region>> children = filterDataNodes(actNode.children, filteredDataNodes);
 		while(children.size() == 1) {
 			actNode = children.get(0);
+			
+			// left sidebar
+			if(actNode.data.x >= 10 && sidebar == null) {
+				sidebar = new Region(0, actNode.data.y, actNode.data.x, actNode.data.height, Region.AMBIGUOUS);
+				mainRegions.add(sidebar);
+			}
+			
+			// top sidebar
+			if(actNode.data.y >= 10 && topbar == null) {
+				topbar = new Region(0, 0, actNode.data.x+actNode.data.width, actNode.data.y, Region.AMBIGUOUS);
+				mainRegions.add(topbar);
+			}
+			
 			children = filterDataNodes(actNode.children, filteredDataNodes);
 		}
 		
@@ -200,17 +215,144 @@ public class ProcessRegionsUtil {
 		return resultRegions;
 	}
 
+	/**
+	 * 
+	 * @param dashboard
+	 * @param intersectRegions - regions that has intersection
+	 * @param resultRegions - regions which will be drawn
+	 */
 	private static void processHighestIntersection(Region dashboard, List<Region> intersectRegions, List<Region> resultRegions) {
 		// find max intersect region
 		Region region1 = intersectRegions.get(0);
+		System.out.println("actual region: " + region1.x + " " + region1.y + " " + region1.width + " " + region1.height);
 		for (Region region : intersectRegions) {
 			if(region.intersects > region1.intersects) {
 				region1 = region;
 			}
 		}
 		
-		// get regions which intersects max intersect region
+		List<Region> actIntersections = getIntersectRegions(region1, intersectRegions);
+		int allIntersectArea = 0;
+		for (Region region : actIntersections) {
+			allIntersectArea += region.tmpIntersectArea;
+		}
+		
+		System.out.println("region area: " + region1.area() + " " + (double) allIntersectArea/region1.area());
+		
+		// filter large region
+		if(!((double) region1.area()/dashboard.area() > 0.5 && (double) allIntersectArea/region1.area() > 0.33)) {
+			// regions that can be joined with region1 
+			List<Region> joinRegions = new ArrayList<>();
+			List<Region> ignore = new ArrayList<>();
+			Region join = new Region(region1.x, region1.y, region1.width, region1.height, Region.JOIN);
+			boolean isJoin = true;
+			while(isJoin) {
+				
+				// get regions which intersects max intersect region
+				actIntersections = getIntersectRegions(region1, intersectRegions);
+				
+				// look for regions that can be joined
+				joinRegions.clear();
+				for (Region region2 : actIntersections) {
+					double share1 = (double) region2.tmpIntersectArea/region1.area();
+					double share2 = (double) region2.tmpIntersectArea/region2.area();
+					if((share1 >= 0.85 && share2 >= 0.85) || 
+						(share1 <= 0.15 && share2 >= 0.85) || 
+						(share2 <= 0.15 && share1 >= 0.85)) {
+						// join
+						join.x = Math.min(join.x, region2.x);
+						join.y = Math.min(join.y, region2.y);
+						join.width = Math.max(join.x+join.width, region2.x+region2.width)-join.x;
+						join.height = Math.max(join.y+join.height, region2.y+region2.height)-join.y;
+						joinRegions.add(region2);
+					}
+				}
+				
+				// join regions
+				isJoin = false;
+				if(!joinRegions.isEmpty()) {
+					// remove join regions from intersetion lists
+					for (Region region2 : joinRegions) {
+						intersectRegions.remove(region2);
+						actIntersections.remove(region2);
+					}
+					// update region 1
+					region1.x = join.x;
+					region1.y = join.y;
+					region1.width = join.width;
+					region1.height = join.height;
+					region1.intersects = actIntersections.size();
+					// we try to look for another join regions
+					isJoin = true;
+				}
+			}
+			
+			actIntersections = getIntersectRegions(region1, intersectRegions);
+			
+			// regions that can be ignored
+			for (Region region2 : actIntersections) {
+				double share1 = (double) region2.tmpIntersectArea/region1.area();
+				double share2 = (double) region2.tmpIntersectArea/region2.area();
+				 if(
+						 //(share1 <= 0.15 && share2 > 0.15 && share2 < 0.85) ||
+						 (share1 <= 0.15 && share2 <= 0.33) ||
+						 (share2 <= 0.15 && share1 <= 0.33)
+					) {
+					ignore.add(region2);
+				}
+			}
+			
+			if(!ignore.isEmpty()) {
+				for (Region region2 : ignore) {
+					actIntersections.remove(region2);
+					// we can't remove them from intersect regions since they might intersect another regions
+				}
+			}
+			
+			if(actIntersections.size() == 0) {
+				resultRegions.add(region1);
+			} else if(actIntersections.size() == 1) {
+				// two region intersection
+				Region region2 = actIntersections.get(0);
+				double share1 = (double) region2.tmpIntersectArea/region1.area();
+				double share2 = (double) region2.tmpIntersectArea/region2.area();
+				
+				// similarity
+				double similarity1 = similarity(region1, resultRegions);
+				double similarityRest = similarity(actIntersections, resultRegions);
+				
+				// one in another
+				if(share1 > 0.95 || share2 > 0.95) {
+					// join 
+					join.x = Math.min(region1.x, region2.x);
+					join.y = Math.min(region1.y, region2.y);
+					join.width = Math.max(region1.x+region1.width, region2.x+region2.width)-join.x;
+					join.height = Math.max(region1.y+region1.height, region2.y+region2.height)-join.y;
+					// check similarity
+					intersectRegions.remove(region2);
+					resultRegions.add(join);
+				} else {
+					resultRegions.add(region1);
+				}
+				
+				// region is hidden in larger region
+			} else if(actIntersections.size() > 1) {
+				// intersection of more regions
+				
+				// big wrong region
+				if(region1.area() > dashboard.area()*0.25 || region1.width > dashboard.width*0.8 || region1.height > dashboard.height*0.8) {
+					intersectRegions.remove(region1);
+					return;
+				}
+			}
+		}
+		
+		intersectRegions.remove(region1);
+	}
+
+	private static List<Region> getIntersectRegions(Region region1, List<Region> intersectRegions) {
 		List<Region> actIntersections = new ArrayList<>();
+		
 		for (Region region : intersectRegions) {
 			if(region != region1) {
 				if(region1.intersects(region)) {
@@ -221,72 +363,7 @@ public class ProcessRegionsUtil {
 				}
 			}
 		}
-		
-		// similar regions
-		List<Region> similar = new ArrayList<>();
-		Region join = new Region(region1.x, region1.y, region1.width, region1.height, Region.JOIN);
-		for (Region region2 : actIntersections) {
-			double share1 = (double) region2.tmpIntersectArea/region1.area();
-			double share2 = (double) region2.tmpIntersectArea/region2.area();
-			if(share1 > 0.90 && share2 > 0.90) {
-				// join
-				join.x = Math.min(join.x, region2.x);
-				join.y = Math.min(join.y, region2.y);
-				join.width = Math.max(join.x+join.width, region2.x+region2.width)-join.x;
-				join.height = Math.max(join.y+join.height, region2.y+region2.height)-join.y;
-				similar.add(region2);
-			}
-		}
-		
-		if(!similar.isEmpty()) {
-			for (Region region2 : similar) {
-				intersectRegions.remove(region2);
-				actIntersections.remove(region2);
-			}
-			intersectRegions.remove(region1);
-			region1 = join;
-			region1.intersects = actIntersections.size();
-			intersectRegions.add(region1);
-		}
-		
-		if(actIntersections.size() == 0) {
-			resultRegions.add(region1);
-		} else if(actIntersections.size() == 1) {
-			// two region intersection
-			Region region2 = actIntersections.get(0);
-			double share1 = (double) region2.tmpIntersectArea/region1.area();
-			double share2 = (double) region2.tmpIntersectArea/region2.area();
-			
-			// similarity
-			double similarity1 = similarity(region1, resultRegions);
-			double similarityRest = similarity(actIntersections, resultRegions);
-			
-			// one in another
-			if(share1 > 0.95 || share2 > 0.95) {
-				// join 
-				join.x = Math.min(region1.x, region2.x);
-				join.y = Math.min(region1.y, region2.y);
-				join.width = Math.max(region1.x+region1.width, region2.x+region2.width)-join.x;
-				join.height = Math.max(region1.y+region1.height, region2.y+region2.height)-join.y;
-				// check similarity
-				intersectRegions.remove(region2);
-				resultRegions.add(join);
-			} else {
-				resultRegions.add(region1);
-			}
-			
-			// region is hidden in larger region
-		} else if(actIntersections.size() > 1) {
-			// intersection of more regions
-			
-			// big wrong region
-			if(region1.area() > dashboard.area()*0.25 || region1.width > dashboard.width*0.8 || region1.height > dashboard.height*0.8) {
-				intersectRegions.remove(region1);
-				return;
-			}
-		}
-		
-		intersectRegions.remove(region1);
+		return actIntersections;
 	}
 
 	private static double similarity(List<Region> actIntersections, List<Region> resultRegions) {
@@ -307,6 +384,57 @@ public class ProcessRegionsUtil {
 			rank = rank + (Math.abs(region.y-resultRegion.y) < 2 ? 1 : 0);
 		}
 		return (double) rank/(8*resultRegions.size());
+	}
+
+	public static List<Region> completeEmptySpaces(List<Region> mainRegions, TreeNode<Region> root) {
+		
+		int matrix[][] = GrayMatrix.newMatrix(root.data.width, root.data.height, 0);
+		
+		// print main regions
+		for (Region region : mainRegions) {
+			GrayMatrix.drawRectangle(matrix, region, -1, false);
+		}
+		
+		// get candidate nodes
+		List<TreeNode<Region>> candidateNodes = new ArrayList<>(); 
+		processEmptySpaceNodes(root, matrix, candidateNodes);
+		
+		// analyze intersections of candidate nodes
+		
+		// filter candidate nodes
+		
+		for (TreeNode<Region> treeNode : candidateNodes) {
+			mainRegions.add(treeNode.data);
+		}
+		
+		return mainRegions;
+	}
+
+	private static void processEmptySpaceNodes(TreeNode<Region> node, int[][] matrix, List<TreeNode<Region>> candidateNodes) {
+		if(intersectsMainRegions(node.data, matrix)) {
+			for (TreeNode<Region> child : node.children) {
+				processEmptySpaceNodes(child, matrix, candidateNodes);
+			}
+		} else {
+			candidateNodes.add(node);
+		}
+	}
+
+	private static boolean intersectsMainRegions(Region region, int[][] matrix) {
+		int x1 = region.x;
+		int x2 = region.x+region.width;
+		int y1 = region.y;
+		int y2 = region.y+region.height;
+		
+		for (int i = x1; i < x2; i++) {
+			for (int j = y1; j < y2; j++) {
+				if(matrix[i][j] == -1) {
+					return true;
+				}
+			}
+			
+		}
+		return false;
 	}
 
 }
