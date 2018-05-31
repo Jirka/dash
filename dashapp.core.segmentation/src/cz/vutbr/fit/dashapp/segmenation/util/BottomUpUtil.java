@@ -14,12 +14,25 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class BottomUpUtil {
 
+	/**
+	 * Method sets matrix to given values.
+	 * 
+	 * @param matrix
+	 * @param value
+	 */
 	public static void setArray(int[][] matrix, int value) {
 		int w = MatrixUtils.width(matrix);
 		for (int i = 0; i < w; i++)
 			Arrays.fill(matrix[i], value);
 	}
 	
+	/**
+	 * Method calculates the % of black pixels in matrix.
+	 * 
+	 * @param matrix
+	 * @param w
+	 * @param h
+	 */
 	public static float averageMatrix(int[][] matrix, int w, int h) {
 		float avg = 0;
 		for (int i = 0; i < w; i++)
@@ -30,7 +43,14 @@ public class BottomUpUtil {
 		return avg;
 	}
 	
-	
+	/**
+	 * Method compare two matrices if they are different.
+	 * 
+	 * @param matrix1
+	 * @param matrix2
+	 * @param w
+	 * @param h
+	 */	
 	public static boolean differentMatrices(int[][] matrix1, int[][] matrix2, int w, int h) {
 		boolean differ = false;
 		for (int i = 0; i < w; i++) {
@@ -43,126 +63,15 @@ public class BottomUpUtil {
 		}
 		return differ;
 	}
-
-	private static List<Region> reDrawRows(List<List<Region>> inRegionList, int limit, char direction, int w, int h) {
-		List<Region> outRegionList = new ArrayList<>();
-		for (int o = 0; o < inRegionList.size(); o++) {
-			if (inRegionList.get(o).size() > 1) {
-				int x1, y1, x2, y2;
-				x1 = w;
-				y1 = h;
-				x2 = y2 = 0;
-				int first = 0;
-
-				List<Region> currentList = inRegionList.get(o);
-				for (int r = 1; r < currentList.size(); r++) {
-					if (direction == 'h' && ((currentList.get(r).x
-							- ((currentList.get(r - 1).x + currentList.get(r - 1).width)) < limit)
-							&& r != currentList.size() - 1)) {
-						continue;
-					} else if (direction == 'v' && ((currentList.get(r).y
-							- ((currentList.get(r - 1).y + currentList.get(r - 1).height)) < limit)
-							&& r != currentList.size() - 1)) {
-						continue;
-					} else {
-						if (r - 1 == first) {
-							outRegionList.add(new Region(currentList.get(r - 1).x, currentList.get(r - 1).y,
-									currentList.get(r - 1).width, currentList.get(r - 1).height, 0));
-							if (r == currentList.size() - 1) {
-								outRegionList.add(new Region(currentList.get(r).x, currentList.get(r).y,
-										currentList.get(r).width, currentList.get(r).height, 0));
-								continue;
-							}
-							first = r;
-						} else {
-							x1 = w;
-							y1 = h;
-							x2 = y2 = 0;
-							for (int u = first; u < r; u++) {
-								x1 = currentList.get(u).x < x1 ? currentList.get(u).x : x1;
-								y1 = currentList.get(u).y < y1 ? currentList.get(u).y : y1;
-								x2 = currentList.get(u).x + currentList.get(u).width > x2
-										? currentList.get(u).x + currentList.get(u).width
-										: x2;
-								y2 = currentList.get(u).y + currentList.get(u).height > y2
-										? currentList.get(u).y + currentList.get(u).height
-										: y2;
-							}
-							outRegionList.add(new Region(x1, y1, x2 - x1, y2 - y1, 0));
-							first = r;
-						}
-					}
-				}
-			}
-		}
-		return outRegionList;
-	}
-
-	private static int getLimit(List<List<Region>> inRegionList, char direction, int w, int h) {
-		int limit, count;
-		limit = count = 0;
-		for (int i = 0; i < inRegionList.size(); i++) {
-			if (inRegionList.get(i).size() > 1) {
-				List<Region> currentList = inRegionList.get(i);
-				for (int j = 1; j < currentList.size(); j++) {
-					int diff = 0;
-					if (direction == 'h')
-						diff = currentList.get(j).x - (currentList.get(j - 1).x + currentList.get(j - 1).width);
-					if (direction == 'v')
-						diff = currentList.get(j).y - (currentList.get(j - 1).y + currentList.get(j - 1).height);
-					if (diff > 0 && ((direction == 'h' && diff < w * 0.3) || (direction == 'v' && diff < h * 0.3))) {
-						limit += diff;
-						count++;
-					}
-				}
-			}
-		}
-		if (count == 0)
-			return 0;
-		limit = limit / count;
-		if (direction == 'v')
-			limit *= 0.5;
-		if (direction == 'h')
-			limit *= 0.5;
-		return limit;
-	}
-
-	private static List<List<Region>> sortDoubleList(List<List<Region>> inRegionDoubleList, char direction) {
-		List<List<Region>> outRegionDoubleList = new ArrayList<List<Region>>();
-		int[] tmpSortArray;
-
-		for (int i = 0; i < inRegionDoubleList.size(); i++) {
-			tmpSortArray = new int[inRegionDoubleList.get(i).size()];
-			for (int j = 0; j < inRegionDoubleList.get(i).size(); j++) {
-				if (direction == 'h')
-					tmpSortArray[j] = inRegionDoubleList.get(i).get(j).x;
-				if (direction == 'v')
-					tmpSortArray[j] = inRegionDoubleList.get(i).get(j).y;
-			}
-			Arrays.sort(tmpSortArray);
-			List<Region> tmpSortedRegionList = new ArrayList<>();
-			for (int j = 0; j < inRegionDoubleList.get(i).size(); j++) {
-				for (int f = 0; f < inRegionDoubleList.get(i).size(); f++) {
-					if (direction == 'h')
-						if (tmpSortArray[j] == inRegionDoubleList.get(i).get(f).x) {
-							tmpSortedRegionList.add(new Region(inRegionDoubleList.get(i).get(f).x, inRegionDoubleList.get(i).get(f).y,
-									inRegionDoubleList.get(i).get(f).width, inRegionDoubleList.get(i).get(f).height, 0));
-							break;
-						}
-					if (direction == 'v')
-						if (tmpSortArray[j] == inRegionDoubleList.get(i).get(f).y) {
-							tmpSortedRegionList.add(new Region(inRegionDoubleList.get(i).get(f).x, inRegionDoubleList.get(i).get(f).y,
-									inRegionDoubleList.get(i).get(f).width, inRegionDoubleList.get(i).get(f).height, 0));
-							break;
-						}
-				}
-			}
-			outRegionDoubleList.add(tmpSortedRegionList);
-		}
-		return outRegionDoubleList;
-	}
-
-	public static int[][] JoinColumns(int[][] matrix, int w, int h) {
+	
+	/**
+	 * Method creates list of potentially joinable regions beneath each other and according
+	 * to the calculated threshold joins them to one region or leaves them separated.
+	 * @param matrix
+	 * @param w
+	 * @param h
+	 */	
+	public static int[][] joinColumns(int[][] matrix, int w, int h) {
 		List<Region> regions = getRegions(matrix, w, h);
 		List<List<Region>> regionDoubleListTop = new ArrayList<List<Region>>();
 		List<List<Region>> regionDoubleListBottom = new ArrayList<List<Region>>();
@@ -217,8 +126,8 @@ public class BottomUpUtil {
 		int limitTop = getLimit(regionDoubleListTop, 'v', w, h);
 		int limitBottom = getLimit(regionDoubleListBottom, 'v', w, h);
 
-		List<Region> tmpRegionListTop = reDrawRows(regionDoubleListTop, limitTop, 'v', w, h);
-		List<Region> tmpRegionListBottom = reDrawRows(regionDoubleListBottom, limitBottom, 'v', w, h);
+		List<Region> tmpRegionListTop = reDrawRowsOrColumns(regionDoubleListTop, limitTop, 'v', w, h);
+		List<Region> tmpRegionListBottom = reDrawRowsOrColumns(regionDoubleListBottom, limitBottom, 'v', w, h);
 
 		for (int x = 0; x < tmpRegionListTop.size(); x++)
 			for (int i = 0; i < tmpRegionListTop.get(x).getWidth(); i++) {
@@ -239,6 +148,13 @@ public class BottomUpUtil {
 		return matrix;
 	}
 
+	/**
+	 * Method creates list of potentially joinable regions beside each other and according
+	 * to the calculated threshold joins them to one region or leaves them separated.
+	 * @param matrix
+	 * @param w
+	 * @param h
+	 */	
 	public static int[][] joinRows(int[][] matrix, int w, int h) {
 		List<Region> regions = getRegions(matrix, w, h);
 		List<List<Region>> regionDoubleListTop = new ArrayList<List<Region>>();
@@ -294,8 +210,8 @@ public class BottomUpUtil {
 		int limitTop = getLimit(regionDoubleListTop, 'h', w, h);
 		int limitBottom = getLimit(regionDoubleListBottom, 'h', w, h);
 
-		List<Region> tmpRegionListTop = reDrawRows(regionDoubleListTop, limitTop, 'h', w, h);
-		List<Region> tmpRegionListBottom = reDrawRows(regionDoubleListBottom, limitBottom, 'h', w, h);
+		List<Region> tmpRegionListTop = reDrawRowsOrColumns(regionDoubleListTop, limitTop, 'h', w, h);
+		List<Region> tmpRegionListBottom = reDrawRowsOrColumns(regionDoubleListBottom, limitBottom, 'h', w, h);
 
 		for (int x = 0; x < tmpRegionListTop.size(); x++)
 			for (int i = 0; i < tmpRegionListTop.get(x).getWidth(); i++) {
@@ -316,6 +232,12 @@ public class BottomUpUtil {
 		return matrix;
 	}
 
+	/**
+	 * Method creates a list of Regions from the matrix.
+	 * @param matrix
+	 * @param w
+	 * @param h
+	 */	
 	public static List<Region> getRegions(int[][] matrix, int w, int h) {
 		List<Region> outRegions = new ArrayList<>();
 		int[][] matrixCopy = new int[w][h];
@@ -359,6 +281,15 @@ public class BottomUpUtil {
 		return outRegions;
 	}
 
+	/**
+	 * Method tries to connect as many regions as possible according to the max distance limit.
+	 * @param regions
+	 * @param inMatrix
+	 * @param hMaxLineSize
+	 * @param vMaxLineSize
+	 * @param w
+	 * @param h
+	 */	
 	public static int[][] connectSmallRegions(List<Region> regions, int[][] inMatrix, int hMaxLineSize,
 			int vMaxLineSize, int w, int h) {
 		int[][] outMatrix = new int[w][h];
@@ -446,6 +377,10 @@ public class BottomUpUtil {
 		return outMatrix;
 	}
 
+	/**
+	 * Method calculates the minimum rectangle size for final regions.
+	 * @param regions
+	 */	
 	public static int getMinRegionSize(List<Region> regions) {
 		if (regions.size() == 0)
 			return 0;
@@ -463,6 +398,14 @@ public class BottomUpUtil {
 		return minRegionSize;
 	}
 
+	/**
+	 * Method connects rectangles closer than a given limit.
+	 * @param inMatrix
+	 * @param hMaxLineSize
+	 * @param vMaxLineSize
+	 * @param w
+	 * @param h
+	 */	
 	public static int[][] reDrawRectangles(int[][] inMatrix, int hMaxLineSize, int vMaxLineSize, int w, int h) {
 		List<Region> regions = getRegions(inMatrix, w, h);
 		int[][] outMatrix = new int[w][h];
@@ -547,7 +490,14 @@ public class BottomUpUtil {
 
 	}
 
-	public static void getTreshold(int[][] rawMatrix, int[] outArray, int w, int h) {
+	/**
+	 * Method calculates max horizontal and vertical distance between joinable rectangles.
+	 * @param inMatrix
+	 * @param outArray
+	 * @param w
+	 * @param h
+	 */	
+	public static void getTreshold(int[][] inMatrix, int[] outArray, int w, int h) {
 		int hMaxLineSize = 0;
 		int vMaxLineSize = 0;
 		{
@@ -555,9 +505,9 @@ public class BottomUpUtil {
 			for (int i = 0; i < h; i++) {
 				for (int j = 0; j < w; j++) {
 
-					if (rawMatrix[j][i] == 255) {
+					if (inMatrix[j][i] == 255) {
 						int tmp = 1;
-						while ((j + tmp) < w && rawMatrix[j + tmp][i] == 255) {
+						while ((j + tmp) < w && inMatrix[j + tmp][i] == 255) {
 							tmp++;
 						}
 						if (tmp == w)
@@ -590,9 +540,9 @@ public class BottomUpUtil {
 			for (int j = 0; j < w; j++) {
 				for (int i = 0; i < h; i++) {
 
-					if (rawMatrix[j][i] == 255) {
+					if (inMatrix[j][i] == 255) {
 						int tmp = 1;
-						while ((i + tmp) < h && rawMatrix[j][i + tmp] == 255) {
+						while ((i + tmp) < h && inMatrix[j][i + tmp] == 255) {
 							tmp++;
 						}
 						if (tmp == h)
@@ -623,11 +573,155 @@ public class BottomUpUtil {
 		outArray[1] = vMaxLineSize;
 	}
 
-	// Reuse of GrayMatrix.createRectangles(matrix, createNew) with different limitations
+	/**
+	 * Method sorts List of regions contained in List according to their
+	 * x or y coordinate.
+	 * @param inRegionDoubleList
+	 * @param direction
+	 */	
+	private static List<List<Region>> sortDoubleList(List<List<Region>> inRegionDoubleList, char direction) {
+		List<List<Region>> outRegionDoubleList = new ArrayList<List<Region>>();
+		int[] tmpSortArray;
+	
+		for (int i = 0; i < inRegionDoubleList.size(); i++) {
+			tmpSortArray = new int[inRegionDoubleList.get(i).size()];
+			for (int j = 0; j < inRegionDoubleList.get(i).size(); j++) {
+				if (direction == 'h')
+					tmpSortArray[j] = inRegionDoubleList.get(i).get(j).x;
+				if (direction == 'v')
+					tmpSortArray[j] = inRegionDoubleList.get(i).get(j).y;
+			}
+			Arrays.sort(tmpSortArray);
+			List<Region> tmpSortedRegionList = new ArrayList<>();
+			for (int j = 0; j < inRegionDoubleList.get(i).size(); j++) {
+				for (int f = 0; f < inRegionDoubleList.get(i).size(); f++) {
+					if (direction == 'h')
+						if (tmpSortArray[j] == inRegionDoubleList.get(i).get(f).x) {
+							tmpSortedRegionList.add(new Region(inRegionDoubleList.get(i).get(f).x, inRegionDoubleList.get(i).get(f).y,
+									inRegionDoubleList.get(i).get(f).width, inRegionDoubleList.get(i).get(f).height, 0));
+							break;
+						}
+					if (direction == 'v')
+						if (tmpSortArray[j] == inRegionDoubleList.get(i).get(f).y) {
+							tmpSortedRegionList.add(new Region(inRegionDoubleList.get(i).get(f).x, inRegionDoubleList.get(i).get(f).y,
+									inRegionDoubleList.get(i).get(f).width, inRegionDoubleList.get(i).get(f).height, 0));
+							break;
+						}
+				}
+			}
+			outRegionDoubleList.add(tmpSortedRegionList);
+		}
+		return outRegionDoubleList;
+	}
+
+	/**
+	 * Method connects regions in a rows or columns, according to the direction
+	 *  give, if the distance is smaller than the limit.
+	 * @param inRegionList
+	 * @param limit
+	 * @param direction
+ 	 * @param w
+	 * @param h
+	 */	
+	private static List<Region> reDrawRowsOrColumns(List<List<Region>> inRegionList, int limit, char direction, int w, int h) {
+		List<Region> outRegionList = new ArrayList<>();
+		for (int o = 0; o < inRegionList.size(); o++) {
+			if (inRegionList.get(o).size() > 1) {
+				int x1, y1, x2, y2;
+				x1 = w;
+				y1 = h;
+				x2 = y2 = 0;
+				int first = 0;
+	
+				List<Region> currentList = inRegionList.get(o);
+				for (int r = 1; r < currentList.size(); r++) {
+					if (direction == 'h' && ((currentList.get(r).x
+							- ((currentList.get(r - 1).x + currentList.get(r - 1).width)) < limit)
+							&& r != currentList.size() - 1)) {
+						continue;
+					} else if (direction == 'v' && ((currentList.get(r).y
+							- ((currentList.get(r - 1).y + currentList.get(r - 1).height)) < limit)
+							&& r != currentList.size() - 1)) {
+						continue;
+					} else {
+						if (r - 1 == first) {
+							outRegionList.add(new Region(currentList.get(r - 1).x, currentList.get(r - 1).y,
+									currentList.get(r - 1).width, currentList.get(r - 1).height, 0));
+							if (r == currentList.size() - 1) {
+								outRegionList.add(new Region(currentList.get(r).x, currentList.get(r).y,
+										currentList.get(r).width, currentList.get(r).height, 0));
+								continue;
+							}
+							first = r;
+						} else {
+							x1 = w;
+							y1 = h;
+							x2 = y2 = 0;
+							for (int u = first; u < r; u++) {
+								x1 = currentList.get(u).x < x1 ? currentList.get(u).x : x1;
+								y1 = currentList.get(u).y < y1 ? currentList.get(u).y : y1;
+								x2 = currentList.get(u).x + currentList.get(u).width > x2
+										? currentList.get(u).x + currentList.get(u).width
+										: x2;
+								y2 = currentList.get(u).y + currentList.get(u).height > y2
+										? currentList.get(u).y + currentList.get(u).height
+										: y2;
+							}
+							outRegionList.add(new Region(x1, y1, x2 - x1, y2 - y1, 0));
+							first = r;
+						}
+					}
+				}
+			}
+		}
+		return outRegionList;
+	}
+
+	/**
+	 * Method calculates limit of distance between rows and columns
+	 * according to the direction given.
+	 * @param inRegionList
+	 * @param direction
+ 	 * @param w
+	 * @param h
+	 */	
+	private static int getLimit(List<List<Region>> inRegionList, char direction, int w, int h) {
+		int limit, count;
+		limit = count = 0;
+		for (int i = 0; i < inRegionList.size(); i++) {
+			if (inRegionList.get(i).size() > 1) {
+				List<Region> currentList = inRegionList.get(i);
+				for (int j = 1; j < currentList.size(); j++) {
+					int diff = 0;
+					if (direction == 'h')
+						diff = currentList.get(j).x - (currentList.get(j - 1).x + currentList.get(j - 1).width);
+					if (direction == 'v')
+						diff = currentList.get(j).y - (currentList.get(j - 1).y + currentList.get(j - 1).height);
+					if (diff > 0 && ((direction == 'h' && diff < w * 0.3) || (direction == 'v' && diff < h * 0.3))) {
+						limit += diff;
+						count++;
+					}
+				}
+			}
+		}
+		if (count == 0)
+			return 0;
+		limit = limit / count;
+		if (direction == 'v')
+			limit *= 0.5;
+		if (direction == 'h')
+			limit *= 0.5;
+		return limit;
+	}
+
+	/**
+	 * Reuse of GrayMatrix.createRectangles(matrix, createNew) with different limitations.
+	 * @param matrix
+	 */
 	public static int[][] createRectangles(int[][] matrix) {
 		int w = MatrixUtils.width(matrix);
 		int h = MatrixUtils.height(matrix);
-
+	
 		// process matrix
 		int color = -1;
 		for (int i = 0; i < w; i++) {
@@ -638,7 +732,7 @@ public class BottomUpUtil {
 				}
 			}
 		}
-
+	
 		// convert colors to black
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
@@ -647,7 +741,7 @@ public class BottomUpUtil {
 				}
 			}
 		}
-
+	
 		return matrix;
 	}
 

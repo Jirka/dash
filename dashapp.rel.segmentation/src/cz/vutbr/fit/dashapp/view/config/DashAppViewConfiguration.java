@@ -30,8 +30,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
 	@Override
 	public String getDefaultWorkspacePath() {
-//		return super.getDefaultWorkspacePath() + "/research/widget-based/gen/all/segmentation/color";
-		return "/home/santi/DP/Dashboard-pics/";
+		return super.getDefaultWorkspacePath(); 
 	}
 	
 	/**
