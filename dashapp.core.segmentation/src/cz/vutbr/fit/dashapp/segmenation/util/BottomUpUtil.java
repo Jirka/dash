@@ -296,7 +296,7 @@ public class BottomUpUtil {
 		setArray(outMatrix, 255);
 
 		int diff;
-
+		// Search every direction for the closest Region. Note: "regions" contains only the small regions.
 		for (int i = 0; i < regions.size(); i++) {
 			diff = w > h ? w : h;
 			int tmpX, tmpY, dirrection; // direction == 0 V dirrection == 1 H
@@ -356,7 +356,8 @@ public class BottomUpUtil {
 					dirrection = 1;
 				}
 			}
-
+			// If the region should be connected to a bigger one, it is enlarged in the given direction.
+			// Later the createRectangle function will form them into 1 region.
 			if (diff <= ((dirrection == 1) ? hMaxLineSize * 3 : vMaxLineSize * 3)) {
 				int newX, newY, newW, newH;
 				newX = regions.get(i).x < tmpX ? regions.get(i).x : tmpX;
@@ -634,7 +635,10 @@ public class BottomUpUtil {
 				int first = 0;
 	
 				List<Region> currentList = inRegionList.get(o);
+				// While the distance between the 2 regions next to each other is smaller than the limit
+				// go to the next. (Find "first" to "current" sequence of regions to join).
 				for (int r = 1; r < currentList.size(); r++) {
+					// If r == currentList.size() - 1 don't search further, but join the found sequence.
 					if (direction == 'h' && ((currentList.get(r).x
 							- ((currentList.get(r - 1).x + currentList.get(r - 1).width)) < limit)
 							&& r != currentList.size() - 1)) {
@@ -643,7 +647,12 @@ public class BottomUpUtil {
 							- ((currentList.get(r - 1).y + currentList.get(r - 1).height)) < limit)
 							&& r != currentList.size() - 1)) {
 						continue;
-					} else {
+					}
+					// The distance between the last two regions checked were bigger than limit, or
+					// it is the end of the list.
+					else {
+						// Check if the r - 1 region equals to "first", which means there is no sequence
+						// to add, only the r-1. In case the current region is the last one, add it to the return list.
 						if (r - 1 == first) {
 							outRegionList.add(new Region(currentList.get(r - 1).x, currentList.get(r - 1).y,
 									currentList.get(r - 1).width, currentList.get(r - 1).height, 0));
@@ -653,10 +662,13 @@ public class BottomUpUtil {
 								continue;
 							}
 							first = r;
-						} else {
+						}
+						// Compute x, y, width and height of the new region. first = r <- start a new search
+						else {
 							x1 = w;
 							y1 = h;
 							x2 = y2 = 0;
+							// TODO check if r is the last region, and if its part of the sequence.
 							for (int u = first; u < r; u++) {
 								x1 = currentList.get(u).x < x1 ? currentList.get(u).x : x1;
 								y1 = currentList.get(u).y < y1 ? currentList.get(u).y : y1;
