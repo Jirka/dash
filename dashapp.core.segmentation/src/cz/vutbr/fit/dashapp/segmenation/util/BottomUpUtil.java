@@ -506,21 +506,27 @@ public class BottomUpUtil {
 	public static void getTreshold(int[][] inMatrix, int[] outArray, int w, int h) {
 		int hMaxLineSize = 0;
 		int vMaxLineSize = 0;
+		//	horizontal
 		{
 			int[] tmpLongest = new int[w];
+			//	loop trough whole image
 			for (int i = 0; i < h; i++) {
 				for (int j = 0; j < w; j++) {
-
+					//	find first white pixel
 					if (inMatrix[j][i] == 255) {
 						int tmp = 1;
+						//	count the consecutive white pixels
 						while ((j + tmp) < w && inMatrix[j + tmp][i] == 255) {
 							tmp++;
 						}
+						//	leave out the distance between last black pixel and end of image
+						//	TODO should have tested for the first sequence before the first black pixel
 						if (tmp == w)
 							continue;
+						//	use the distance between two black pixels as index in the histogram
+						//	and increase it by 1
 						tmpLongest[tmp] += 1;
 						j += tmp;
-						hMaxLineSize++;
 					}
 
 				}
@@ -530,17 +536,20 @@ public class BottomUpUtil {
 			float[] avgr = new float[w];
 			for (int i = 0; i < w; i++) {
 				tmp += (tmpLongest[i]);
+				//	compute average of previous values up to "i" in the histogram
 				avgr[i] = (float) tmp / (float) (i + 1);
 			}
 			tmp = 0;
-
+			//	find the first decrease in the histogram
 			for (int i = 0; i < w; i++) {
 				if (avgr[tmp] < avgr[i])
 					tmp = i;
 			}
+			//	in case the threshold is too small
 			hMaxLineSize = tmp < 4 ? 4 : tmp;
 		}
 
+		//	vertical
 		{
 			int[] tmpLongest = new int[h];
 			for (int j = 0; j < w; j++) {
@@ -555,7 +564,6 @@ public class BottomUpUtil {
 							continue;
 						tmpLongest[tmp] += 1;
 						i += tmp;
-						vMaxLineSize++;
 					}
 
 				}
