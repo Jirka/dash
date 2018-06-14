@@ -15,6 +15,7 @@ import cz.vutbr.fit.dashapp.segmenation.XYCut2;
 import cz.vutbr.fit.dashapp.segmenation.XYCut4;
 import cz.vutbr.fit.dashapp.segmenation.XYCutFinal;
 import cz.vutbr.fit.dashapp.segmenation.BottomUp;
+import cz.vutbr.fit.dashapp.segmenation.BottomUpRefactorized;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationAlgorithm1;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
@@ -35,6 +36,7 @@ public class SegmentationTool extends AbstractGUITool implements IGUITool {
 	private static XYCut4 xyCutAlg4;
 	private static XYCutFinal xyCutAlgFinal;
 	private static BottomUp _BottomUp;
+	private static BottomUpRefactorized _BottomUpRefactorized;
 	
 	private static final ISegmentationAlgorithm[] ALGORITHMS = new ISegmentationAlgorithm[] {
 			new SegmentationAlgorithm1(),
@@ -44,6 +46,7 @@ public class SegmentationTool extends AbstractGUITool implements IGUITool {
 			xyCutAlg4 = new XYCut4(),
 			xyCutAlgFinal = new XYCutFinal(),
 			_BottomUp = new BottomUp(),
+			_BottomUpRefactorized = new BottomUpRefactorized(),
 	};
 	
 	@Override
@@ -55,7 +58,9 @@ public class SegmentationTool extends AbstractGUITool implements IGUITool {
 		toolbar.addButton("XY-cut 2", "/icons/Application form.png", new SegmentationAction(xyCutAlg2), 0);
 		toolbar.addButton("XY-cut 4", "/icons/Application form.png", new SegmentationAction(xyCutAlg4), 0);
 		toolbar.addButton("XY-cut final", "/icons/Application form.png", new SegmentationAction(xyCutAlgFinal), 0);
+		toolbar.addSeparator();
 		toolbar.addButton("BottomUp", "/icons/Application form.png", new SegmentationAction(_BottomUp), 0);
+		toolbar.addButton("BottomUpRefactorized", "/icons/Application form.png", new SegmentationAction(_BottomUpRefactorized), 0);
 	}
 	
 	@Override

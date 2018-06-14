@@ -23,7 +23,7 @@ public class FrequentValuesThresholdUtil {
 		int[][] frequentColorMatrix = new int[w][h];
 		GrayMatrix.clearMatrix(frequentColorMatrix, GrayMatrix.BLACK);
 		for (Integer frequentValue : frequentValues) {
-			GrayMatrix.copyPixels(frequentColorMatrix, matrix, frequentValue, (int) actColor);
+			MatrixUtils.copyPixels(frequentColorMatrix, matrix, frequentValue, (int) actColor);
 			actColor-=colorInterval;
 		}
 		

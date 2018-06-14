@@ -41,7 +41,7 @@ public class FindSameColorRegionsUtils {
 		final int mH = MatrixUtils.height(matrix);
 		
 		// working copy
-		int[][] workingCopy = GrayMatrix.copy(matrix);
+		int[][] workingCopy = MatrixUtils.copy(matrix);
 		int[][] edgesMatrix = GrayMatrix.inverse(GrayMatrix.edges(matrix), false);
 		
 		// debug

@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.vutbr.fit.dashapp.image.floodfill.SimpleRectangleFloodFill;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.Dashboard;
@@ -55,8 +56,8 @@ public class XYCut extends AbstractSegmentationAlgorithm implements ISegmentatio
 		GrayMatrix.inverse(edgesMatrix, false);
 		debug("edges matrix", GrayMatrix.printMatrixToImage(null, edgesMatrix));
 		
-		GrayMatrix.createRectangles(rawMatrix, false);
-		GrayMatrix.createRectangles(rawMatrix, false);
+		new SimpleRectangleFloodFill(rawMatrix, false, GrayMatrix.BLACK).process();
+		new SimpleRectangleFloodFill(rawMatrix, false, GrayMatrix.BLACK).process();
 		debug("rectangles", GrayMatrix.printMatrixToImage(null, rawMatrix));
 		
 		List<Rectangle> rectangles = new ArrayList<>(); // result rectangles

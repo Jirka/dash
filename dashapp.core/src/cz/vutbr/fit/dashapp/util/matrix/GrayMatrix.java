@@ -1,11 +1,8 @@
 package cz.vutbr.fit.dashapp.util.matrix;
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
 
@@ -76,166 +73,6 @@ public class GrayMatrix {
 			}
 		}
 		return resultMatrix;
-	}
-	
-	public static int[][] copy(int[][] matrix) {				
-		return copy(new int[MatrixUtils.width(matrix)][MatrixUtils.height(matrix)], matrix);
-	}
-	
-	public static int[][] copy(int[][] to, int[][] from) {
-		int mW = Math.min(to.length, from.length);
-		int mH = Math.min(to[0].length, from[0].length);
-		
-		for (int x = 0; x < mW; x++) {
-			for (int y = 0; y < mH; y++) {
-				to[x][y] = from[x][y];
-			}
-		}
-		
-		return to;
-	}
-	
-	public static int[][] copy(int[][] to, int[][] from, Rectangle rectangle) {
-		
-		int x1 = rectangle.x;
-		int x2 = rectangle.x+rectangle.width;
-		
-		int y1 = rectangle.y;
-		int y2 = rectangle.y+rectangle.height;
-		
-		for (int x = x1; x < x2; x++) {
-			for (int y = y1; y < y2; y++) {
-				to[x][y] = from[x][y];
-			}
-		}
-		
-		return to;
-	}
-	
-	public static int[][] copyPixels(int[][] to, int[][] from, int x1, int y1, int x2, int y2) {
-		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
-		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
-		
-		x1 = MathUtils.roundInRange(x1, 0, mW_max);
-		x2 = MathUtils.roundInRange(x2, 0, mW_max);
-		y1 = MathUtils.roundInRange(y1, 0, mH_max);
-		y2 = MathUtils.roundInRange(y2, 0, mH_max);
-		
-		for (int x = x1; x < x2; x++) {
-			for (int y = y1; y < y2; y++) {
-				to[x][y] = from[x][y];
-			}
-		}
-		
-		return to;
-	}
-	
-	public static int[][] copyPixels(int[][] to, int[][] from, int copyColor, int drawColor) {
-		int mW_max = Math.max(MatrixUtils.width(to), MatrixUtils.width(from));
-		int mH_max = Math.max(MatrixUtils.height(to), MatrixUtils.height(from));
-		
-		for (int x = 0; x < mW_max; x++) {
-			for (int y = 0; y < mH_max; y++) {
-				if(from[x][y] == copyColor) {
-					if(drawColor == SAME_COLOR) {
-						to[x][y] = from[x][y];
-					} else {
-						to[x][y] = drawColor;
-					}
-				}
-			}
-		}
-		
-		return to;
-	}
-	
-	public static int[][] drawPixels(int[][] matrix, int x1, int y1, int x2, int y2, int color) {
-		int mW = MatrixUtils.width(matrix);
-		int mH = MatrixUtils.height(matrix);
-		
-		x1 = MathUtils.roundInRange(x1, 0, mW);
-		x2 = MathUtils.roundInRange(x2, 0, mW);
-		y1 = MathUtils.roundInRange(y1, 0, mH);
-		y2 = MathUtils.roundInRange(y2, 0, mH);
-		
-		for (int x = x1; x < x2; x++) {
-			for (int y = y1; y < y2; y++) {
-				matrix[x][y] = color;
-			}
-		}
-		
-		return matrix;
-	}
-	
-	public static int[][] drawRectangle(int[][] matrix, Rectangle r, int color, boolean onlyBorders) {
-		int mW = MatrixUtils.width(matrix);
-		int mH = MatrixUtils.height(matrix);
-		
-		int x1 = MathUtils.roundInRange(r.x, 0, mW);
-		int x2 = MathUtils.roundInRange(r.x + r.width, 0, mW);
-		int y1 = MathUtils.roundInRange(r.y, 0, mH);
-		int y2 = MathUtils.roundInRange(r.y + r.height, 0, mH);
-		
-		if(onlyBorders) {
-			// draw rectangle borders
-			boolean x1InRange = MathUtils.isInRange(r.x, 0, mW);
-			boolean x2InRange = MathUtils.isInRange(r.x + r.width, 0, mW);
-			boolean y1InRange = MathUtils.isInRange(r.y, 0, mH);
-			boolean y2InRange = MathUtils.isInRange(r.y + r.height, 0, mH);
-			
-			int x2_last = x2-1;
-			int y2_last = y2-1;
-			
-			//if(y2InRange == false) {
-			//	System.out.println("y2 is not in range");
-			//}
-			
-			// optimization
-			if(y1InRange) {
-				if(y2InRange) {
-					for (int x = x1; x < x2; x++) {
-						matrix[x][y1] = color;
-						matrix[x][y2_last] = color;
-					}
-				} else {
-					for (int x = x1; x < x2; x++) {
-						matrix[x][y1] = color;
-					}
-				}
-			} else if(y2InRange) {
-				for (int x = x1; x < x2; x++) {
-					matrix[x][y2_last] = color;
-				}
-			}
-			
-			if(x1InRange) {
-				if(x2InRange) {
-					for (int y = y1; y < y2; y++) {
-						matrix[x1][y] = color;
-						matrix[x2_last][y] = color;
-					}
-				} else {
-					for (int y = y1; y < y2; y++) {
-						matrix[x1][y] = color;
-						matrix[x2_last][y] = color;
-					}
-				}
-			} else if(x2InRange) {
-				for (int y = y1; y < y2; y++) {
-					matrix[x1][y] = color;
-					matrix[x2_last][y] = color;
-				}
-			}
-		} else {
-			// fill rectangle
-			for (int x = x1; x < x2; x++) {
-				for (int y = y1; y < y2; y++) {
-					matrix[x][y] = color;
-				}
-			}
-		}
-		
-		return matrix;
 	}
 	
 	public static int[][] convolve(int[][] matrix, int[][] filter) {
@@ -316,7 +153,7 @@ public class GrayMatrix {
 		int mW_crop = mW-kernelDepth;
 		int mH_crop = mH-kernelDepth;
 		
-		int resultMatrix[][] = copy(matrix);
+		int resultMatrix[][] = MatrixUtils.copy(matrix);
 		
 		int kernelWidth = kernelDepth*2+1;
 		int middle = (kernelWidth*kernelWidth)/2;
@@ -647,107 +484,7 @@ public class GrayMatrix {
 		return emphasizedMatrix;
 	}
 	
-	/**
-	 * Expects black and white matrix.
-	 * 
-	 * @param matrix
-	 * @param createNew
-	 * @return
-	 */
-	public static int[][] createRectangles(int[][] matrix, boolean createNew) {
-		int mW = MatrixUtils.width(matrix);
-		int mH = MatrixUtils.height(matrix);
-		
-		int rectangleMatrix[][] = matrix;
-		if(createNew) {
-			rectangleMatrix = new int[mW][mH];
-			copy(rectangleMatrix, matrix);
-		}
-		
-		// process matrix
-		int color = -1;
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				if(rectangleMatrix[i][j] != WHITE) {
-					processSeedPixel(i, j, color, rectangleMatrix);
-					color--;
-				}
-			}
-		}
-		
-		// convert colors to black
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				if(rectangleMatrix[i][j] < 0) {
-					rectangleMatrix[i][j] = BLACK;
-				}
-			}
-		}
-		
-		return rectangleMatrix;
-	}
 	
-	private static void processSeedPixel(int i, int j, int color, int[][] matrix) {
-		int mW = MatrixUtils.width(matrix);
-		int mH = MatrixUtils.height(matrix);
-		
-		// do flood fill algorithm
-		Queue<Point> queue = new LinkedList<Point>();
-        queue.add(new Point(i, j));
-        int x1 = i, x2 = i, y1 = j, y2 = j;
-        while (!queue.isEmpty()) {
-            Point p = queue.remove();
-            if ((p.x >= 0) && (p.x < mW) && (p.y >= 0) && (p.y < mH)) {
-                if (matrix[p.x][p.y] == GrayMatrix.BLACK) {
-                	matrix[p.x][p.y] = color;
-                	
-                	// update min/max points 
-                	if(p.x < x1) {
-                		x1 = p.x;
-                	} else if(p.x > x2) {
-                		x2 = p.x;
-                	}
-                	if(p.y < y1) {
-                		y1 = p.y;
-                	} else if(p.y > y2) {
-                		y2 = p.y;
-                	}
-
-                	// add neighbour points
-                    queue.add(new Point(p.x + 1, p.y));
-                    queue.add(new Point(p.x - 1, p.y));
-                    queue.add(new Point(p.x, p.y + 1));
-                    queue.add(new Point(p.x, p.y - 1));
-                    
-                    queue.add(new Point(p.x + 1, p.y + 1));
-                    queue.add(new Point(p.x + 1, p.y - 1));
-                    queue.add(new Point(p.x - 1, p.y + 1));
-                    queue.add(new Point(p.x - 1, p.y - 1));
-                }
-            }
-        }
-        
-        x2++; y2++;
-        
-        // test rectangle size
-        if(x2-x1 > mW/2 && y2-y1 > mH/2) {
-        	// delete area
-           for (int x = 0; x < mW; x++) {
-    			for (int y = 0; y < mH; y++) {
-    				if(matrix[x][y] == color) {
-    					matrix[x][y] = WHITE;
-    				}
-    			}
-    		}
-        } else {
-        	// create rectangle
-            for (int x = x1; x < x2; x++) {
-    			for (int y = y1; y < y2; y++) {
-    				matrix[x][y] = color;
-    			}
-    		}
-        }
-	}
 
 	public static int[][] filterPixels(int[][] matrix, int[][] maskMatrix, boolean createNew) {
 		int mW = Math.min(matrix.length, maskMatrix.length);
@@ -797,7 +534,7 @@ public class GrayMatrix {
 					if(start >= 0) {
 						if(y - start > verticalLineLength) {
 							// draw line
-							copyPixels(lineMatrix, matrix, x, start, x+1, y);
+							MatrixUtils.copyPixels(lineMatrix, matrix, x, start, x+1, y);
 							// only last pixel can be not-white
 							if(matrix[x][y] != WHITE) {
 								lineMatrix[x][y] = matrix[x][y];
@@ -825,7 +562,7 @@ public class GrayMatrix {
 						// long enough
 						if(x - start > horizontalLineLength) {
 							// draw line
-							copyPixels(lineMatrix, matrix, start, y, x, y+1);
+							MatrixUtils.copyPixels(lineMatrix, matrix, start, y, x, y+1);
 							// only last pixel can be not-white
 							if(matrix[x][y] != WHITE) {
 								lineMatrix[x][y] = matrix[x][y];

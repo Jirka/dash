@@ -2,6 +2,8 @@ package cz.vutbr.fit.dashapp.segmenation.util.region;
 
 import java.awt.Rectangle;
 
+import cz.vutbr.fit.dashapp.model.Constants;
+
 public class Region extends Rectangle {
 
 	/**
@@ -66,6 +68,45 @@ public class Region extends Rectangle {
 
 	public int area() {
 		return width*height;
+	}
+
+	public Region copy() {
+		return new Region(x, y, width, height, color);
+	}
+
+	public int p(int dimension) {
+		if(dimension == Constants.X) {
+			return x;
+		} else if(dimension == Constants.Y) {
+			return y;
+		}
+		return -1;
+	}
+	
+	public int size(int dimension) {
+		if(dimension == Constants.X) {
+			return this.width;
+		} else if(dimension == Constants.Y) {
+			return this.height;
+		}
+		return -1;
+	}
+
+	public int x2() {
+		return x+width;
+	}
+	
+	public int y2() {
+		return y+height;
+	}
+	
+	public int p2(int dimension) {
+		if(dimension == Constants.X) {
+			return x2();
+		} else if(dimension == Constants.Y) {
+			return y2();
+		}
+		return -1;
 	}
 
 }

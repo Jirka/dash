@@ -14,6 +14,7 @@ import cz.vutbr.fit.dashapp.segmenation.util.XYCutUtil;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class XYCut2 extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
 	
@@ -49,10 +50,10 @@ public class XYCut2 extends AbstractSegmentationAlgorithm implements ISegmentati
 		debug("lines matrix", GrayMatrix.printMatrixToImage(null, linesMatrix));
 		
 		// ------ Hough Transform to detect lines (experiment)
-		int[][] edgesMatrix2 = GrayMatrix.copy(edgesMatrix); // debug
+		int[][] edgesMatrix2 = MatrixUtils.copy(edgesMatrix); // debug
 		int[][] houghLineMatrix = HoughLineUtil.process(edgesMatrix2, 0.5, 0.5);
 		debug("hough_lines", GrayMatrix.printMatrixToImage(null, houghLineMatrix));
-		debug("hough_lines_edges", GrayMatrix.printMatrixToImage(null, GrayMatrix.copyPixels(GrayMatrix.copy(edgesMatrix), houghLineMatrix, GrayMatrix.BLACK, Color.RED.getRGB())));
+		debug("hough_lines_edges", GrayMatrix.printMatrixToImage(null, MatrixUtils.copyPixels(MatrixUtils.copy(edgesMatrix), houghLineMatrix, GrayMatrix.BLACK, Color.RED.getRGB())));
 		debug("hough_lines_filtered", GrayMatrix.printMatrixToImage(null, GrayMatrix.filterPixels(edgesMatrix, houghLineMatrix, true)));
 		
 		List<Rectangle> rectangles = new ArrayList<>(); // result rectangles

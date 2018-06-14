@@ -5,6 +5,7 @@ import java.util.List;
 import com.tree.TreeNode;
 
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 public class DrawRegionsUtil {
 	
@@ -15,7 +16,7 @@ public class DrawRegionsUtil {
 	 */
 	public static int[][] drawRegions(int[][] matrix, List<Region> regions) {
 		for (Region region : regions) {
-			GrayMatrix.drawRectangle(matrix, region, region.color, true);
+			MatrixUtils.drawRectangle(matrix, region, region.color, true);
 		}
 		return matrix;
 	}
@@ -27,7 +28,19 @@ public class DrawRegionsUtil {
 	 */
 	public static int[][] drawRegions(int[][] matrix, List<Region> regions, int color) {
 		for (Region region : regions) {
-			GrayMatrix.drawRectangle(matrix, region, color, true);
+			MatrixUtils.drawRectangle(matrix, region, color, true);
+		}
+		return matrix;
+	}
+	
+	/**
+	 * 
+	 * @param matrix
+	 * @param regions
+	 */
+	public static int[][] drawRegions(int[][] matrix, List<Region> regions, int color, boolean fill) {
+		for (Region region : regions) {
+			MatrixUtils.drawRectangle(matrix, region, color, !fill);
 		}
 		return matrix;
 	}
@@ -51,15 +64,15 @@ public class DrawRegionsUtil {
 	 */
 	public static int[][] drawRegionType(int[][] matrix, Region region) {
 		if(region.type == Region.R_FILL) {
-			GrayMatrix.drawRectangle(matrix, region, 0, true);
+			MatrixUtils.drawRectangle(matrix, region, 0, true);
 		} else if(region.type == Region.R_MEDIUM) {
-			GrayMatrix.drawRectangle(matrix, region, 0, true);
+			MatrixUtils.drawRectangle(matrix, region, 0, true);
 		} else if(region.type == Region.R_BORDER) {
-			GrayMatrix.drawRectangle(matrix, region, 0, true);
+			MatrixUtils.drawRectangle(matrix, region, 0, true);
 		} else if(region.type == Region.DATA) {
-			GrayMatrix.drawRectangle(matrix, region, 225, true);
+			MatrixUtils.drawRectangle(matrix, region, 225, true);
 		} else {
-			GrayMatrix.drawRectangle(matrix, region, 125, true);
+			MatrixUtils.drawRectangle(matrix, region, 125, true);
 		}
 		return matrix;
 	}

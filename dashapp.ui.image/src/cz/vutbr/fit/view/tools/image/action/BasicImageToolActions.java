@@ -2,6 +2,7 @@ package cz.vutbr.fit.view.tools.image.action;
 
 import java.awt.image.BufferedImage;
 
+import cz.vutbr.fit.dashapp.image.floodfill.SimpleRectangleFloodFill;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
@@ -237,7 +238,7 @@ public class BasicImageToolActions {
 		@Override
 		protected BufferedImage processImage(int[][] matrix) {
 			ColorMatrix.toGrayScale(matrix, true, false);
-			matrix = GrayMatrix.createRectangles(matrix, false);
+			new SimpleRectangleFloodFill(matrix, false, GrayMatrix.BLACK).process();
 			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}

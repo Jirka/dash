@@ -37,7 +37,7 @@ public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgo
 		}
 	}
 	
-	protected void debug(String name, BufferedImage image) {
+	public void debug(String name, BufferedImage image) {
 		if(debugMode == DebugMode.INTERACTIVE) {
 			new ImagePreview(image, name).openWindow(800,600,0.8);
 		} else if(debugMode == DebugMode.SILENT) {

@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.tree.TreeNode;
 
-import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.segmenation.util.EmphasizeSameColorsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FilterGradientsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FindFrequentValuesUtil;
@@ -20,7 +19,6 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import cz.vutbr.fit.view.tools.image.AbstractImageToolAction;
-import tmp.Histogram;
 
 public class SegmentationImageToolActions {
 	
@@ -205,7 +203,7 @@ public class SegmentationImageToolActions {
 			double scaleH = askForDouble("min vertical length share", "Minimal vertical length share", 0.5);
 			ColorMatrix.toGrayScale(matrix, true, false);
 			int[][] houghLineMatrix = HoughLineUtil.process(matrix, scaleW, scaleH);
-			GrayMatrix.copyPixels(matrix, houghLineMatrix, GrayMatrix.BLACK, Color.RED.getRGB());
+			MatrixUtils.copyPixels(matrix, houghLineMatrix, GrayMatrix.BLACK, Color.RED.getRGB());
 			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
 	}

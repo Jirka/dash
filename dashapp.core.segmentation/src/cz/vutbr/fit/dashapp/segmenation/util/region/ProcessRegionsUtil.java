@@ -171,7 +171,7 @@ public class ProcessRegionsUtil {
 			r = node.data;
 			x1=r.x-pX;
 			y1=r.y-pY;
-			GrayMatrix.drawPixels(matrix, x1, y1, x1+r.width, y1+r.height, GrayMatrix.BLACK);
+			MatrixUtils.drawPixels(matrix, x1, y1, x1+r.width, y1+r.height, GrayMatrix.BLACK);
 		}
 		
 		area = MatrixUtils.amount(matrix, GrayMatrix.BLACK);
@@ -392,7 +392,7 @@ public class ProcessRegionsUtil {
 		
 		// print main regions
 		for (Region region : mainRegions) {
-			GrayMatrix.drawRectangle(matrix, region, -1, false);
+			MatrixUtils.drawRectangle(matrix, region, -1, false);
 		}
 		
 		// get candidate nodes

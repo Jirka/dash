@@ -13,7 +13,7 @@ public class EmphasizeSameColorsUtil {
 		final int mW = MatrixUtils.width(matrix);
 		final int mH = MatrixUtils.height(matrix);
 		
-		int[][] workingCopy = GrayMatrix.copy(matrix);
+		int[][] workingCopy = MatrixUtils.copy(matrix);
 		int[][] resultMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		
 		int markColor = -1;

@@ -49,4 +49,8 @@ public interface Constants {
 			return index;
 		}
 	}
+
+	public static int getComplementDimension(int dm) {
+		return dm == X ? Y : X;
+	}
 }

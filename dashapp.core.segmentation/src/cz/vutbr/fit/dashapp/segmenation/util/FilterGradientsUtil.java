@@ -29,7 +29,7 @@ public class FilterGradientsUtil {
 		}
 		final int mW = MatrixUtils.width(matrix);
 		final int mH = MatrixUtils.height(matrix);
-		int[][] workingCopy = GrayMatrix.copy(matrix);
+		int[][] workingCopy = MatrixUtils.copy(matrix);
 		int[][] nonGradientMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		int[][] markMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		
