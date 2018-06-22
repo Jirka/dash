@@ -17,7 +17,7 @@ import cz.vutbr.fit.dashapp.segmenation.util.FindFrequentValuesUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FrequentValuesThresholdUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.HoughLineUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.DrawRegionsUtil;
-import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtils;
+import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.ProcessRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.Region;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
@@ -114,7 +114,7 @@ public class XYCut4 extends AbstractSegmentationAlgorithm implements ISegmentati
 		//debug("histogram_70_edges", GrayMatrix.printMatrixToImage(null, frequentColorMatrixEdges));
 		
 		// ------ find rectangle regions
-		List<Region> regions = FindSameColorRegionsUtils.findRegions(frequentColorMatrix2);
+		List<Region> regions = FindSameColorRegionsUtil.findRegions(frequentColorMatrix2);
 		//debug("rectangles", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE), regions)));
 		//debug("rectangle types", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegionTypes(GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE), regions)));
 		

@@ -52,11 +52,10 @@ public class MatrixUtils {
 	}
 	
 	public static int amount(int[][] matrix, int value) {
-		int n = 0;
-		
 		int mW = width(matrix);
 		int mH = height(matrix);
 		
+		int n = 0;
 		for (int x = 0; x < mW; x++) {
 			for (int y = 0; y < mH; y++) {
 				if(matrix[x][y] == value) {
@@ -69,10 +68,12 @@ public class MatrixUtils {
 	}
 	
 	public static int amount(boolean[][] matrix, boolean value) {
-		int n = 0;
+		int mW = width(matrix);
+		int mH = height(matrix);
 		
-		for (int x = 0; x < matrix.length; x++) {
-			for (int y = 0; y < matrix.length; y++) {
+		int n = 0;
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
 				if(matrix[x][y] == value) {
 					n++;
 				}
@@ -83,10 +84,12 @@ public class MatrixUtils {
 	}
 	
 	public static int amount(Object[][] matrix, Object value) {
-		int n = 0;
+		int mW = width(matrix);
+		int mH = height(matrix);
 		
-		for (int x = 0; x < matrix.length; x++) {
-			for (int y = 0; y < matrix.length; y++) {
+		int n = 0;
+		for (int x = 0; x < mW; x++) {
+			for (int y = 0; y < mH; y++) {
 				if(value.equals(matrix[x][y])) {
 					n++;
 				}
@@ -101,8 +104,8 @@ public class MatrixUtils {
 	}
 	
 	public static int[][] copy(int[][] to, int[][] from) {
-		int mW = Math.min(to.length, from.length);
-		int mH = Math.min(to[0].length, from[0].length);
+		int mW = Math.min(width(to), width(from));
+		int mH = Math.min(height(to), height(from));
 		
 		for (int x = 0; x < mW; x++) {
 			for (int y = 0; y < mH; y++) {

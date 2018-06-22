@@ -42,12 +42,12 @@ public class BottomUp1 {
 		BUBasicUtil.createRectangles(resultMatrix);
 		
 		// create words / rows
-		resultMatrix = BUJoinLineUtil.joinLine(resultMatrix, Constants.X);
+		resultMatrix = BUJoinLineUtil.joinLine(resultMatrix, Constants.X, 5);
 		BUBasicUtil.createRectangles(resultMatrix);
 		BUBasicUtil.createRectangles(resultMatrix);
 	
 		// join columns
-		resultMatrix = BUJoinLineUtil.joinLine(resultMatrix, Constants.Y);
+		resultMatrix = BUJoinLineUtil.joinLine(resultMatrix, Constants.Y, 5);
 		BUBasicUtil.createRectangles(resultMatrix);
 		BUBasicUtil.createRectangles(resultMatrix);
 		

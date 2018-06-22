@@ -27,6 +27,16 @@ public class BUBasicUtil {
 		return matrix;
 	}
 	
+	/**
+	 * Reuse of GrayMatrix.createRectangles(matrix, createNew) with different limitations.
+	 * @param matrix
+	 */
+	public static int[][] createRectangles(int[][] matrix, boolean createNew) {
+		new BottomUpRectangleFloodFill(matrix, createNew, GrayMatrix.BLACK).process();
+	
+		return matrix;
+	}
+	
 	public static class BottomUpRectangleFloodFill extends SimpleRectangleFloodFill {
 
 		public BottomUpRectangleFloodFill(int[][] matrix, boolean createNew, int refColor) {

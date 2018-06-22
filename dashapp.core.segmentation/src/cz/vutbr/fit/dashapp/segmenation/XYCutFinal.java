@@ -12,9 +12,12 @@ import cz.vutbr.fit.dashapp.segmenation.util.FilterGradientsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FindFrequentValuesUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FrequentValuesThresholdUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.PosterizeUtil;
-import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtils;
+import cz.vutbr.fit.dashapp.segmenation.util.region.DrawRegionsUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtil;
+import cz.vutbr.fit.dashapp.segmenation.util.region.JoinSmallRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.ProcessRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.Region;
+import cz.vutbr.fit.dashapp.segmenation.util.region.RegionsOverlapUtil;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 
@@ -74,15 +77,18 @@ public class XYCutFinal extends AbstractSegmentationAlgorithm implements ISegmen
 		//debugHistogram("frequent", frequentColorMatrix);
 		
 		// get regions
-		List<Region> regions = FindSameColorRegionsUtils.findRegions(frequentColorMatrix);
+		List<Region> regions = FindSameColorRegionsUtil.findRegions(frequentColorMatrix);
 		TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, w, h);
 		List<Region> mainRegions = ProcessRegionsUtil.getMainRegions(root); // result rectangles*/
 		
+		//debug("tree rectangle types", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(root, -1)));
+		//debug("main regions", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(new int[w][h], mainRegions, GrayMatrix.BLACK, false)));
+		
 		// some regions overlap other
-		mainRegions = ProcessRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
+		mainRegions = RegionsOverlapUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.OTHER), mainRegions);
 		
 		// find small regions located in empty spaces and construct main regions from them
-		mainRegions = ProcessRegionsUtil.completeEmptySpaces(mainRegions, root);
+		mainRegions = JoinSmallRegionsUtil.completeEmptySpaces(mainRegions, root, this);
 		
 		// create dashboard
 		Dashboard dashboard = new Dashboard();

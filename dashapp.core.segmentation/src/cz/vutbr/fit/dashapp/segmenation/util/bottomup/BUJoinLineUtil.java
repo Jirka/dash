@@ -18,6 +18,10 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
  */
 public class BUJoinLineUtil {
 	
+	public static int[][] joinLine(int[][] matrix, int dm, int offsetLimit) {
+		return joinLine(matrix, dm, offsetLimit, -1);
+	}
+	
 	/**
 	 * Method creates list of potentially joinable regions beneath each other and according
 	 * to the calculated threshold joins them to one region or leaves them separated.
@@ -25,8 +29,10 @@ public class BUJoinLineUtil {
 	 * @param w
 	 * @param h
 	 */	
-	public static int[][] joinLine(int[][] matrix, int dm) {
+	public static int[][] joinLine(int[][] matrix, int dm, int offsetLimit, int joinLimit) {
 		int dm2 = Constants.getComplementDimension(dm);
+		int limitTop = joinLimit;
+		int limitBottom = joinLimit;
 		
 		List<Region> regions = BUBasicUtil.getRegions(matrix);
 		
@@ -55,7 +61,7 @@ public class BUJoinLineUtil {
 			// try to add region to existing bottom list
 			added = false;
 			for (List<Region> currentRegionList : regionDoubleListBottom) {
-				if ((Math.abs((r.p(dm2) + r.size(dm2)) - (currentRegionList.get(0).p(dm2) + currentRegionList.get(0).size(dm2))) < 5)) {
+				if ((Math.abs((r.p(dm2) + r.size(dm2)) - (currentRegionList.get(0).p(dm2) + currentRegionList.get(0).size(dm2))) < offsetLimit)) {
 					currentRegionList.add(r.copy());
 					added = true;
 					break;
@@ -73,8 +79,12 @@ public class BUJoinLineUtil {
 		sortDoubleList(regionDoubleListBottom, dm);
 
 		// get join limit
-		int limitTop = getLimit(regionDoubleListTop, matrix, dm);
-		int limitBottom = getLimit(regionDoubleListBottom, matrix, dm);
+		if(limitTop < 0) {
+			limitTop = getLimit(regionDoubleListTop, matrix, dm);
+		}
+		if(limitBottom < 0) {
+			limitBottom = getLimit(regionDoubleListBottom, matrix, dm);
+		}
 
 		// join regions
 		List<Region> tmpRegionListTop = reDrawRowsOrColumns(regionDoubleListTop, limitTop, dm);
@@ -138,7 +148,7 @@ public class BUJoinLineUtil {
 				// go through all regions
 				for (Region r : currentList) {
 					if(r_prev != null) {
-						int diff = r.p(dm) - (r_prev.p(dm) + r_prev.size(dm));
+						int diff = r.p(dm) - (r_prev.p2(dm));
 						// TODO: can be optimized for every dimension in different way
 						if (diff > 0 && diff < size * 0.3) {
 							limit += diff;

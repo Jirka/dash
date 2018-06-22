@@ -11,7 +11,7 @@ import cz.vutbr.fit.dashapp.util.MathUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
-public class FindSameColorRegionsUtils {
+public class FindSameColorRegionsUtil {
 	
 	/**
 	 * 

@@ -12,7 +12,7 @@ import cz.vutbr.fit.dashapp.segmenation.util.FindFrequentValuesUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.FrequentValuesThresholdUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.HoughLineUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.DrawRegionsUtil;
-import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtils;
+import cz.vutbr.fit.dashapp.segmenation.util.region.FindSameColorRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.ProcessRegionsUtil;
 import cz.vutbr.fit.dashapp.segmenation.util.region.Region;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
@@ -310,7 +310,7 @@ public class SegmentationImageToolActions {
 			int mW = MatrixUtils.width(matrix);
 			int mH = MatrixUtils.height(matrix);
 			ColorMatrix.toGrayScale(matrix, true, false);
-			List<Region> regions = FindSameColorRegionsUtils.findRegions(matrix);
+			List<Region> regions = FindSameColorRegionsUtil.findRegions(matrix);
 			TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, mW, mH);
 			matrix = DrawRegionsUtil.drawRegions(root, maxDepth);
 			return GrayMatrix.printMatrixToImage(null, matrix);
@@ -334,7 +334,7 @@ public class SegmentationImageToolActions {
 			int mW = MatrixUtils.width(matrix);
 			int mH = MatrixUtils.height(matrix);
 			int[][] workingCopy = ColorMatrix.toGrayScale(matrix, true, true);
-			List<Region> regions = FindSameColorRegionsUtils.findRegions(workingCopy);
+			List<Region> regions = FindSameColorRegionsUtil.findRegions(workingCopy);
 			TreeNode<Region> root = ProcessRegionsUtil.constructTree(regions, 0, 0, mW, mH);
 			List<Region> mainRegions = ProcessRegionsUtil.getMainRegions(root);
 			workingCopy = DrawRegionsUtil.drawRegions(matrix, mainRegions, Color.RED.getRGB());
