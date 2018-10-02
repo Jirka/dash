@@ -1,5 +1,6 @@
 package cz.vutbr.fit.dashapp.view.tools.analysis;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -18,7 +19,8 @@ public class CompareAllAnalysisUI extends FolderAnalysisUI {
 	private JTextField fileRegexTextField;
 	private JTextField outputPathTextField;
 	private JTextField outputFilePrefixTextField;
-	
+	private JCheckBox printAvgCheckBox;
+	private JCheckBox printAllCheckBox;
 
 	public CompareAllAnalysisUI() {
 		super(new CompareAllAnalysis());
@@ -49,6 +51,14 @@ public class CompareAllAnalysisUI extends FolderAnalysisUI {
 		panel.add(new JLabel("Ouput files prefix:"));
 		outputFilePrefixTextField = new JTextField(compareAllAnalysis.outputFile);
 		panel.add(outputFilePrefixTextField);
+		
+		// print average value or all diffs
+		printAvgCheckBox = new JCheckBox("Print average values", compareAllAnalysis.printAverageOutput);
+		panel.add(printAvgCheckBox);
+		
+		// print average value or all diffs
+		printAllCheckBox = new JCheckBox("Print all values", compareAllAnalysis.printAllOutput);
+		panel.add(printAllCheckBox);
 	}
 	
 	@Override
@@ -91,6 +101,10 @@ public class CompareAllAnalysisUI extends FolderAnalysisUI {
 			chosenOuputFilePrefix = compareAllAnalysis.outputFile;
 		}
 		compareAllAnalysis.outputFile = chosenOuputFilePrefix;
+		
+		// print average value or all diffs
+		compareAllAnalysis.printAverageOutput = printAvgCheckBox.isSelected();
+		compareAllAnalysis.printAllOutput = printAllCheckBox.isSelected();
 	}
 
 }

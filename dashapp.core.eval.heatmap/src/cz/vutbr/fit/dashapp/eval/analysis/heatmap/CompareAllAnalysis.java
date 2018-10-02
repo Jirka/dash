@@ -15,9 +15,14 @@ import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
-import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
-import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
+import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;;
 
+/**
+ * Analysis compare file with all users descriptions of regions.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Compare Widgets (All)";
@@ -31,9 +36,11 @@ public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 	public boolean enable_stats_output = true;
 	public String outputFolderPath = DEFAULT_OUTPUT_PATH + NAME;
 	public String outputFile = FILE;
+	public boolean printAverageOutput = true;
+	public boolean printAllOutput = true;
 	//public String outputFileSuffix = DEFAULT_OUT_FILE_SUFFIX;
 	
-	private Map<String, int[]> countVectors;
+	private Map<String, double[]> diffVectors;
 	private Map<String, Integer> matrixSizes;
 	
 	public CompareAllAnalysis() {
@@ -47,7 +54,7 @@ public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 	
 	@Override
 	public void init() {
-		countVectors = new LinkedHashMap<>();
+		diffVectors = new LinkedHashMap<>();
 		matrixSizes = new LinkedHashMap<>();
 	}
 	
@@ -98,16 +105,16 @@ public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 		int[][] matrixRef = getDashboardMatrix(actWorkspaceFolder, matrixNameRef);
 		// go through dashboards
 		DashboardCollection actDashboards = getDashboardCollection(actWorkspaceFolder, inputFilesRegex);
-		int[] countVector = new int[actDashboards.length];
+		double[] diffVector = new double[actDashboards.length];
 		for (int i = 0; i < actDashboards.length; i++) {
 			int[][] actDashboardMatrix = BooleanMatrix.toGrayMatrix(BooleanMatrix.printDashboard(actDashboards.dashboards[i], true, GEType.ALL_TYPES));
 			// make diff
 			int[][] cmpMatrix = GrayMatrix.compareMatrices(matrixRef, actDashboardMatrix);
-			countVector[i] = GrayMatrix.getColorCount(cmpMatrix, GrayMatrix.BLACK);
+			diffVector[i] = StatsUtils.meanStatistics(cmpMatrix).mean;
 		}
 		if(enable_stats_output) {
 			// make stats
-			countVectors.put(actWorkspaceFolder.getFileName(), countVector);
+			diffVectors.put(actWorkspaceFolder.getFileName(), diffVector);
 			matrixSizes.put(actWorkspaceFolder.getFileName(), MatrixUtils.area(matrixRef));
 		}
 	}
@@ -115,30 +122,48 @@ public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
 		if(enable_stats_output) {
-			StringBuffer sb = new StringBuffer();
-			/*for (Entry<String, MeanSatistics> entry : meanValues.entrySet()) {
-				sb.append(entry.getKey() + " " + (GrayMatrix.WHITE - entry.getValue().mean)/GrayMatrix.WHITE + " " + entry.getValue().stdev / GrayMatrix.WHITE
-						 + " " + entry.getValue().min + " " + entry.getValue().max+ "\n");
-			}*/
-			int[][] helpMatrix = new int[1][];
-			sb.append("ID mean stdev\n");
+			StringBuffer sb_avg = null;
+			StringBuffer sb_all = null;
+			
+			if(printAverageOutput) {
+				sb_avg = new StringBuffer();
+				sb_avg.append("ID mean\n");
+			}
+			
+			if(printAllOutput) {
+				sb_all = new StringBuffer();
+				sb_all.append("ID diffs...\n");
+			}
+			
+			double[] diffVector;
 			for (WorkspaceFolder workspaceFolder : analyzedFolders) {
 				String key = workspaceFolder.getFileName();
-				helpMatrix[0] = removeExtremeValues(countVectors.get(key));
-				int matrixSize = matrixSizes.get(key);
-				MeanStatistics stat = StatsUtils.meanStatistics(helpMatrix);
-				double statMean = stat.mean/matrixSize;
-				double statStdev = stat.stdev/matrixSize;
-				sb.append(key + " " + statMean + " " + statStdev + " " +  "\n");
-				//sb.append(key + " " + value + " " + valueCrop + " " + " " + (valueCrop-value) + " " + (1.0-valueCrop/value) + " " +  "\n");
+				diffVector = diffVectors.get(key);
+				if(printAverageOutput) {
+					double sum = 0;
+					for (double diff : diffVector) {
+						sum += diff;
+					}
+					sb_avg.append(key + " " + (GrayMatrix.WHITE - (sum/diffVector.length))/GrayMatrix.WHITE + " " +  "\n");
+				}
+				
+				if(printAllOutput) {
+					sb_all.append(key);
+					for (double diff : diffVector) {
+						sb_all.append(" " + (GrayMatrix.WHITE - (diff))/GrayMatrix.WHITE);
+					}
+					sb_all.append("\n");
+				}
 			}
-			printTextFile(actWorkspaceFolder, sb.toString(), actWorkspaceFolder.getPath() + "/" + outputFolderPath + "/" + NAME + getFileSuffix(), outputFile + getFileSuffix(actWorkspaceFolder));
+			
+			if(printAverageOutput) {
+				printTextFile(actWorkspaceFolder, sb_avg.toString(), actWorkspaceFolder.getPath() + "/" + outputFolderPath + "/" + NAME + getFileSuffix(), outputFile + getFileSuffix(actWorkspaceFolder) + "_avg");
+			}
+			
+			if(printAllOutput) {
+				printTextFile(actWorkspaceFolder, sb_all.toString(), actWorkspaceFolder.getPath() + "/" + outputFolderPath + "/" + NAME + getFileSuffix(), outputFile + getFileSuffix(actWorkspaceFolder) + "_all");
+			}
 		}
-	}
-
-	private int[] removeExtremeValues(int[] vector) {
-		// TODO 
-		return vector;
 	}
 
 }
