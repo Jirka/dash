@@ -1,57 +1,47 @@
 package cz.vutbr.fit.dashapp.segmenation;
 
 import java.awt.image.BufferedImage;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
-import extern.ImagePreview;
-import tmp.Histogram;
 
+/**
+ * This class provides implementation of basic methods of segmentation algorithm.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {	
 
 	// ----------------- internal for debugging
-	
-	private DebugMode debugMode;
-	private Map<String, BufferedImage> debugMatrices;
-	
-	public static enum DebugMode {
-		NONE,
-		SILENT,
-		INTERACTIVE
-	}
+	private List<ISegmentationDebugListener> debugListeners;
 	
 	public AbstractSegmentationAlgorithm() {
-		this(DebugMode.INTERACTIVE);
-	}
-	
-	public AbstractSegmentationAlgorithm(DebugMode debugMode) {
-		setDebugMode(debugMode);
+		debugListeners = new ArrayList<>();
 	}
 	
 	@Override
-	public void setDebugMode(DebugMode debugMode) {
-		this.debugMode = debugMode;
-		if(debugMode == DebugMode.SILENT) {
-			debugMatrices = new LinkedHashMap<>();
+	public void addSegmentationDebugListener(ISegmentationDebugListener debugListener) {
+		debugListeners.add(debugListener);
+	}
+	
+	@Override
+	public List<ISegmentationDebugListener> getDebugListeners() {
+		return debugListeners;
+	}
+	
+	protected void debugImage(String label, BufferedImage image) {
+		for (ISegmentationDebugListener debugListener : debugListeners) {
+			debugListener.debugImage(label, image, this);
 		}
 	}
 	
-	public void debug(String name, BufferedImage image) {
-		if(debugMode == DebugMode.INTERACTIVE) {
-			new ImagePreview(image, name).openWindow(800,600,0.8);
-		} else if(debugMode == DebugMode.SILENT) {
-			debugMatrices.put(name, image);
-		}
-	}
-	
-	public Map<String, BufferedImage> getDebugImages() {
-		return debugMatrices;
-	}
-	
-	protected void debugHistogram(String name, int[][] matrix) {
+	protected void debugHistogram(String label, int[][] matrix) {
 		int[] histogram = HistogramUtils.getGrayscaleHistogram(matrix);
-		new Histogram(name, histogram).openWindow();
+		for (ISegmentationDebugListener debugListener : debugListeners) {
+			debugListener.debugHistogram(label, histogram, this);
+		}
 	}
 	
 	// ----------------------------------------------------------------------

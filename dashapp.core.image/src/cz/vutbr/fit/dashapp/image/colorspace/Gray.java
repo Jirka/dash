@@ -4,6 +4,11 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class Gray implements ColorSpace {
 
 	public int grayValue;

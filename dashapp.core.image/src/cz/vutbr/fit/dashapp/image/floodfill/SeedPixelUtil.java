@@ -7,10 +7,25 @@ import java.util.Queue;
 
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class SeedPixelUtil {
 	
 	public static final int QUEUE_COLOR = -1;
 
+	/**
+	 * basic flood-fill seed pixel method which returns boundary of the area.
+	 * 
+	 * @param i
+	 * @param j
+	 * @param refColor
+	 * @param markColor
+	 * @param matrix
+	 * @return
+	 */
 	public static Rectangle processSeedPixel(int i, int j, int refColor, int markColor, int[][] matrix) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);

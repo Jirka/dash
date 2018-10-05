@@ -5,6 +5,11 @@ import java.awt.Color;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class HSB implements ColorSpace {
 	
 	public static final int CHANNEL_HUE = 0;

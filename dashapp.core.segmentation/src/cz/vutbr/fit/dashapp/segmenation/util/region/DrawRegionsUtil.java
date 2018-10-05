@@ -7,6 +7,12 @@ import com.tree.TreeNode;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * Help methods which draw regions into matrix.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DrawRegionsUtil {
 	
 	/**
@@ -63,13 +69,13 @@ public class DrawRegionsUtil {
 	 * @param region
 	 */
 	public static int[][] drawRegionType(int[][] matrix, Region region) {
-		if(region.type == Region.R_FILL) {
+		if(region.type == Region.TYPE_RECT_FILL) {
 			MatrixUtils.drawRectangle(matrix, region, 0, true);
-		} else if(region.type == Region.R_MEDIUM) {
+		} else if(region.type == Region.TYPE_RECT_MEDIUM) {
 			MatrixUtils.drawRectangle(matrix, region, 0, true);
-		} else if(region.type == Region.R_BORDER) {
+		} else if(region.type == Region.TYPE_RECT_BORDER) {
 			MatrixUtils.drawRectangle(matrix, region, 0, true);
-		} else if(region.type == Region.DATA) {
+		} else if(region.type == Region.TYPE_DATA) {
 			MatrixUtils.drawRectangle(matrix, region, 225, true);
 		} else {
 			MatrixUtils.drawRectangle(matrix, region, 125, true);

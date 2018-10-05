@@ -1,10 +1,15 @@
 package cz.vutbr.fit.dashapp.segmenation;
 
-import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
+import cz.vutbr.fit.dashapp.segmenation.methods.DashboardSegmentation;
 
+/**
+ * Enumeration of segmentation algorithms which can be used for analysis.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public enum SegmentationType {
-	// raster color
-	XYCutFinal
+	DashboardSegmentation
 	;
 	
 	String label = null;
@@ -17,11 +22,15 @@ public enum SegmentationType {
 		this.label = label;
 	}
 	
+	/**
+	 * Factory.
+	 * 
+	 * @return
+	 */
 	public ISegmentationAlgorithm createAlgorithm() {
 		switch (this) {
 		
-			// raster color
-			case XYCutFinal: return new XYCutFinal(DebugMode.NONE);
+			case DashboardSegmentation: return new DashboardSegmentation();
 			
 			default: return null;
 		}
@@ -30,12 +39,11 @@ public enum SegmentationType {
 	@Override
 	public String toString() {
 		switch (this) {
-		// raster color
-		case XYCutFinal:
-			return this.name()/* + "()"*/;
-
-		default:
-			return super.toString();
+			case DashboardSegmentation:
+				return this.name()/* + "()"*/;
+	
+			default:
+				return super.toString();
 		}
 	}
 }

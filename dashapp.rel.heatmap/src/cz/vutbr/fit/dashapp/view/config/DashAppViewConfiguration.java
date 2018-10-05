@@ -39,7 +39,7 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import cz.vutbr.fit.view.tools.image.old.OldImageTool;
+import cz.vutbr.fit.dashapp.view.tools.image.old.OldImageTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	

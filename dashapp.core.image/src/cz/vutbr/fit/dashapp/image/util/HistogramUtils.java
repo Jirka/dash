@@ -80,17 +80,17 @@ public class HistogramUtils {
 	}
 	
 	public static int findMax(int[] histogram, int upperLimitIndex) {
-		int max = -1;
-		int maxValue = -1; // we need to store value (problem with upperLimitIndex)
+		int maxBarIndex = -1;
+		int maxBarValue = -1; // we need to store value (problem with upperLimitIndex)
 		for (int i = 0; i < histogram.length; i++) {
-			if(histogram[i] >= maxValue) {
+			if(histogram[i] >= maxBarValue) {
 				if(upperLimitIndex < 0 || histogram[i] < histogram[upperLimitIndex] || (histogram[i] == histogram[upperLimitIndex] && i < upperLimitIndex)) {
-					max = i;
-					maxValue = histogram[i];
+					maxBarIndex = i;
+					maxBarValue = histogram[i];
 				}
 			}
 		}
-		return max;
+		return maxBarIndex;
 	}
 
 	public static List<Integer> getUsedValues(int[][] matrix) {

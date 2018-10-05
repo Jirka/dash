@@ -4,6 +4,11 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import extern.CIELab2;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class CIE implements ColorSpace {
 	
 	public static final int CHANNEL_LIGHTNESS = 0;

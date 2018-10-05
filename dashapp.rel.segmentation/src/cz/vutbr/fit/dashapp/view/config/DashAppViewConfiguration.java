@@ -21,10 +21,10 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import cz.vutbr.fit.tools.segmentation.SegmentationImageActionFactory;
-import cz.vutbr.fit.tools.segmentation.SegmentationTool;
-import cz.vutbr.fit.view.tools.image.ImageActionFactory;
-import cz.vutbr.fit.view.tools.image.ImageTool;
+import cz.vutbr.fit.dashapp.view.tools.image.ImageActionFactory;
+import cz.vutbr.fit.dashapp.view.tools.image.ImageTool;
+import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationImageActionFactory;
+import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	

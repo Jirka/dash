@@ -76,6 +76,18 @@ public class BooleanMatrix {
 		return sum;
 	}
 	
+	public static boolean[][] newMatrix(int mW, int mH, boolean value) {
+		boolean[][] matrix = new boolean[mW][mH];
+		
+		for (int i = 0; i < mW; i++) {
+			for (int j = 0; j < mH; j++) {
+				matrix[i][j] = value;
+			}
+		}
+		
+		return matrix;
+	}
+	
 	public static void initMattrix(boolean[][] matrix, boolean initValue) {
 		int mW = MatrixUtils.width(matrix);
 		int mH = MatrixUtils.height(matrix);

@@ -1,19 +1,43 @@
 package cz.vutbr.fit.dashapp.segmenation;
 
 import java.awt.image.BufferedImage;
-import java.util.Map;
+import java.util.List;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
-import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
 
+/**
+ * Segmentation algorithm methods.
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public interface ISegmentationAlgorithm {
 	
+	/**
+	 * Performs segmentation algorithm.
+	 * 
+	 * @param image
+	 * @return dashboard
+	 */
 	Dashboard processImage(BufferedImage image);
 	
+	/**
+	 * 
+	 * @return name of segmentation algorithm
+	 */
 	String getName();
+	
+	/**
+	 * Register debug listener (for debug purposes).
+	 * 
+	 * @param debugListener
+	 */
+	void addSegmentationDebugListener(ISegmentationDebugListener debugListener);
 
-	void setDebugMode(DebugMode debugMode);
-
-	Map<String, BufferedImage> getDebugImages();
+	/**
+	 * 
+	 * @return list of debug listeners (for debug purposes)
+	 */
+	List<ISegmentationDebugListener> getDebugListeners();
 
 }

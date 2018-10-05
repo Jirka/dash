@@ -284,5 +284,30 @@ public class MatrixUtils {
 		
 		return resultMatrix;
 	}
+	
+	/**
+	 * Method compares values of two matrices.
+	 * 
+	 * @param matrix1
+	 * @param matrix2
+	 * @param w
+	 * @param h
+	 */	
+	public static boolean equals(int[][] matrix1, int[][] matrix2) {
+		int mW = MatrixUtils.width(matrix1);
+		int mH = MatrixUtils.height(matrix1);
+		
+		if(mW == MatrixUtils.width(matrix2) && mH == MatrixUtils.height(matrix2)) {
+			for (int i = 0; i < mW; i++) {
+				for (int j = 0; j < mH; j++) {
+					if (matrix1[i][j] != matrix2[i][j]) {
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 
 }

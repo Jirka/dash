@@ -4,6 +4,11 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import extern.HSLColor;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class HSL implements ColorSpace {
 	
 	public static final int CHANNEL_HUE = 0;

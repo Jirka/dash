@@ -5,6 +5,11 @@ import java.awt.Rectangle;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class ColorSpaceUtils {
 	
 	public static ColorSpace[][] fromRGB(int[][] matrix, Class<?> colorSpaceClass) {
@@ -34,7 +39,6 @@ public class ColorSpaceUtils {
 		if(cropRectangle.width == 0 || cropRectangle.height == 0) {
 			//return 
 		}
-		
 		
 		int mW = MatrixUtils.width(matrix);
 		if(mW > 0) {

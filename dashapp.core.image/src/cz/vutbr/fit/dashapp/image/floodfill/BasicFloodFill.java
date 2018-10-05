@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
+import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 
 /**
@@ -14,67 +16,95 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 public class BasicFloodFill {
 	
 	protected int[][] matrix;
+	protected int[][] markMatrix;
+	protected boolean[][] processedMatrix;
 	protected boolean createNew;
 	protected int refColor;
 	protected int mW;
 	protected int mH;
 	protected int area;
+	protected boolean isRefColor = false;
+	protected int startColor;
+	protected int markColor;
+	protected int seedX;
+	protected int seedY;
+	Queue<Point> queue;
 	
-	public static final int QUEUE_COLOR = -1;
+	public static final int INIT_QUEUE_COLOR = -1;
 
 	public BasicFloodFill(int[][] matrix, boolean createNew, int refColor) {
-		this.matrix = matrix;
+		setMatrix(matrix);
 		this.createNew = createNew;
+		setRefColor(refColor);
+	}
+	
+	public BasicFloodFill(int[][] matrix, boolean createNew) {
+		setMatrix(matrix);
+		this.createNew = createNew;
+	}
+	
+	public void setRefColor(int refColor) {
 		this.refColor = refColor;
+		this.isRefColor = true;
+	}
+	
+	public void setMatrix(int[][] matrix) {
+		this.matrix = matrix;
+		mW = MatrixUtils.width(matrix);
+		mH = MatrixUtils.height(matrix);
 	}
 	
 	/**
-	 * Expects black and white matrix.
+	 * Expects gray matrix.
 	 * 
 	 * @param matrix
 	 * @param createNew
 	 * @return
 	 */
 	public int[][] process() {
-		mW = MatrixUtils.width(matrix);
-		mH = MatrixUtils.height(matrix);
-		
-		int resultMatrix[][] = matrix;
+		processedMatrix = BooleanMatrix.newMatrix(mW, mH, false);
+		markMatrix = matrix;
 		if(createNew) {
-			resultMatrix = new int[mW][mH];
-			MatrixUtils.copy(resultMatrix, matrix);
+			//markMatrix = MatrixUtils.copy(matrix);
+			markMatrix = GrayMatrix.newMatrix(mW, mH, GrayMatrix.WHITE);
 		}
 		
 		// process matrix
-		int markColor = QUEUE_COLOR-1;
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				if(resultMatrix[i][j] == refColor) {
-					processSeedPixel(i, j, refColor, markColor, resultMatrix);
-					markColor--;
+		markColor = INIT_QUEUE_COLOR;
+		queue = new LinkedList<Point>();
+		for (seedX = 0; seedX < mW; seedX++) {
+			for (seedY = 0; seedY < mH; seedY++) {
+				if(!processedMatrix[seedX][seedY]) {
+					startColor = matrix[seedX][seedY];
+					if(!isRefColor || startColor == refColor) {
+						processSeedPixel();
+						markColor--;
+					}
 				}
 			}
 		}
 		
-		postProcessMatrix(resultMatrix);
-		
-		return resultMatrix;
+		return postProcessMatrix();
 	}
 	
-	protected void postProcessMatrix(int[][] resultMatrix) {
+	protected int[][] postProcessMatrix() {
 		// update according to requirements
+		return markMatrix;
 	}
 
-	protected void processSeedPixel(int i, int j, int refColor, int markColor, int[][] matrix) {
+	protected void processSeedPixel() {
+		preprocessSeedPixel();
 		
 		// do flood fill algorithm
-		Queue<Point> queue = new LinkedList<Point>();
-        queue.add(new Point(i, j));
-        int x1 = i, x2 = i, y1 = j, y2 = j;
+        queue.add(new Point(seedX, seedY));
+        processedMatrix[seedX][seedY] = true;
         area = 0;
+        int x1 = seedX, x2 = seedX, y1 = seedY, y2 = seedY;
+        int actColor;
         while (!queue.isEmpty()) {
             Point p = queue.remove();
-        	matrix[p.x][p.y] = markColor;
+            actColor = matrix[p.x][p.y];
+        	markMatrix[p.x][p.y] = markColor;
         	area++;
         	
         	// update min/max points 
@@ -90,32 +120,49 @@ public class BasicFloodFill {
         	}
 
         	// add neighbour points
-        	addPoint(matrix, queue, p.x + 1, p.y, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x - 1, p.y, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x, p.y + 1, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x, p.y - 1, mW, mH, refColor);
+        	addPoint(p.x + 1, p.y, actColor);
+        	addPoint(p.x - 1, p.y, actColor);
+        	addPoint(p.x, p.y + 1, actColor);
+        	addPoint(p.x, p.y - 1, actColor);
         	
-        	addPoint(matrix, queue, p.x + 1, p.y + 1, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x + 1, p.y - 1, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x - 1, p.y + 1, mW, mH, refColor);
-        	addPoint(matrix, queue, p.x - 1, p.y - 1, mW, mH, refColor);
+        	addPoint(p.x + 1, p.y + 1, actColor);
+        	addPoint(p.x + 1, p.y - 1, actColor);
+        	addPoint(p.x - 1, p.y + 1, actColor);
+        	addPoint(p.x - 1, p.y - 1, actColor);
+        	
+        	postProcessPixel(p.x, p.y, actColor);
         }
         
         x2++; y2++;
         
-        postProcessSeedPixel(x1, y1, x2, y2, markColor);
+        postProcessSeedPixel(x1, y1, x2, y2);
 	}
-	
-	private void addPoint(int[][] matrix, Queue<Point> queue, int x, int y, int mW, int mH, int refColor) {
+
+	private void addPoint(int x, int y, int actColor) {
 		if ((x >= 0) && (x < mW) && (y >= 0) && (y < mH)) {
-			if(matrix[x][y] == refColor) {
-				matrix[x][y] = QUEUE_COLOR; // is in queue (optimization)
-				queue.add(new Point(x, y));
+			if(!processedMatrix[x][y]) {
+				if(matches(x, y, actColor)) {
+					processedMatrix[x][y] = true; // is in queue (optimization)
+					queue.add(new Point(x, y));
+				}
 			}
 		}
 	}
 	
-	protected void postProcessSeedPixel(int x1, int y1, int x2, int y2, int color) {
+	protected boolean matches(int x, int y, int actColor) {
+		// update according to requirements
+		return matrix[x][y] == startColor;
+	}
+	
+	protected void postProcessPixel(int x, int y, int actColor) {
+		// update according to requirements
+	}
+	
+	protected void preprocessSeedPixel() {
+		// update according to requirements
+	}
+	
+	protected void postProcessSeedPixel(int x1, int y1, int x2, int y2) {
 		// update according to requirements
 	}
 

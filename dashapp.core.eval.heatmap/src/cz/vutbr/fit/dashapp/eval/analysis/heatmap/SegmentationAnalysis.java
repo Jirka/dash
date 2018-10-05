@@ -3,16 +3,15 @@ package cz.vutbr.fit.dashapp.eval.analysis.heatmap;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
-import cz.vutbr.fit.dashapp.segmenation.XYCutFinal;
 import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
-import cz.vutbr.fit.dashapp.segmenation.AbstractSegmentationAlgorithm.DebugMode;
+import cz.vutbr.fit.dashapp.segmenation.methods.DashboardSegmentation;
 import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
+import cz.vutbr.fit.dashapp.segmenation.ISegmentationDebugListener;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 
 public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
@@ -23,9 +22,10 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	public static final String RECTANGLES_SUFFIX = "-r";
 	
 	public static final SegmentationType[] DEFAULT_SEGMENTATIONS = new SegmentationType[] { 
-			SegmentationType.XYCutFinal,
+			SegmentationType.DashboardSegmentation,
 	};
 	
+	private WorkspaceFolder actWorkspaceFolder;
 	public boolean enable_act_folder_output = true;
 	public boolean enable_all_folder_output = true;
 	public boolean enable_debug_output = false;
@@ -36,7 +36,6 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	public List<SegmentationType> segmentationTypes = Arrays.asList(DEFAULT_SEGMENTATIONS);
 	public boolean enable_custom_segmentations = true;
 	private ISegmentationAlgorithm[] segmentations = null;
-	public DebugMode debugMode = DebugMode.SILENT;
 
 	@Override
 	public String getLabel() {
@@ -56,7 +55,6 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 				for (SegmentationType segmentationType : segmentationTypes) {
 					try {
 						segmentations[i] = (ISegmentationAlgorithm) segmentationType.createAlgorithm();
-						segmentations[i].setDebugMode(debugMode);
 					} catch (Exception e) {
 						System.err.println("Unable to create segmentation algorithm: " + segmentationType);
 					}
@@ -65,8 +63,16 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 			} else {
 				// specify own metrics if required
 				segmentations = new ISegmentationAlgorithm[] {
-						new XYCutFinal(DebugMode.SILENT)
+						new DashboardSegmentation()
 				};
+			}
+			
+			if(enable_debug_output) {
+				// register listener
+				AnalysisSegmentationDebugListener debugListener = new AnalysisSegmentationDebugListener();
+				for (ISegmentationAlgorithm segmentationAlgorithm : segmentations) {
+					segmentationAlgorithm.addSegmentationDebugListener(debugListener);
+				}
 			}
 		}
 		return segmentations;
@@ -86,30 +92,18 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	}
 	
 	public void processFolder(WorkspaceFolder actWorkspaceFolder, String suffix) {
+		this.actWorkspaceFolder = actWorkspaceFolder;
 		List<DashboardFile> dashboardCandidates = actWorkspaceFolder.getChildren(
 				DashboardFile.class, actWorkspaceFolder.getFileName() + suffix, false
 		);
 		if(dashboardCandidates != null && dashboardCandidates.size() == 1) {
 			BufferedImage image = dashboardCandidates.get(0).getImage();
 			if(image != null) {
-				Map<String, BufferedImage> debugImages;
 				ISegmentationAlgorithm[] segmentationAlgorithms = getSegmentations();
 				String algName;
 				for (ISegmentationAlgorithm segmentationAlgorithm : segmentationAlgorithms) {
 					algName = segmentationAlgorithm.getClass().getSimpleName();
 					Dashboard dashboard = segmentationAlgorithm.processImage(image);
-					if(enable_debug_output) {
-						debugImages = segmentationAlgorithm.getDebugImages();
-						for (Map.Entry<String, BufferedImage> debugImage : debugImages.entrySet()) {
-							if(enable_act_folder_output) {
-								printImage(actWorkspaceFolder, debugImage.getValue(), actWorkspaceFolder.getPath(), outputFile + "_" + algName + "_" + debugImage.getKey());
-							}
-							if(enable_all_folder_output) {
-								printImage(actWorkspaceFolder, debugImage.getValue(), actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName + "/" + debugImage.getKey(), actWorkspaceFolder.getFileName());
-							}
-						}
-						debugImages.clear();
-					}
 					
 					if(dashboard != null) {
 						BufferedImage rectanglesImage = BooleanMatrix.printMatrixToImage(null, BooleanMatrix.printDashboard(dashboard, true, GEType.ALL_TYPES));
@@ -131,6 +125,30 @@ public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 
 	@Override
 	public void sumarizeFolders(WorkspaceFolder actWorkspaceFolder, List<WorkspaceFolder> analyzedFolders) {
+		
+	}
+	
+	private class AnalysisSegmentationDebugListener implements ISegmentationDebugListener {
+
+		@Override
+		public void debugImage(String label, BufferedImage image, ISegmentationAlgorithm segmentationAlgorithm) {
+			if(enable_debug_output) {
+				String algName = segmentationAlgorithm.getClass().getSimpleName();
+				if(enable_act_folder_output) {
+					printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath(), outputFile + "_" + algName + "_" + label);
+				}
+				if(enable_all_folder_output) {
+					printImage(actWorkspaceFolder, image, actWorkspaceFolder.getPath() + "/../" + outputFolderPath + "/" + algName + "/" + label, actWorkspaceFolder.getFileName());
+				}
+			}
+		}
+
+		@Override
+		public void debugHistogram(String label, int[] histogram, ISegmentationAlgorithm segmentationAlgorithm) {
+			// do nothing
+			// TODO print histogram to image
+		}
+		
 	}
 
 }
