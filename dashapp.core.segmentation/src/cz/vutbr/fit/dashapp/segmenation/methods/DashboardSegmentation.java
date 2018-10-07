@@ -32,6 +32,12 @@ import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
  */
 public class DashboardSegmentation extends AbstractSegmentationAlgorithm implements ISegmentationAlgorithm {
 	
+	public boolean enableCustomGradientThreshold = false;
+	public int gradientThreshold = 2;
+	
+	public boolean enableCustomPosterizationValue = false;
+	public int posterizationValue = 4;
+
 	public DashboardSegmentation() {
 		super();
 	}
@@ -53,7 +59,7 @@ public class DashboardSegmentation extends AbstractSegmentationAlgorithm impleme
 		int[][] rawMatrix = ColorMatrix.toGrayScale(matrix, true, true);
 		
 		// remove gradients
-		int gradientLimit = FilterGradientsUtil.recommendGradientThreshlodIterative(rawMatrix);
+		int gradientLimit = enableCustomGradientThreshold ? gradientThreshold : FilterGradientsUtil.recommendGradientThreshlodIterative(rawMatrix);
 		System.out.println("segmentation: gradient limit = " + gradientLimit);
 		int[][] nonGradientMatrix = rawMatrix;
 		/*if(gradientLimit > 2) {
@@ -64,7 +70,7 @@ public class DashboardSegmentation extends AbstractSegmentationAlgorithm impleme
 		debugHistogram("non-gradient", nonGradientMatrix);
 		
 		// posterization
-		int posetrizationLimit = PosterizationUtil.recommendPosterizationValue(nonGradientMatrix);
+		int posetrizationLimit = enableCustomPosterizationValue ? posterizationValue : PosterizationUtil.recommendPosterizationValue(nonGradientMatrix);
 		System.out.println("segmentation : posterization limit = " + posetrizationLimit);
 		GrayMatrix.posterizeMatrix(nonGradientMatrix, posetrizationLimit, false);
 		debugImage("post. non-gradient", GrayMatrix.printMatrixToImage(null, nonGradientMatrix));
@@ -73,8 +79,8 @@ public class DashboardSegmentation extends AbstractSegmentationAlgorithm impleme
 		// detect colour layers
 		List<Integer> frequentValues = FindFrequentValuesUtil.find(nonGradientMatrix);
 		int[][] frequentColorMatrix = ColorLayersSegmentationUtil.segment(nonGradientMatrix, frequentValues);
-		debugImage("frequent", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
-		debugHistogram("frequent", frequentColorMatrix);
+		debugImage("frequent values", GrayMatrix.printMatrixToImage(null, frequentColorMatrix));
+		debugHistogram("frequent values", frequentColorMatrix);
 		
 		// detect layout primitives
 		List<Region> regions = DetectRegionsUtil.findRegions(frequentColorMatrix);
@@ -85,13 +91,15 @@ public class DashboardSegmentation extends AbstractSegmentationAlgorithm impleme
 		
 		// top-down analysis (detect main regions)
 		List<Region> mainRegions = TopDownAnalysisUtil.getMainRegions(root); // result rectangles*/
-		debugImage("main regions", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(new int[w][h], mainRegions, GrayMatrix.BLACK, false)));
+		debugImage("top-down main regions", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE), mainRegions, GrayMatrix.BLACK, false)));
 		
 		// analyse overlap regions
 		mainRegions = OverlappingRegionsUtil.arrangeOverlaps(new Region(0, 0, w, h, Region.TYPE_OTHER), mainRegions);
+		debugImage("non-overlapping main regions", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE), mainRegions, GrayMatrix.BLACK, false)));
 		
 		// bottom-up analysis (find small regions located in empty spaces and construct main regions from them)
 		mainRegions = BottomUpAnalysisUtil.clusterRemainingSmallRegions(mainRegions, root, this);
+		debugImage("bottom-up main regions", GrayMatrix.printMatrixToImage(null, DrawRegionsUtil.drawRegions(GrayMatrix.newMatrix(w, h, GrayMatrix.WHITE), mainRegions, GrayMatrix.BLACK, false)));
 		
 		// create dashboard
 		Dashboard dashboard = new Dashboard();

@@ -23,9 +23,9 @@ import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
 
-public class WidgetAnalysis extends AbstractHeatMapAnalysis {
+public class HeatMapWidgetAnalysis extends AbstractHeatMapAnalysis {
 	
-	public static final String LABEL = "Widget Detection";
+	public static final String LABEL = "Heatmap Widget Detection";
 	public static final String NAME = "widget";
 	public static final String FILE = "_" + NAME;
 	
@@ -52,7 +52,7 @@ public class WidgetAnalysis extends AbstractHeatMapAnalysis {
 	double actInversedEntrophyMean;*/
 	private double actThreshlod;
 	
-	public WidgetAnalysis() {
+	public HeatMapWidgetAnalysis() {
 		init();
 	}
 	

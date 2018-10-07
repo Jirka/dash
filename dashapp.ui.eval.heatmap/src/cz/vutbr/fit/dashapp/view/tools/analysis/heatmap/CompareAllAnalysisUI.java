@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis;
+package cz.vutbr.fit.dashapp.view.tools.analysis.heatmap;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import cz.vutbr.fit.dashapp.eval.analysis.heatmap.CompareAllAnalysis;
+import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
 
 /**
  * UI part of analysis which provides additional settings dialog.

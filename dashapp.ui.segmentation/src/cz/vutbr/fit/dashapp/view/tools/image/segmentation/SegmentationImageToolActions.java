@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.segmentation;
+package cz.vutbr.fit.dashapp.view.tools.image.segmentation;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -44,7 +44,6 @@ public class SegmentationImageToolActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			int minArea = askForInteger("minimal area", "Minimal area", 1000);
 			int minSize = askForInteger("minimal size", "Minimal size", 20);
-			//ColorMatrix.toGrayScale(matrix, true, false);
 			matrix = EmphasizeSameColorsUtil.process(matrix, minArea, minSize);
 			return GrayMatrix.printMatrixToImage(null, matrix);
 		}
@@ -61,40 +60,6 @@ public class SegmentationImageToolActions {
 		public String getName() {
 			return "Remove gradients (gray)";
 		}
-		
-		/*private void printMatrix(String label, int[][] matrix) {
-			System.out.println(label);
-			int mW = MatrixUtils.width(matrix);
-			int mH = MatrixUtils.height(matrix);
-			
-			int val;
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					val = matrix[i][j];
-					//System.out.print(val + " ");
-					System.out.print("(" + ColorMatrix.getRed(val) + "," + ColorMatrix.getGreen(val) + "," + ColorMatrix.getBlue(val) + "," + ColorMatrix.getAlpha(val) + ") ");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}
-		
-		private void printImage(String label, BufferedImage image) {
-			System.out.println(label);
-			int mW = image.getWidth();
-			int mH = image.getHeight();
-			
-			int val;
-			for (int i = 0; i < 4; i++) {
-				for (int j = 0; j < 4; j++) {
-					val = image.getRGB(i, j);
-					//System.out.print(val + " ");
-					System.out.print("(" + ColorMatrix.getRed(val) + "," + ColorMatrix.getGreen(val) + "," + ColorMatrix.getBlue(val) + "," + ColorMatrix.getAlpha(val) + ") ");
-				}
-				System.out.println();
-			}
-			System.out.println();
-		}*/
 
 		@Override
 		protected BufferedImage processImage(int[][] matrix) {
@@ -103,26 +68,6 @@ public class SegmentationImageToolActions {
 			matrix = FilterGradientsUtil.process(matrix, maxDiff);
 			BufferedImage newImage = GrayMatrix.printMatrixToImage(null, matrix);
 			
-			/*// smaller debug matrix
-			int mW = 4;
-			int mH = 4;
-			//int mW = image.getWidth();
-			//int mH = image.getHeight();
-			
-			BufferedImage image1 = canvas.getImage();
-			printImage("canvas image", image1);
-			
-			int[][] colorMatrix = ColorMatrix.printImageToMatrix(image1);
-			printMatrix("color matrix 1", colorMatrix);
-			
-			int[][] grayMatrix = ColorMatrix.toGrayScale(colorMatrix, false, true);
-			printMatrix("gray matrix 1", grayMatrix);
-			
-			BufferedImage image2 = ColorMatrix.printMatrixToImage(image1, grayMatrix);
-			printImage("image 2", image2);
-			
-			int[][] colorMatrix2 = ColorMatrix.printImageToMatrix(image2);
-			printMatrix("color matrix 2", colorMatrix2);*/
 			return newImage;
 		}
 	}

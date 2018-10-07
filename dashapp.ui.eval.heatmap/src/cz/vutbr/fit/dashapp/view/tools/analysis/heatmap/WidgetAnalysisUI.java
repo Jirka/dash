@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis;
+package cz.vutbr.fit.dashapp.view.tools.analysis.heatmap;
 
 import java.util.Hashtable;
 
@@ -10,7 +10,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.WidgetAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapWidgetAnalysis;
+import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
 
 /**
  * UI part of analysis which provides additional settings dialog.
@@ -34,14 +35,14 @@ public class WidgetAnalysisUI extends FolderAnalysisUI {
 	
 
 	public WidgetAnalysisUI() {
-		super(new WidgetAnalysis());
+		super(new HeatMapWidgetAnalysis());
 	}
 	
 	@Override
 	protected void getCustomSettings(JPanel panel) {
 		super.getCustomSettings(panel);
 		
-		WidgetAnalysis widgetAnalysis = (WidgetAnalysis) analysis;
+		HeatMapWidgetAnalysis widgetAnalysis = (HeatMapWidgetAnalysis) analysis;
 		
 		// file regex
 		panel.add(new JLabel("Input files regex:"));
@@ -89,6 +90,7 @@ public class WidgetAnalysisUI extends FolderAnalysisUI {
 		labelTable.put( new Integer( 50 ), actThresholdLabel );
 		labelTable.put( new Integer( 100 ), new JLabel("BLACK") );
 		thresholdSlider.setLabelTable(labelTable);
+		thresholdSlider.setEnabled(isThresholdEnabled);
 		thresholdSlider.addChangeListener(new ChangeListener() {
 			
 			@Override
@@ -116,7 +118,7 @@ public class WidgetAnalysisUI extends FolderAnalysisUI {
 	protected void processCustomSettings() {
 		super.processCustomSettings();
 		
-		WidgetAnalysis widgetAnalysis = (WidgetAnalysis) analysis;
+		HeatMapWidgetAnalysis widgetAnalysis = (HeatMapWidgetAnalysis) analysis;
 		
 		// file regex
 		String chosenFileRegex = (String) fileRegexTextField.getText();

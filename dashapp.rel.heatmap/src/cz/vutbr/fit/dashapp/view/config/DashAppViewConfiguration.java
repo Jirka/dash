@@ -1,7 +1,6 @@
 package cz.vutbr.fit.dashapp.view.config;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import javax.swing.ButtonGroup;
 
@@ -15,7 +14,7 @@ import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
 //import cz.vutbr.fit.dashapp.eval.analysis.heatmap.old.WidgetMetricAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricType;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
-import cz.vutbr.fit.dashapp.view.tools.AnalysisTool;
+import cz.vutbr.fit.dashapp.view.tools.FolderAnalysisTool;
 import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
 import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
 import cz.vutbr.fit.dashapp.view.tools.OpenTool;
@@ -23,18 +22,17 @@ import cz.vutbr.fit.dashapp.view.tools.ReloadTool;
 import cz.vutbr.fit.dashapp.view.tools.SaveTool;
 import cz.vutbr.fit.dashapp.view.tools.XMLTool;
 import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
-import cz.vutbr.fit.dashapp.view.tools.analysis.AbstractAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.AverageMetricAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.CompareAllAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.CompareAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.EdgesAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.EntropyAnalysisUI;
-//import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.HeatMapAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.SegmentationAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.SimpleMetricAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.ThresholdAnalysisUI;
-import cz.vutbr.fit.dashapp.view.tools.analysis.WidgetAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.AverageMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.CompareAllAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.CompareAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.EdgesAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.EntropyAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.HeatMapAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.SegmentationAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.SimpleMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.ThresholdAnalysisUI;
+import cz.vutbr.fit.dashapp.view.tools.analysis.heatmap.WidgetAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
@@ -82,23 +80,24 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		
 		guiTools.add(new OldImageTool());
 		
-		// heat map tools
-		LinkedList<AbstractAnalysisUI> heatmapActions = new LinkedList<>();
-		heatmapActions.add(new HeatMapAnalysisUI());
-		heatmapActions.add(new EntropyAnalysisUI());
-		heatmapActions.add(new ThresholdAnalysisUI());
-		heatmapActions.add(new EdgesAnalysisUI());
-		heatmapActions.add(new WidgetAnalysisUI());
-		heatmapActions.add(new CompareAnalysisUI());
-		heatmapActions.add(new CompareAllAnalysisUI());
+		// folder analysis tools
 		MetricType[] metricTypes = MetricType.values();
-		heatmapActions.add(new SimpleMetricAnalysisUI(metricTypes));
-		heatmapActions.add(new AverageMetricAnalysisUI(metricTypes));
-		//heatmapActions.add(new FolderAnalysisUI(new WidgetMetricAnalysis()));
-		//heatmapActions.add(new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()));
 		SegmentationType[] segmentationTypes = SegmentationType.values();
-		heatmapActions.add(new SegmentationAnalysisUI(segmentationTypes));
-		guiTools.add(new AnalysisTool(heatmapActions.toArray(new AbstractAnalysisUI[heatmapActions.size()])));
+		FolderAnalysisUI[] folderActionsUIs = new FolderAnalysisUI[] {
+				new HeatMapAnalysisUI(),
+				new EntropyAnalysisUI(),
+				new ThresholdAnalysisUI(),
+				new EdgesAnalysisUI(),
+				new WidgetAnalysisUI(),
+				new CompareAnalysisUI(),
+				new CompareAllAnalysisUI(),
+				new SimpleMetricAnalysisUI(metricTypes),
+				new AverageMetricAnalysisUI(metricTypes),
+				//new FolderAnalysisUI(new WidgetMetricAnalysis()),
+				//new FolderAnalysisUI(new TestOfGEBoundariesAnalysis()),
+				new SegmentationAnalysisUI(segmentationTypes),
+		};
+		guiTools.add(new FolderAnalysisTool(folderActionsUIs));
 	}
 	
 	@Override

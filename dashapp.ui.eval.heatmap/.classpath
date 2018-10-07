@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.segmentation"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

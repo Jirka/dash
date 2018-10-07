@@ -19,7 +19,7 @@ import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
 public class CompareAnalysis extends AbstractHeatMapAnalysis {
 	
-	public static final String LABEL = "Compare Widgets";
+	public static final String LABEL = "Compare 2 Files";
 	public static final String NAME = "cmp";
 	public static final String FILE = "_" + NAME;
 	

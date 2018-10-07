@@ -25,7 +25,7 @@ import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;;
  */
 public class CompareAllAnalysis extends AbstractHeatMapAnalysis {
 	
-	public static final String LABEL = "Compare Widgets (All)";
+	public static final String LABEL = "Compare Regex Files";
 	public static final String NAME = "cmp-all";
 	public static final String FILE = "_" + NAME;
 	

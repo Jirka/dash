@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 
+import cz.vutbr.fit.dashapp.segmenation.methods.Experimental1;
+import cz.vutbr.fit.dashapp.segmenation.methods.Experimental2;
+import cz.vutbr.fit.dashapp.segmenation.methods.Experimental4;
+import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUp;
+import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUpRefactorized;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
@@ -23,7 +28,9 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
 import cz.vutbr.fit.dashapp.view.tools.image.ImageActionFactory;
 import cz.vutbr.fit.dashapp.view.tools.image.ImageTool;
-import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationImageActionFactory;
+import cz.vutbr.fit.dashapp.view.tools.image.segmentation.SegmentationImageActionFactory;
+import cz.vutbr.fit.dashapp.view.tools.segmentation.DashboardSegmentationUI;
+import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationAlgorithmUI;
 import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
@@ -74,7 +81,16 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools.add(new ImageTool(ImageActionFactory.getRecommendedActions()));
 		guiTools.add(new ImageTool(SegmentationImageActionFactory.getRecommendedActions()));
 		
-		guiTools.add(new SegmentationTool());
+		// segmentation algorithm tool
+		SegmentationAlgorithmUI[] segmentationUIs = new SegmentationAlgorithmUI[] {
+				new DashboardSegmentationUI(),
+				new SegmentationAlgorithmUI(new Experimental1()),
+				new SegmentationAlgorithmUI(new Experimental2()),
+				new SegmentationAlgorithmUI(new Experimental4()),
+				new SegmentationAlgorithmUI(new BottomUp()),
+				new SegmentationAlgorithmUI(new BottomUpRefactorized()),
+		};
+		guiTools.add(new SegmentationTool(segmentationUIs));
 	}
 	
 

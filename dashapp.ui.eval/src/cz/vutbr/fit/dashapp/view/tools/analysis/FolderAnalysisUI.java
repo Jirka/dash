@@ -1,10 +1,8 @@
 package cz.vutbr.fit.dashapp.view.tools.analysis;
 
-import java.awt.GridLayout;
 import java.util.List;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -13,12 +11,24 @@ import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.view.DashAppView;
+import cz.vutbr.fit.dashapp.view.action.IDashActionUI;
 import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog;
 import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog.DashAppTask;
+import cz.vutbr.fit.dashapp.view.util.SettingsDialog;
 
-public class FolderAnalysisUI extends AbstractAnalysisUI {
+/**
+ * 
+ * Analysis goes through all folders in workspace and makes heatmaps of dashboards stored in selected folder.
+ * It expects dashboards to differ only in XML description.
+ * Dashboards can be filtered by PREFIX.
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public class FolderAnalysisUI implements IDashActionUI {
 	
-	AbstractAnalysis analysis;
+	protected AbstractAnalysis analysis;
+	protected JTextField folderRegexInput;
 	
 	public static final String DEFAULT_FOLDER_REGEX = ".*";
 	
@@ -29,9 +39,13 @@ public class FolderAnalysisUI extends AbstractAnalysisUI {
 		this.analysis = analysis;
 	}
 	
+	public String getLabel() {
+		return this.analysis.toString();
+	}
+	
 	@Override
 	public String toString() {
-		return this.analysis.toString();
+		return getLabel();
 	}
 
 	@Override
@@ -44,37 +58,58 @@ public class FolderAnalysisUI extends AbstractAnalysisUI {
 	}
 	
 	private boolean getSettings() {
-		// dialog panel
-		JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5)); // TODO use better layout
-		
-		// folder regex
-		JLabel folderRegexLabel = new JLabel("Input folders regex:");
-		JTextField folderRegexInput = new JTextField(DEFAULT_FOLDER_REGEX);
-		panel.add(folderRegexLabel);
-        panel.add(folderRegexInput);
-		
-        // custom settings
-		getCustomSettings(panel);
-
-		int option = JOptionPane.showConfirmDialog(null, panel, analysis + " Settings", JOptionPane.OK_CANCEL_OPTION);
-		if (option == JOptionPane.OK_OPTION) {
-			chosenFolderRegex = (String) folderRegexInput.getText();
-			analysis.init();
-			processCustomSettings();
-			return true;
-		}
-		return false;
+		FolderAnalysisSettingsDialog settingsDialog = new FolderAnalysisSettingsDialog(this);
+		return settingsDialog.showConfirmDialog();
 	}
 
 	protected void getCustomSettings(JPanel panel) {
-		// extend this class if required
+		// folder regex
+		JLabel folderRegexLabel = new JLabel("Input folders regex:");
+		folderRegexInput = new JTextField(DEFAULT_FOLDER_REGEX);
+		panel.add(folderRegexLabel);
+        panel.add(folderRegexInput);
+		
+        // extend this class if required
 	}
 	
 	protected void processCustomSettings() {
+		chosenFolderRegex = (String) folderRegexInput.getText();
+		analysis.init();
+		
 		// extend this class if required
 	}
+	
+	/**
+	 * 
+	 * @author Jiri Hynek
+	 *
+	 */
+	public static class FolderAnalysisSettingsDialog extends SettingsDialog {
+		
+		private FolderAnalysisUI analysisUI;
 
-	static class FolderAnalysisTask extends DashAppTask {
+		public FolderAnalysisSettingsDialog(FolderAnalysisUI analysisUI) {
+			super(analysisUI.analysis + " Settings");
+			this.analysisUI = analysisUI;
+		}
+		
+		@Override
+		protected void getCustomSettings(JPanel panel) {
+			analysisUI.getCustomSettings(panel);
+		}
+		
+		@Override
+		protected void processCustomSettings() {
+			analysisUI.processCustomSettings();
+		}
+	}
+
+	/**
+	 * 
+	 * @author Jiri Hynek
+	 *
+	 */
+	public static class FolderAnalysisTask extends DashAppTask {
 		
 		private AbstractAnalysis analysis;
 		private String folderRegex;
