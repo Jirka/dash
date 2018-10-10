@@ -24,7 +24,7 @@ public class BasicDashAction extends AbstractAction {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		this.actionUI.perform();
+		this.actionUI.perform(e);
 	}
 
 }

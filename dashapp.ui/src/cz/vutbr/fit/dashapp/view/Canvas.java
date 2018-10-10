@@ -270,7 +270,7 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 	private void updateDashboardFile(IWorkspaceFile workspaceFile) {
 		if(workspaceFile instanceof DashboardFile) {
 			this.dashboardFile = (DashboardFile) workspaceFile;
-			this.dashboard = this.dashboardFile.getDashboard(false);
+			this.dashboard = this.dashboardFile.getPhysicalDashboard();
 		} else {
 			this.dashboardFile = null;
 		}
@@ -402,21 +402,25 @@ public class Canvas extends JPanel implements IPropertyChangeListener, MouseList
 		updateDashboardFile(workspaceFile);
 		if(workspaceFile != null && workspaceFile instanceof DashboardFile) {
 			DashboardFile dashboardFile = (DashboardFile) workspaceFile;
+			int imageWidth = 0;
+			int imageHeight = 0;
 			image = dashboardFile.getImage();
 			if(image != null) {
 				if(grayScale && grayScaleToolEnabled) {
 					convertToGrayScale(image);
 				}
+				imageWidth = image.getWidth();
+				imageHeight = image.getHeight();
 			}
 			int width, height;
 			
 			// get serialized dashboard width and height
 			if(dashboard.isSizeInitialized()) {
-				width = dashboard.x + dashboard.width;
-				height = dashboard.y + dashboard.height;
+				width = Math.max(imageWidth, dashboard.x2());
+				height = Math.max(imageHeight, dashboard.y2());
 			} else if(image != null) {
-				width = image.getWidth();
-		        height = image.getHeight();
+				width = imageWidth;
+		        height = imageHeight;
 		        dashboard.setDimension(0, 0, width, height);
 			} else {
 				return;

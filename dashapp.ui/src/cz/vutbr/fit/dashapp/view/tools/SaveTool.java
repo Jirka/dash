@@ -21,7 +21,7 @@ import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
-import cz.vutbr.fit.dashapp.view.util.Dialogs;
+import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
 
 /**
  * Save dashboard support.
@@ -113,7 +113,7 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 							DashAppController.getEventManager().saveDashboardToFile(selectedDashboardFile);
 							
 						} catch (IOException e1) {
-							Dialogs.report("Unable to save dashboard file " + selectedDashboardFile.toString() + ".");
+							SimpleDialogs.report("Unable to save dashboard file " + selectedDashboardFile.toString() + ".");
 						}
 					}
 					break;
@@ -137,7 +137,7 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 							}
 							sb.append(dashboardFile.getSerializedDashboard().toString());
 						}
-						Dialogs.report("Unable to save dashboard files: " + sb.toString() + ".");
+						SimpleDialogs.report("Unable to save dashboard files: " + sb.toString() + ".");
 					}
 					break;
 				}
@@ -179,7 +179,7 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 			}
 		}
 		if(!unsavedDashboards.isEmpty()) {
-			int result = Dialogs.YesNoCancel("There are several unsaved dashboards. Do you want to save them?");
+			int result = SimpleDialogs.YesNoCancel("There are several unsaved dashboards. Do you want to save them?");
 			if(result == JOptionPane.YES_OPTION) {
 				saveAllAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 			} else if(result == JOptionPane.CANCEL_OPTION) {

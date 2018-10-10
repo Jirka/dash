@@ -1,9 +1,14 @@
-package cz.vutbr.fit.dashapp.view.util;
+package cz.vutbr.fit.dashapp.view.dialog;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-public class Dialogs {
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public class SimpleDialogs {
 	
 	/**
 	 * Yes/no dialog.
@@ -26,6 +31,16 @@ public class Dialogs {
 	public static void report(String s) {
 		JFrame parent = new JFrame();
 		JOptionPane.showMessageDialog(parent, s);
+	}
+	
+	/**
+	 * Default report.
+	 *
+	 * @param s
+	 * @return 
+	 */
+	public static String inputText(String s, String implicitValue) {
+		return JOptionPane.showInputDialog(s, implicitValue);
 	}
 
 }

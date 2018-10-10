@@ -69,7 +69,7 @@ public class BottomUpRefactorized extends AbstractSegmentationAlgorithm implemen
 		dashboard.setDimension(0, 0, w, h);
 		List<Region> regions = BUBasicUtil.getRegions(finalCombination);
 		for (Rectangle r : regions) {
-			dashboard.addChildGE(new GraphicalElement(dashboard, r.x, r.y, r.width, r.height));
+			dashboard.addChildGE(new GraphicalElement(r.x, r.y, r.width, r.height));
 		}
 		
 		return dashboard;

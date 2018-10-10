@@ -1,7 +1,5 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis.heatmap;
+package cz.vutbr.fit.dashapp.view.action.analysis.heatmap;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Hashtable;
 
 import javax.swing.JCheckBox;
@@ -12,8 +10,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import cz.vutbr.fit.dashapp.eval.analysis.heatmap.EdgesAnalysis;
-import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.HeatMapWidgetAnalysis;
+import cz.vutbr.fit.dashapp.view.action.analysis.FolderAnalysisUI;
 
 /**
  * UI part of analysis which provides additional settings dialog.
@@ -21,7 +19,7 @@ import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
  * @author Jiri Hynek
  *
  */
-public class EdgesAnalysisUI extends FolderAnalysisUI {
+public class WidgetAnalysisUI extends FolderAnalysisUI {
 	
 	private JTextField fileRegexTextField;
 	private JCheckBox actFolderOutputCheckBox;
@@ -36,51 +34,51 @@ public class EdgesAnalysisUI extends FolderAnalysisUI {
 	private JCheckBox outBordersBodyCheckBox;
 	
 
-	public EdgesAnalysisUI() {
-		super(new EdgesAnalysis());
+	public WidgetAnalysisUI() {
+		super(new HeatMapWidgetAnalysis());
 	}
 	
 	@Override
 	protected void getCustomSettings(JPanel panel) {
 		super.getCustomSettings(panel);
 		
-		EdgesAnalysis edgesAnalysis = (EdgesAnalysis) analysis;
+		HeatMapWidgetAnalysis widgetAnalysis = (HeatMapWidgetAnalysis) analysis;
 		
 		// file regex
 		panel.add(new JLabel("Input files regex:"));
-		fileRegexTextField = new JTextField(edgesAnalysis.inputFilesRegex);
+		fileRegexTextField = new JTextField(widgetAnalysis.inputFilesRegex);
 		panel.add(fileRegexTextField);
 		
 		// output destinations
-		actFolderOutputCheckBox = new JCheckBox("Act folder output", edgesAnalysis.enable_act_folder_output);
+		actFolderOutputCheckBox = new JCheckBox("Act folder output", widgetAnalysis.enable_act_folder_output);
 		panel.add(actFolderOutputCheckBox);
-		allFolderOutputCheckBox = new JCheckBox("All folder output", edgesAnalysis.enable_all_folder_output);
+		allFolderOutputCheckBox = new JCheckBox("All folder output", widgetAnalysis.enable_all_folder_output);
 		panel.add(allFolderOutputCheckBox);
 		
 		// output 'all' relative path
 		panel.add(new JLabel("Ouput 'all' relative path:"));
-		outputPathTextField = new JTextField(edgesAnalysis.outputFolderPath);
+		outputPathTextField = new JTextField(widgetAnalysis.outputFolderPath);
 		panel.add(outputPathTextField);
 		
 		// output files prefix
 		panel.add(new JLabel("Ouput files prefix:"));
-		outputFilePrefixTextField = new JTextField(edgesAnalysis.outputFile);
+		outputFilePrefixTextField = new JTextField(widgetAnalysis.outputFile);
 		panel.add(outputFilePrefixTextField);
 		
 		// output types
-		outBasicCheckBox = new JCheckBox("Full with borders", edgesAnalysis.enable_basic_output);
+		outBasicCheckBox = new JCheckBox("Full with borders", widgetAnalysis.enable_basic_output);
 		panel.add(outBasicCheckBox);
-		outBasicBodyCheckBox = new JCheckBox("Body with borders", edgesAnalysis.enable_basic_body_output);
+		outBasicBodyCheckBox = new JCheckBox("Body with borders", widgetAnalysis.enable_basic_body_output);
 		panel.add(outBasicBodyCheckBox);
-		outBordersCheckBox = new JCheckBox("Full without borders", edgesAnalysis.enable_borders_output);
+		outBordersCheckBox = new JCheckBox("Full without borders", widgetAnalysis.enable_borders_output);
 		panel.add(outBordersCheckBox);
-		outBordersBodyCheckBox = new JCheckBox("Body without borders", edgesAnalysis.enable_borders_body_output);
+		outBordersBodyCheckBox = new JCheckBox("Body without borders", widgetAnalysis.enable_borders_body_output);
 		panel.add(outBordersBodyCheckBox);
 		
 		// threshold
-		boolean isThresholdEnabled = edgesAnalysis.enable_custom_threshold;
-		double defaultThreshold = edgesAnalysis.threshold;
-		thresholdSlider = new JSlider(0, 100, (int) (defaultThreshold*100));
+		boolean isThresholdEnabled = widgetAnalysis.enable_custom_threshold;
+		double defaultThreshold = widgetAnalysis.threshold;
+		thresholdSlider = new JSlider(0, 100, 80);
 		thresholdSlider.setEnabled(isThresholdEnabled);
 		thresholdSlider.setMajorTickSpacing(50);
 		thresholdSlider.setMinorTickSpacing(10);
@@ -103,10 +101,10 @@ public class EdgesAnalysisUI extends FolderAnalysisUI {
 			}
 		});
 		thresholdCheckBox = new JCheckBox("Custom threshold", isThresholdEnabled);
-		thresholdCheckBox.addActionListener(new ActionListener() {
-
+		thresholdCheckBox.addChangeListener(new ChangeListener() {
+			
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void stateChanged(ChangeEvent e) {
 				if(e.getSource() == thresholdCheckBox) {
 					thresholdSlider.setEnabled(thresholdCheckBox.isSelected());
 				}
@@ -120,19 +118,19 @@ public class EdgesAnalysisUI extends FolderAnalysisUI {
 	protected void processCustomSettings() {
 		super.processCustomSettings();
 		
-		EdgesAnalysis edgesAnalysis = (EdgesAnalysis) analysis;
+		HeatMapWidgetAnalysis widgetAnalysis = (HeatMapWidgetAnalysis) analysis;
 		
 		// file regex
 		String chosenFileRegex = (String) fileRegexTextField.getText();
 		if(chosenFileRegex == null || chosenFileRegex.isEmpty()) {
 			// TODO test validity
-			chosenFileRegex = edgesAnalysis.inputFilesRegex;
+			chosenFileRegex = widgetAnalysis.inputFilesRegex;
 		}
-		edgesAnalysis.inputFilesRegex = chosenFileRegex;
+		widgetAnalysis.inputFilesRegex = chosenFileRegex;
 		
 		// output types
-		edgesAnalysis.enable_act_folder_output = actFolderOutputCheckBox.isSelected();
-		edgesAnalysis.enable_all_folder_output = allFolderOutputCheckBox.isSelected();
+		widgetAnalysis.enable_act_folder_output = actFolderOutputCheckBox.isSelected();
+		widgetAnalysis.enable_all_folder_output = allFolderOutputCheckBox.isSelected();
 		//heatMapAnalysis.enable_stats_output = statsCheckBox.isSelected();
 		
 		// output 'all' relative path
@@ -142,27 +140,27 @@ public class EdgesAnalysisUI extends FolderAnalysisUI {
 			if(chosenOuputPath.endsWith("/")) {
 				chosenOuputPath.substring(0, chosenOuputPath.length()-1);
 			}
-			chosenOuputPath = edgesAnalysis.outputFolderPath;
+			chosenOuputPath = widgetAnalysis.outputFolderPath;
 		}
-		edgesAnalysis.outputFolderPath = chosenOuputPath;
+		widgetAnalysis.outputFolderPath = chosenOuputPath;
 		
 		// output 'all' relative path
 		String chosenOuputFilePrefix = (String) outputFilePrefixTextField.getText();
 		if(chosenOuputFilePrefix == null || chosenOuputFilePrefix.isEmpty()) {
 			// TODO test validity
-			chosenOuputFilePrefix = edgesAnalysis.outputFile;
+			chosenOuputFilePrefix = widgetAnalysis.outputFile;
 		}
-		edgesAnalysis.outputFile = chosenOuputFilePrefix;
+		widgetAnalysis.outputFile = chosenOuputFilePrefix;
 		
 		// output types
-		edgesAnalysis.enable_basic_output = outBasicCheckBox.isSelected();
-		edgesAnalysis.enable_basic_body_output = outBasicBodyCheckBox.isSelected();
-		edgesAnalysis.enable_borders_output = outBordersCheckBox.isSelected();
-		edgesAnalysis.enable_borders_body_output = outBordersBodyCheckBox.isSelected();
+		widgetAnalysis.enable_basic_output = outBasicCheckBox.isSelected();
+		widgetAnalysis.enable_basic_body_output = outBasicBodyCheckBox.isSelected();
+		widgetAnalysis.enable_borders_output = outBordersCheckBox.isSelected();
+		widgetAnalysis.enable_borders_body_output = outBordersBodyCheckBox.isSelected();
 		
 		// threshold
-		edgesAnalysis.enable_custom_threshold = thresholdCheckBox.isSelected();
-		edgesAnalysis.threshold = thresholdSlider.getValue()/100.0;
+		widgetAnalysis.enable_custom_threshold = thresholdCheckBox.isSelected();
+		widgetAnalysis.threshold = thresholdSlider.getValue()/100.0;
 	}
 
 }

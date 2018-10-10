@@ -140,7 +140,7 @@ public class Experimental4 extends AbstractSegmentationAlgorithm implements ISeg
 		dashboard.setDimension(0, 0, w, h);
 		
 		for (Rectangle r : mainRegions) {
-			dashboard.addChildGE(new GraphicalElement(dashboard, r.x, r.y, r.width, r.height));
+			dashboard.addChildGE(new GraphicalElement(r.x, r.y, r.width, r.height));
 		}
 		
 		return dashboard;

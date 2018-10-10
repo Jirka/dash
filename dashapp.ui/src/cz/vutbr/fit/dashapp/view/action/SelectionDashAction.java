@@ -28,7 +28,7 @@ public class SelectionDashAction extends AbstractAction {
 		IDashActionUI analysis = chooseAction();
 		if(analysis != null) {
 			// create analysis
-			analysis.perform();
+			analysis.perform(e);
 		}
 	}
 	

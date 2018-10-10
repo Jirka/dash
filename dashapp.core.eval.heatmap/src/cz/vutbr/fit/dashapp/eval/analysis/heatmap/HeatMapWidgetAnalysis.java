@@ -206,7 +206,7 @@ public class HeatMapWidgetAnalysis extends AbstractHeatMapAnalysis {
                 	//double screenShare = colorCount/((double)(actWidth*actHeight));
                 	
             		if(colorShare > 0.95) {
-            			dashboard.addChildGE(new GraphicalElement(dashboard, rectangle.x, rectangle.y, rectangle.width, rectangle.height));
+            			dashboard.addChildGE(new GraphicalElement(rectangle.x, rectangle.y, rectangle.width, rectangle.height));
                 	} else {
                 		// split rectangle...
                 		
@@ -244,7 +244,7 @@ public class HeatMapWidgetAnalysis extends AbstractHeatMapAnalysis {
                 			line.draw(image, Color.RED.getRGB());
                 		} else {
                 			if(colorShare > 0.75) {
-                				dashboard.addChildGE(new GraphicalElement(dashboard, rectangle.x, rectangle.y, rectangle.width, rectangle.height));
+                				dashboard.addChildGE(new GraphicalElement(rectangle.x, rectangle.y, rectangle.width, rectangle.height));
                 			}
                 		}
                 	}

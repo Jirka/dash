@@ -1,5 +1,6 @@
-package cz.vutbr.fit.dashapp.view.tools.segmentation;
+package cz.vutbr.fit.dashapp.view.tools;
 
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JCheckBox;
@@ -13,9 +14,9 @@ import cz.vutbr.fit.dashapp.segmenation.ISegmentationDebugListener;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.action.IDashActionUI;
-import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog;
-import cz.vutbr.fit.dashapp.view.util.SettingsDialog;
-import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog.DashAppTask;
+import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog;
+import cz.vutbr.fit.dashapp.view.dialog.GridLayoutFormDialog;
+import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog.DashAppTask;
 import extern.ImagePreview;
 import tmp.Histogram;
 
@@ -46,7 +47,7 @@ public class SegmentationAlgorithmUI implements IDashActionUI {
 		return getLabel();
 	}
 	
-	public void perform() {
+	public void perform(ActionEvent e) {
 		if(getSettings()) {
 			SegmentationAlgorithmTask task = new SegmentationAlgorithmTask(segmentationAlgorithm, debug);
 			DashAppProgressDialog monitor = new DashAppProgressDialog(DashAppView.getInstance().getFrame(), task);
@@ -79,7 +80,7 @@ public class SegmentationAlgorithmUI implements IDashActionUI {
 	 * @author Jiri Hynek
 	 *
 	 */
-	public static class SegmentationAlgorithmSettingsDialog extends SettingsDialog {
+	public static class SegmentationAlgorithmSettingsDialog extends GridLayoutFormDialog {
 		
 		private SegmentationAlgorithmUI algorithmUI;
 
@@ -89,13 +90,15 @@ public class SegmentationAlgorithmUI implements IDashActionUI {
 		}
 		
 		@Override
-		protected void getCustomSettings(JPanel panel) {
+		protected void addCustomWidgets(JPanel panel) {
 			algorithmUI.getCustomSettings(panel);
 		}
 		
 		@Override
-		protected void processCustomSettings() {
+		protected boolean processCustomWidgets() {
 			algorithmUI.processCustomSettings();
+			
+			return true;
 		}
 	}
 	

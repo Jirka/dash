@@ -49,6 +49,7 @@ public class EventManager {
 	public static enum EventKind {
 		FOLDER_PATH_CHANGED,
 		FILE_SELECTION_CHANGED,
+		FILE_SELECTION_CHANGED_IMPLICIT,
 		XML_CHANGED,
 		GRAPHICAL_ELEMENT_CHANGED,
 		GRAPHICAL_ELEMENT_CREATED,
@@ -292,7 +293,7 @@ public class EventManager {
 			y = parent.toRelativeX(y);
 		}
 		// create graphical element
-		GraphicalElement graphicalElement = new GraphicalElement(parent, x, y, width, height);
+		GraphicalElement graphicalElement = new GraphicalElement(x, y, width, height);
 		// add to parent
 		parent.addChildGE(graphicalElement);
 		// update dashboard serialized definition (serialization problem should not occur)
@@ -330,7 +331,7 @@ public class EventManager {
 	 * 
 	 * @param workspaceFile
 	 */
-	public void updateSelectedWorkspaceFile(IWorkspaceFile workspaceFile) {
+	public void reloadSelectedWorkspaceFile(IWorkspaceFile workspaceFile) {
 		DashAppModel model = DashAppModel.getInstance();
 		IWorkspaceFile oldFile = model.getSelectedFile();
 		if(oldFile != workspaceFile) {
@@ -346,6 +347,36 @@ public class EventManager {
 			}
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FILE_SELECTION_CHANGED, workspaceFile, new Change(oldFile, workspaceFile), null));
 		}
+	}
+	
+	public void changeSelectedWorkspaceFile(String fileName) {
+		changeSelectedWorkspaceFile(fileName, null);
+	}
+	
+	public void changeSelectedWorkspaceFile(String fileName, String imageExtension) {
+    	DashAppModel model = DashAppModel.getInstance();
+    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(true);
+    	DashboardFile df = null;
+    	String fullName = imageExtension != null ? (fileName + "." + imageExtension) : fileName;
+    	for (IWorkspaceFile child : children) {
+    		if(child instanceof DashboardFile) {
+    			if(((DashboardFile) child).getFileName().equals(fileName)) {
+    				if(imageExtension != null) {
+    					File imageFile = ((DashboardFile) child).getImageFile();
+    					if(imageFile != null && imageFile.getName().equals(fullName)) {
+    						df = (DashboardFile) child;
+    						break;
+    					}
+    				} else {
+    					df = (DashboardFile) child;
+    					break;
+    				}
+				}
+    		}
+		}
+    	if(df != null) {
+    		reloadSelectedWorkspaceFile(df);
+    	}				    
 	}
 	
 	public void refreshFolder() {
@@ -364,12 +395,19 @@ public class EventManager {
 		DashAppModel model = DashAppModel.getInstance();
 		WorkspaceFolder oldFolder = model.getWorkspaceFolder();
 		if(!oldFolder.equals(folder) || forceReload) {
-			updateSelectedWorkspaceFile(null);
+			reloadSelectedWorkspaceFile(null);
 			model.getOpenedDashboardFiles().clear();
 			model.setWorkspaceFolder(folder);
 			controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(oldFolder, folder), null));
 			model.getOpenedDashboardFiles().clear(); // folder is changed, all cached dashboards can be released
 		}
+	}
+	
+	public void refreshWorkspaceFolder() {
+		WorkspaceFolder folder = DashAppModel.getInstance().getWorkspaceFolder();
+		// update workspace
+		folder.getChildren(true); // TODO create new instance for the Change object
+		controller.firePropertyChange(new PropertyChangeEvent(EventKind.FOLDER_PATH_CHANGED, null, new Change(folder, folder), null));
 	}
 	
 	/**
@@ -422,17 +460,18 @@ public class EventManager {
 				saveDashboardToFile(dashboardFile);
 				// add to model
 				model.setDashboardFileOpened(dashboardFile);
+				// update workspace
+				refreshWorkspaceFolder();
 				// update selection
-				updateSelectedWorkspaceFile(dashboardFile);
-			} catch (IOException e) {
-				return false;
+				reloadSelectedWorkspaceFile(dashboardFile);
 			} catch (Exception e) {
-				e.printStackTrace();
 				return false;
 			}
 			
 			return true;
+		} else {
+			changeSelectedWorkspaceFile(name);
 		}
-		return false;
+		return true;
 	}
 }

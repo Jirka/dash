@@ -13,13 +13,16 @@ public class PhantomConfiguration {
 	private String outputFolder = null;
 	private String urlAddress = null;
 	private String fileName = null;
+	private String imageFormat = null;
 	private String selector = null;
 	private Integer height = null;
 	private Integer width = null;
 	private Integer timeout = null;
 	private Integer maximumHierarchyLevel = null;
-	private boolean onlyScreen = false;
-	private boolean generateWidetScreenshots = false;
+	private Integer marginX = null;
+	private Integer marginY = null;
+	private Boolean onlyScreen = null;
+	private Boolean generateWidgetScreenshots = null;
 	
 	public PhantomConfiguration() {
 	}
@@ -64,11 +67,11 @@ public class PhantomConfiguration {
 		this.urlAddress = urlAddress;
 	}
 
-	public boolean isOnlyScreen() {
+	public Boolean isOnlyScreen() {
 		return onlyScreen;
 	}
 
-	public void setOnlyScreen(boolean onlyScreen) {
+	public void setOnlyScreen(Boolean onlyScreen) {
 		this.onlyScreen = onlyScreen;
 	}
 
@@ -80,12 +83,12 @@ public class PhantomConfiguration {
 		this.maximumHierarchyLevel = maximumHierarchyLevel;
 	}
 
-	public boolean isGenerateWidetScreenshots() {
-		return generateWidetScreenshots;
+	public Boolean isGenerateWidgetScreenshots() {
+		return generateWidgetScreenshots;
 	}
 
-	public void setGenerateWidetScreenshots(boolean generateWidetScreenshots) {
-		this.generateWidetScreenshots = generateWidetScreenshots;
+	public void setGenerateWidgetScreenshots(Boolean generateWidgetScreenshots) {
+		this.generateWidgetScreenshots = generateWidgetScreenshots;
 	}
 
 	public String getFileName() {
@@ -126,5 +129,30 @@ public class PhantomConfiguration {
 
 	public void setTimeout(Integer timeout) {
 		this.timeout = timeout;
+	}
+	
+	public Integer getMarginX() {
+		return marginX;
+	}
+
+	public void setMarginX(Integer marginX) {
+		this.marginX = marginX;
+	}
+	
+	public Integer getMarginY() {
+		return marginY;
+	}
+
+	public void setMarginY(Integer marginY) {
+		this.marginY = marginY;
+	}
+	
+	public String getImageFormat() {
+		return imageFormat;
+	}
+
+	public void setImageFormat(String imageFormat) {
+		this.imageFormat = imageFormat;
+		
 	}
 }

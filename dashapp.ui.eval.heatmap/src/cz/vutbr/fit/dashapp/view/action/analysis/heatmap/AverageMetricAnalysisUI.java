@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis.heatmap;
+package cz.vutbr.fit.dashapp.view.action.analysis.heatmap;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +20,7 @@ import javax.swing.event.ChangeListener;
 
 import cz.vutbr.fit.dashapp.eval.analysis.heatmap.AverageMetricAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricType;
-import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
+import cz.vutbr.fit.dashapp.view.action.analysis.FolderAnalysisUI;
 
 /**
  * UI part of analysis which provides additional settings dialog.

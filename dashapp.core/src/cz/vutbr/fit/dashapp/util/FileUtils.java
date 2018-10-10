@@ -11,6 +11,10 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 
 public class FileUtils {
 	
+	public static final String IMAGE_EXTENSION = "png";
+	public static final String DASHBOARD_EXTENSION = "xml";
+	public static final String TEXT_EXTENSION = "txt";
+	
 	public static File createFile(String folderPath, String fileName, String fileExtension) {
 		File folder = new File(folderPath);
 		if(!folder.exists()) {
@@ -19,8 +23,8 @@ public class FileUtils {
 		return new File(folderPath + "/" + fileName + "." + fileExtension);
 	}
 	
-	public static void saveDashboard(Dashboard dashboard, String folderPath, String fileName) {
-		File outputFile = createFile(folderPath, fileName, "xml");
+	public static File saveDashboard(Dashboard dashboard, String folderPath, String fileName) {
+		File outputFile = createFile(folderPath, fileName, DASHBOARD_EXTENSION);
 		try {
 			FileOutputStream out = new FileOutputStream(outputFile);
 			out.write(XMLUtils.serialize(dashboard).getBytes());
@@ -29,20 +33,22 @@ public class FileUtils {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		return outputFile;
 	}
 	
-	public static void saveImage(BufferedImage image, String folderPath, String fileName) {
-		File outputFile = createFile(folderPath, fileName, "png");
+	public static File saveImage(BufferedImage image, String folderPath, String fileName) {
+		File outputFile = createFile(folderPath, fileName, IMAGE_EXTENSION);
 		try {
 			ImageIO.write(image, "png", outputFile);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		return outputFile;
 	}
 	
-	public static void saveTextFile(String output, String folderPath, String fileName) {
-		File outputFile = createFile(folderPath, fileName, "txt");
+	public static File saveTextFile(String output, String folderPath, String fileName) {
+		File outputFile = createFile(folderPath, fileName, TEXT_EXTENSION);
 		try {
 			FileOutputStream out = new FileOutputStream(outputFile);
 			out.write(output.getBytes());
@@ -51,6 +57,7 @@ public class FileUtils {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		return outputFile;
 	}
 
 }

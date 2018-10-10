@@ -14,7 +14,13 @@ import javax.swing.JTextField;
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
+import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class NewFileTool extends AbstractGUITool implements IGUITool {
 	
 	NewFileAction newFileAction;
@@ -66,17 +72,14 @@ public class NewFileTool extends AbstractGUITool implements IGUITool {
 			spinnerHeight.setPreferredSize(new Dimension(60, 20));
 			final JComponent[] inputs = new JComponent[] { new JLabel("Name"), nameInput, new JLabel("Width"),
 					spinnerWidth, new JLabel("Height"), spinnerHeight };
-			//
-			if (JOptionPane.showConfirmDialog(null, inputs, "My custom dialog", JOptionPane.OK_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
-				try {
-					int width = new Integer(spinnerWidth.getValue().toString());
-					int height = new Integer(spinnerHeight.getValue().toString());
-					if (DashAppController.getEventManager().createEmptyDashboard(width, height, nameInput.getText())) {
-						// TODO report problem;
-					}
-				} catch (Exception e2) {
-					// TODO: handle exception
+			// ask user
+			if (JOptionPane.showConfirmDialog(null, inputs, "Create empty dashboard", JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION) {
+				int width = new Integer(spinnerWidth.getValue().toString());
+				int height = new Integer(spinnerHeight.getValue().toString());
+				// try to create new file
+				if (!DashAppController.getEventManager().createEmptyDashboard(width, height, nameInput.getText())) {
+					SimpleDialogs.report("Unable to create new file. Check write permissions.");
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis.heatmap;
+package cz.vutbr.fit.dashapp.view.action.analysis.heatmap;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,7 +16,7 @@ import javax.swing.JTextField;
 
 import cz.vutbr.fit.dashapp.eval.analysis.heatmap.SegmentationAnalysis;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
-import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
+import cz.vutbr.fit.dashapp.view.action.analysis.FolderAnalysisUI;
 
 public class SegmentationAnalysisUI extends FolderAnalysisUI {
 	

@@ -1,5 +1,6 @@
-package cz.vutbr.fit.dashapp.view.tools.analysis;
+package cz.vutbr.fit.dashapp.view.action.analysis;
 
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -12,9 +13,9 @@ import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.action.IDashActionUI;
-import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog;
-import cz.vutbr.fit.dashapp.view.util.DashAppProgressDialog.DashAppTask;
-import cz.vutbr.fit.dashapp.view.util.SettingsDialog;
+import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog;
+import cz.vutbr.fit.dashapp.view.dialog.GridLayoutFormDialog;
+import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog.DashAppTask;
 
 /**
  * 
@@ -49,7 +50,7 @@ public class FolderAnalysisUI implements IDashActionUI {
 	}
 
 	@Override
-	public void perform() {
+	public void perform(ActionEvent e) {
 		if(getSettings()) {
 			FolderAnalysisTask task = new FolderAnalysisTask(analysis, chosenFolderRegex);
 			DashAppProgressDialog monitor = new DashAppProgressDialog(DashAppView.getInstance().getFrame(), task);
@@ -75,7 +76,7 @@ public class FolderAnalysisUI implements IDashActionUI {
 	protected void processCustomSettings() {
 		chosenFolderRegex = (String) folderRegexInput.getText();
 		analysis.init();
-		
+
 		// extend this class if required
 	}
 	
@@ -84,7 +85,7 @@ public class FolderAnalysisUI implements IDashActionUI {
 	 * @author Jiri Hynek
 	 *
 	 */
-	public static class FolderAnalysisSettingsDialog extends SettingsDialog {
+	public static class FolderAnalysisSettingsDialog extends GridLayoutFormDialog {
 		
 		private FolderAnalysisUI analysisUI;
 
@@ -94,13 +95,15 @@ public class FolderAnalysisUI implements IDashActionUI {
 		}
 		
 		@Override
-		protected void getCustomSettings(JPanel panel) {
+		protected void addCustomWidgets(JPanel panel) {
 			analysisUI.getCustomSettings(panel);
 		}
 		
 		@Override
-		protected void processCustomSettings() {
+		protected boolean processCustomWidgets() {
 			analysisUI.processCustomSettings();
+			
+			return true;
 		}
 	}
 

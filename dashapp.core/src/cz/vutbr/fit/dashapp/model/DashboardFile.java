@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import cz.vutbr.fit.dashapp.Logger;
+import cz.vutbr.fit.dashapp.util.FileUtils;
 import cz.vutbr.fit.dashapp.util.XMLUtils;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
@@ -54,7 +55,7 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 	}
 
 	public void setFile(File file) {
-		if (file.getName().toLowerCase().endsWith(".xml")) {
+		if (file.getName().toLowerCase().endsWith("." + FileUtils.DASHBOARD_EXTENSION)) {
 			setXmlFile(file);
 		} else {
 			setImageFile(file);
@@ -153,6 +154,19 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 		}
 	}
 	
+	/**
+	 * This method is stronger than getActualDashboard.
+	 * 
+	 * @return
+	 */
+	public Dashboard getPhysicalDashboard() {
+		if(dashboard == null) {
+			reloadDashboard();
+		}
+		return dashboard;
+	}
+	
+	@Override
 	public Dashboard getDashboard(boolean forceDashboardLoad) {
 		if(dashboard == null && forceDashboardLoad) {
 			reloadDashboard();

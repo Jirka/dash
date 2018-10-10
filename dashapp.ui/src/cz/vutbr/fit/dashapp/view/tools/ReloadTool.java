@@ -10,7 +10,7 @@ import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.util.DashAppUtils;
 import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
-import cz.vutbr.fit.dashapp.view.util.Dialogs;
+import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
 
 /**
  * Load dashboard support.
@@ -60,7 +60,7 @@ public class ReloadTool extends AbstractGUITool implements IGUITool {
 				try {
 					DashAppController.getEventManager().reloadDashboardFromFile(selectedDashboardFile);
 				} catch (Exception e1) {
-					Dialogs.report("Unable to load dashboard file.");
+					SimpleDialogs.report("Unable to load dashboard file.");
 				}
 			}
 		}

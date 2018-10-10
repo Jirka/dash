@@ -157,20 +157,23 @@ public class GraphicalElement {
 		// used by deserialization
 	}
 	
-	public GraphicalElement(GraphicalElement parent, int x, int y, int width, int height) {
-		this(parent, x, y);
+	public GraphicalElement(int x, int y, int width, int height) {
+		this(x, y);
 		this.width = width;
 		this.height = height;
 	}
 	
-	public GraphicalElement(GraphicalElement parent, int x, int y) {
+	public GraphicalElement(int x, int y) {
 		setParent(parent);
 		this.x = x;
 		this.y = y;
 	}
 	
 	public GraphicalElement copy() {
-		return new GraphicalElement(parent, x, y, width, height);
+		GraphicalElement copy = new GraphicalElement(x, y, width, height);
+		copy.setParent(parent);
+		copy.type = type;
+		return copy;
 	}
 	
 	public void setDimension(int x, int y, int width, int height) {
@@ -284,6 +287,7 @@ public class GraphicalElement {
 			children = new ArrayList<>();
 		}
 		children.add(graphicalElement);
+		graphicalElement.setParent(this);
 	}
 	
 	/**
@@ -469,6 +473,38 @@ public class GraphicalElement {
 		}
 		
 		return depth;
+	}
+	
+	/**
+	 * TODO: make this class to extend Rectangle
+	 * 
+	 * @return rectangle
+	 */
+	public Rectangle getRectangle() {
+		return new Rectangle(x, y, width, height);
+	}
+	
+	/**
+	 * Returns rectangle which lays in specific crop rectangle.
+	 * 
+	 * @param q
+	 * @return rectangle.
+	 */
+	public Rectangle intersectionRectangle(Rectangle cropRectangle) {
+		return getRectangle().intersection(cropRectangle);
+	}
+	
+	/**
+	 * Returns ge which lays in specific crop rectangle.
+	 * 
+	 * @param cropRectangle
+	 * @return
+	 */
+	public GraphicalElement intersectionGE(Rectangle cropRectangle) {
+		Rectangle intersectionRectangle = getRectangle().intersection(cropRectangle);
+		GraphicalElement intersectionGE = copy();
+		intersectionGE.setDimension(intersectionRectangle.x, intersectionRectangle.y, intersectionRectangle.width, intersectionRectangle.height);
+		return intersectionGE;
 	}
 	
 	/**

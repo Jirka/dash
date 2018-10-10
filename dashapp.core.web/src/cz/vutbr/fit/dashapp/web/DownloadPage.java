@@ -1,15 +1,8 @@
 package cz.vutbr.fit.dashapp.web;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.model.DashAppModel;
-import cz.vutbr.fit.dashapp.model.DashboardFile;
-import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
-import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 
 /**
  * 
@@ -32,36 +25,42 @@ public class DownloadPage {
 		String outputFolder = phantomConfiguration.getOutputFolder();
 		String url = phantomConfiguration.getUrlAddress();
 		String fileName = phantomConfiguration.getFileName();
+		String imageFormat = phantomConfiguration.getImageFormat();
 		String selector = phantomConfiguration.getSelector();
-		Integer height = phantomConfiguration.getHeight();
 		Integer width = phantomConfiguration.getWidth();
+		Integer height = phantomConfiguration.getHeight();
 		Integer timeout = phantomConfiguration.getTimeout();
 		Integer maximumHierarchyLevel = phantomConfiguration.getMaximumHierarchyLevel();
+		Integer marginX = phantomConfiguration.getMarginX();
+		Integer marginY = phantomConfiguration.getMarginY();
 		Boolean isOnlyScreen = phantomConfiguration.isOnlyScreen();
-		Boolean isGenerateWidetScreenshots = phantomConfiguration.isGenerateWidetScreenshots();
+		Boolean isGenerateWidgetScreenshots = phantomConfiguration.isGenerateWidgetScreenshots();
 		
 		String command = phantomBin + " " + phantomMain;
 		
 		// configuration file can be missing and parameters can be specified manually (or they can override configuration file)
-		command += isValueSet(configFile) ? " -c " + configFile  : "";
-		command += isValueSet(outputFolder) ? " -resultPath " + outputFolder : "";
-		command += isValueSet(url) ? " -url " + url  : "";
-		command += isValueSet(fileName) ? " -fileName " + fileName : "";
-		command += isValueSet(selector)? " -selector " + selector : "";
+		command += isStringSet(configFile) ? " -c " + configFile  : "";
+		command += isStringSet(outputFolder) ? " -resultPath " + outputFolder : "";
+		command += isStringSet(url) ? " -url " + url  : "";
+		command += isStringSet(fileName) ? " -fileName " + fileName : "";
+		command += isStringSet(imageFormat) ? " -imageFormat " + imageFormat : "";
+		command += isStringSet(selector)? " -selector " + selector : "";
 		
 		command += height != null ? " -heigth " + height : "";
 		command += width != null ? " -width " + width : "";
 		command += timeout != null ?  " -timeout " + timeout : "";
 		command += maximumHierarchyLevel != null ? " -maximumHierarchyLevel " + maximumHierarchyLevel : "";
+		command += marginX != null ? " -marginX " + marginX : "";
+		command += marginY != null ?  " -timeout " + marginY : "";
 		
-		command += isOnlyScreen ? " -onlyScreen true " : "";
-		command += isGenerateWidetScreenshots ? " -generateWidetScreenshots true " : "";
+		command += isOnlyScreen != null ? (" -onlyScreen " + (isOnlyScreen ? "true " : "false ")) : "";
+		command += isGenerateWidgetScreenshots != null ? (" -generateWidgetScreenshots " + (isGenerateWidgetScreenshots ? "true " : "false ")) : "";
 		
 		return command;
 	}
 	
-	private static boolean isValueSet(String value) {
-		return !value.isEmpty() && value != null;
+	private static boolean isStringSet(String value) {
+		return value != null && !value.isEmpty();
 	}
 	
 	/**
@@ -70,134 +69,110 @@ public class DownloadPage {
 	 * @param command
 	 * @return
 	 */
-	public static int runPhantomScript(String command) {
-		int status = 0;
+	public static int runPhantomScript(String command, StringBuffer result, int timeout) {
+		int status = -1;
 		
+		// run in new thread with limited time
+		RunCommandTask timeoutTask = new RunCommandTask(command, result);
+		timeoutTask.start();
 		try {
-			Process p = Runtime.getRuntime().exec(command);
+			// the timeout should be used by render method of phantom.js
+			// there are other stuff which need to be done
+			timeout += 2000;
 			
-			String line;
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			
-			StringBuffer result = new StringBuffer();
-		    while ((line = reader.readLine()) != null) {
-		    	result.append(line);
-		    	result.append('\n');
-	        }
-		    
-		    System.out.println(result.toString());
-		    
-		    // TODO process result similarly as runPhantomScript2
-		    
-		    status = p.waitFor();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// wait for timeout
+			timeoutTask.join(timeout);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// interrupted (OK)
+		}
+		
+		if(timeoutTask.isAlive()) {
+			timeoutTask.interrupt();
+			status = STATUS_Timeout;
+		} else {
+			status = timeoutTask.getStatus();
 		}
 		
 		return status;
 	}
-
-	public static void runPhantomScriptOld(String configFilePath) {
-		try {
-			String repositoryPath= getAbsolutePathOfScriptRepository();
-			String relativePath = "/dash.samples/phantom/src/";
-			String absolutePath = repositoryPath + relativePath;
+	
+	/**
+	 * Task which runs command using timeout.
+	 * 
+	 * @author Jiri Hynek
+	 *
+	 */
+	private static class RunCommandTask extends Thread {
+		
+		private int status = -1;
+		private String command;
+		private StringBuffer result;
+		Process runCommandProcess;
+		
+		public RunCommandTask(String command, StringBuffer result) {
+			this.command = command;
+			this.result = result;
+		}
+		
+		@Override
+		public final void run() {
+			// Function runs command and process result.
+			System.out.println("command: " + command);
 			
-			//setting paths for subprocess
-			String phantomJs = absolutePath + "main.js";
-			String phantomBin = absolutePath + "phantomjs ";
-			
-			String subprocess = phantomBin + phantomJs + " -c " + configFilePath + " -a " + absolutePath;
-			
-			Process p = Runtime.getRuntime().exec(subprocess);
-			
-			String line;
-			String resultPath = "";
-			String fileName = "";
-			String imageFormat = "";
-			BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		    while ((line = reader.readLine()) != null) {
-		    	String resultPathToFind = "resultPath::";					    	
-		    	int resultPathindex = line.indexOf(resultPathToFind);
-		        if(resultPathindex != -1) {
-		        	resultPath = line.substring(resultPathindex + resultPathToFind.length());
-		        	//resultPathHidden.setText(resultPath);
+			try {
+				runCommandProcess = Runtime.getRuntime().exec(command);
+				String line;
+				BufferedReader reader = new BufferedReader(new InputStreamReader(runCommandProcess.getInputStream()));
+							
+			    while ((line = reader.readLine()) != null) {
+			    	result.append(line);
+			    	result.append('\n');
 		        }
-
-		        String fileNameToFind = "fileName::";
-		        int fileNameIndex = line.indexOf(fileNameToFind);
-		        if(fileNameIndex != -1) {
-		        	fileName = line.substring(fileNameIndex + fileNameToFind.length());
-		        }
-		        
-		        String imageFormatToFind = "imageFormat::";
-		        int imageFormatIndex = line.indexOf(imageFormatToFind);
-		        if(imageFormatIndex != -1) {
-		        	imageFormat = line.substring(imageFormatIndex + imageFormatToFind.length());
-		        }
-	        }
-		    
-		    int status = p.waitFor();
-		    
-		    String statusText = (status == 0) ? "Success" : "Error";
-		    //statusBar.setText(statusText);
-		    
-		    if(status == 0) {
-			    File filee = new File(resultPath);
-			    DashAppController.getEventManager().updateWorkspaceFolder(
-		    		/*
-		    		 * set folder where downloaded image and xml are located
-		    		 */
-	        		new WorkspaceFolder(DashAppModel.getInstance(), new File(resultPath)), true
-		        );
-
-	    		File file = new File(resultPath + "/"+ fileName + "."+ imageFormat);
-			    File xmlFile = new File(resultPath + "/" + fileName +".xml");
-			    if(file.exists() && xmlFile.exists()) {
-			    	/*
-			    	 * should show downloaded image to canvas
-			    	 */
-			    	DashAppModel model = DashAppModel.getInstance();
-			    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(true);
-			    	DashboardFile df = null;
-			    	for (IWorkspaceFile child : children) {
-						if(child.getFileName().equals(fileName + "." + imageFormat) && child instanceof DashboardFile) {
-							df = (DashboardFile) child;
-							break;
-						}
-					}
-			    	if(df != null ) {
-			    		DashAppController.getEventManager().updateSelectedWorkspaceFile(df);
-			    	}					    
-			    }
 			    
-			    /*
-			     * should format generated xml to proper structure
-			     */
+			    System.out.println(result.toString());
 			    
-		    }	
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch(InterruptedException e) {
-			//TODO
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			    status = runCommandProcess.waitFor();
+			} catch (IOException e) {
+				status = STATUS_IOException;
+			} catch (InterruptedException e) {
+				status = STATUS_InterruptedException;
+			}
+		}
+		
+		public int getStatus() {
+			return status;
+		}
+		
+		@Override
+		public void interrupt() {
+			// kill command
+			runCommandProcess.destroy();
+			super.interrupt();
 		}
 	}
 	
-	private static String getAbsolutePathOfScriptRepository() {
-		File currentDirFile = new File(".");
-		currentDirFile.getParent();
-		String absolutePath = currentDirFile.getAbsolutePath();
-		int index = absolutePath.indexOf("/dash/");
-		absolutePath = absolutePath.substring(0, index);
+	public static final int STATUS_OK = 0;
+	public static final int STATUS_IOException = -10;
+	public static final int STATUS_InterruptedException = -20;
+	public static final int STATUS_Timeout = -30;
 	
-		return absolutePath;
+	public static String getErrorMessage(int status) {
+		String message;
+		switch (status) {
+		case STATUS_IOException:
+			message = "problem with reading input.";
+			break;
+		case STATUS_InterruptedException:
+			message = "interruted";
+			break;
+		case STATUS_Timeout:
+			message = "timeout";
+			break;
+		default:
+			message = "unknown problem";
+			break;
+		}
+		
+		return message;
 	}
 }

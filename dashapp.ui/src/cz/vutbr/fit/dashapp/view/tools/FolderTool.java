@@ -68,6 +68,8 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 	
 	private void initListeners() {
 		DashAppController.getInstance().addPropertyChangeListener(this);
+		// we need to use selection listener since there is problem with mouse click listener
+		// list selection index might not be updated
 		list.addListSelectionListener(new ListSelectionListener() {
 			
 			private int previousIndex = -1;
@@ -88,7 +90,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 							}
 						}
 						propertyChangeDiasbled = true;
-						DashAppController.getEventManager().updateSelectedWorkspaceFile(selectedDashboardFile);
+						DashAppController.getEventManager().reloadSelectedWorkspaceFile(selectedDashboardFile);
 						propertyChangeDiasbled = false;
 						previousIndex = index;
 					}
@@ -214,7 +216,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 				}
 				list.setSelectedIndex(i);
 			} else if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
-				if(e.modelChange.newValue != null) {
+				if(e.modelChange.newValue != null && e.modelChange.newValue instanceof DashboardFile) {
 					int index = list.getNextMatch(((DashboardFile) e.modelChange.newValue).toString(), 0, Bias.Forward);
 					if(index >= 0) {
 						list.setSelectedIndex(index);

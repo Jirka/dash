@@ -10,6 +10,7 @@ import cz.vutbr.fit.dashapp.segmenation.methods.Experimental4;
 import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUp;
 import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUpRefactorized;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
+import cz.vutbr.fit.dashapp.view.tools.DashboardSegmentationUI;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
 import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
@@ -20,6 +21,8 @@ import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
 import cz.vutbr.fit.dashapp.view.tools.OpenTool;
 import cz.vutbr.fit.dashapp.view.tools.ReloadTool;
 import cz.vutbr.fit.dashapp.view.tools.SaveTool;
+import cz.vutbr.fit.dashapp.view.tools.SegmentationAlgorithmUI;
+import cz.vutbr.fit.dashapp.view.tools.SegmentationTool;
 import cz.vutbr.fit.dashapp.view.tools.XMLTool;
 import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
@@ -29,9 +32,6 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
 import cz.vutbr.fit.dashapp.view.tools.image.ImageActionFactory;
 import cz.vutbr.fit.dashapp.view.tools.image.ImageTool;
 import cz.vutbr.fit.dashapp.view.tools.image.segmentation.SegmentationImageActionFactory;
-import cz.vutbr.fit.dashapp.view.tools.segmentation.DashboardSegmentationUI;
-import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationAlgorithmUI;
-import cz.vutbr.fit.dashapp.view.tools.segmentation.SegmentationTool;
 
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	

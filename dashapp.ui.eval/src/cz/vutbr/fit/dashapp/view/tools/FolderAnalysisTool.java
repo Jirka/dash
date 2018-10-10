@@ -6,9 +6,9 @@ import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.action.BasicDashAction;
 import cz.vutbr.fit.dashapp.view.action.SelectionDashAction;
+import cz.vutbr.fit.dashapp.view.action.analysis.FolderAnalysisUI;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
-import cz.vutbr.fit.dashapp.view.tools.analysis.FolderAnalysisUI;
 
 
 /**

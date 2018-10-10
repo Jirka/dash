@@ -1,4 +1,4 @@
-package cz.vutbr.fit.dashapp.view.tools.segmentation;
+package cz.vutbr.fit.dashapp.view.tools;
 
 import javax.swing.JMenu;
 
