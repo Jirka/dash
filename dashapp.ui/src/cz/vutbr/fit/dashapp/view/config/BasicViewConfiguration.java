@@ -10,6 +10,7 @@ import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.PathUtils;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
+import cz.vutbr.fit.dashapp.view.tools.CropTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderTool;
 import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
@@ -95,6 +96,7 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		guiTools.add(new RectanglesTool(false, false, buttonGroup));
 		
 		guiTools.add(new AttachTool());
+		guiTools.add(new CropTool());
 		guiTools.add(new GETypeTool());
 		
 		guiTools.add(new GrayScaleTool());
