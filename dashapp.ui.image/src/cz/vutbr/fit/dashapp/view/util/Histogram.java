@@ -34,8 +34,16 @@ public class Histogram implements IComponent {
 	private DefaultCategoryDataset dataset;
 
 	private int[] histogram;
-
+	private String label;
+	
+	public static final String IMPLICIT_LABEL = "Histogram";
+	
 	public Histogram(int[] histogram) {
+		this(IMPLICIT_LABEL, histogram);
+	}
+
+	public Histogram(String label, int[] histogram) {
+		this.label = label;
 		this.histogram = histogram;
 		initDataset();
 		initGUI();
@@ -52,7 +60,7 @@ public class Histogram implements IComponent {
 
 	private void initGUI() {
 		chart = ChartFactory.createBarChart(
-				"Histogram", // chart title
+				this.label, // chart title
 				"Color", // domain axis label
 				"Pixel count", // range axis label
 				dataset, // data

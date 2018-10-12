@@ -8,6 +8,5 @@
 	<classpathentry kind="lib" path="lib/fxgraphics2d-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jcommon-1.0.23.jar"/>
 	<classpathentry kind="lib" path="lib/jfreechart-1.0.19.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/3rd-party"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -22,6 +22,7 @@ import cz.vutbr.fit.dashapp.image.colorspace.CIE;
 import cz.vutbr.fit.dashapp.image.colorspace.ColorSpaceUtils;
 import cz.vutbr.fit.dashapp.image.colorspace.ColorSpace;
 import cz.vutbr.fit.dashapp.image.colorspace.HSB;
+import cz.vutbr.fit.dashapp.image.util.AdaptiveThresholdUtils;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
@@ -36,7 +37,6 @@ import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 import cz.vutbr.fit.dashapp.view.util.Histogram;
-import extern.AdaptiveThreshold;
 import cz.vutbr.fit.dashapp.view.Canvas;
 
 /**
@@ -133,13 +133,13 @@ public class OldImageTool extends AbstractGUITool implements IGUITool {
 						if(kind == ADAPTIVE1) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
-							AdaptiveThreshold.adaptiveThreshold(matrix, false, s, t, false);
+							AdaptiveThresholdUtils.adaptiveThreshold(matrix, false, s, t, false);
 							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == ADAPTIVE2) {
 							int s = askForInteger("Select s", "Threshold option", 8);
 							int t = askForInteger("Select t", "Threshold option", 6);
-							AdaptiveThreshold.adaptiveThreshold(matrix, true, s, t, false);
+							AdaptiveThresholdUtils.adaptiveThreshold(matrix, true, s, t, false);
 							ColorMatrix.printMatrixToImage(image, matrix, dashboard);
 							surface.updateImage(image, true, true);
 						} else if(kind == GRAY_SCALE) {

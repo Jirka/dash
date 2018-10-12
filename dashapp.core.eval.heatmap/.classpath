@@ -5,7 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.eval"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.image"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/3rd-party"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.segmentation"/>
+	<classpathentry kind="lib" path="/dashapp.core.segmentation/lib/houghtransform.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -7,6 +7,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.stackoverflow.graphicsonly.GraphicsOnly;
+
 import cz.vutbr.fit.dashapp.controller.DashAppController;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
@@ -16,9 +18,8 @@ import cz.vutbr.fit.dashapp.view.DashAppView;
 import cz.vutbr.fit.dashapp.view.action.IDashActionUI;
 import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog;
 import cz.vutbr.fit.dashapp.view.dialog.GridLayoutFormDialog;
+import cz.vutbr.fit.dashapp.view.util.Histogram;
 import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog.DashAppTask;
-import extern.ImagePreview;
-import tmp.Histogram;
 
 /**
  * 
@@ -172,7 +173,7 @@ public class SegmentationAlgorithmUI implements IDashActionUI {
 		@Override
 		public void debugImage(String label, BufferedImage image, ISegmentationAlgorithm segmentationAlgorithm) {
 			if(debug) {
-				new ImagePreview(image, label).openWindow(800,600,0.8);
+				new GraphicsOnly(image, label).openWindow(800,600,0.8);
 			}
 		}
 

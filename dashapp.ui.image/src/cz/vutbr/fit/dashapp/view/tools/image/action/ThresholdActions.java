@@ -2,9 +2,9 @@ package cz.vutbr.fit.dashapp.view.tools.image.action;
 
 import java.awt.image.BufferedImage;
 
+import cz.vutbr.fit.dashapp.image.util.AdaptiveThresholdUtils;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.view.tools.image.AbstractImageToolAction;
-import extern.AdaptiveThreshold;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class ThresholdActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			int s = askForInteger("Select s", "Threshold option", 8);
 			int t = askForInteger("Select t", "Threshold option", 6);
-			AdaptiveThreshold.adaptiveThreshold(matrix, false, s, t, false);
+			AdaptiveThresholdUtils.adaptiveThreshold(matrix, false, s, t, false);
 			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}
@@ -60,7 +60,7 @@ public class ThresholdActions {
 		protected BufferedImage processImage(int[][] matrix) {
 			int s = askForInteger("Select s", "Threshold option", 8);
 			int t = askForInteger("Select t", "Threshold option", 6);
-			AdaptiveThreshold.adaptiveThreshold(matrix, true, s, t, false);
+			AdaptiveThresholdUtils.adaptiveThreshold(matrix, true, s, t, false);
 			return ColorMatrix.printMatrixToImage(null, matrix);
 		}
 	}

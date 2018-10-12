@@ -10,8 +10,8 @@ import java.util.Queue;
 import java.util.Vector;
 
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine;
-import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import ac.essex.ooechs.imaging.commons.edge.hough.HoughLine.Orientation;
+import ac.essex.ooechs.imaging.commons.edge.hough.HoughTransform;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;

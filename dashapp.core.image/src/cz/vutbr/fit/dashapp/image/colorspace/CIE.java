@@ -1,8 +1,10 @@
 package cz.vutbr.fit.dashapp.image.colorspace;
 
+import org.colormine.colorspace.ColorSpaceConverter;
+import org.colormine.colorspace.Lab;
+
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
-import extern.CIELab2;
 
 /**
  * 
@@ -25,12 +27,12 @@ public class CIE implements ColorSpace {
 	public double h;
 
 	public CIE(int rgb) {
-		double[] lchvals = CIELab2.fromRGB(ColorMatrix.getRed(rgb), ColorMatrix.getGreen(rgb), ColorMatrix.getBlue(rgb));
-		this.l = lchvals[0];
-		this.a = lchvals[1];
-		this.b = lchvals[2];
-		this.c = lchvals[3];
-		this.h = lchvals[4];
+		Lab lab = ColorSpaceConverter.colorToLab(ColorMatrix.getRed(rgb), ColorMatrix.getGreen(rgb), ColorMatrix.getBlue(rgb));
+		this.l = lab.L;
+		this.a = lab.A;
+		this.b = lab.B;
+		this.c = getC();
+		this.h = getH();
 	}
 
 	@Override
@@ -53,6 +55,29 @@ public class CIE implements ColorSpace {
 		default:
 			return -1;
 		}
+	}
+	
+	private double getC() {
+		double h = Math.atan2(b, a);
+
+		// radians to degrees
+		if (h > 0) {
+			h = (h / Math.PI) * 180.0;
+		} else {
+			h = 360 - (Math.abs(h) / Math.PI) * 180.0;
+		}
+
+		if (h < 0) {
+			h += 360.0;
+		} else if (h >= 360) {
+			h -= 360.0;
+		}
+
+		return h;
+	}
+	
+	private double getH() {
+		return Math.sqrt(a * a + b * b);
 	}
 
 	@Override

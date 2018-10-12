@@ -36,10 +36,6 @@ public class ColorSpaceUtils {
 	 * @return
 	 */
 	public static ColorSpace[][] cropMatrix(ColorSpace[][] matrix, Rectangle cropRectangle) {
-		if(cropRectangle.width == 0 || cropRectangle.height == 0) {
-			//return 
-		}
-		
 		int mW = MatrixUtils.width(matrix);
 		if(mW > 0) {
 			int mH = MatrixUtils.height(matrix);

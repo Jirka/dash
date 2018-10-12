@@ -7,6 +7,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.ui.image"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/dashapp.core.segmentation"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/3rd-party"/>
+	<classpathentry kind="lib" path="/dashapp.core.segmentation/lib/yet-another-tree-structure.jar"/>
+	<classpathentry kind="lib" path="lib/stackoverflow-graphicsonly.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

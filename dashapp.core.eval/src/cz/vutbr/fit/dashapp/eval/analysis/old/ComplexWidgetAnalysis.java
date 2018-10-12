@@ -15,6 +15,7 @@ import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoProportion;
 import cz.vutbr.fit.dashapp.eval.metric.widget.ngo.NgoRegularity;
 import cz.vutbr.fit.dashapp.image.colorspace.CIE;
 import cz.vutbr.fit.dashapp.image.colorspace.HSB;
+import cz.vutbr.fit.dashapp.image.util.AdaptiveThresholdUtils;
 import cz.vutbr.fit.dashapp.image.util.HistogramUtils;
 import cz.vutbr.fit.dashapp.image.util.PosterizationUtils;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult;
@@ -26,7 +27,6 @@ import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
-import extern.AdaptiveThreshold;
 
 public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis {
 
@@ -122,7 +122,7 @@ public class ComplexWidgetAnalysis extends AbstractAnalysis implements IAnalysis
 					rgb4Symmetry.add(new Double((double) result[0].value));
 					
 					// BW 1 bit
-					int matrixBW[][] = ColorMatrix.toGrayScale(AdaptiveThreshold.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
+					int matrixBW[][] = ColorMatrix.toGrayScale(AdaptiveThresholdUtils.adaptiveThreshold(matrix, false, 0, 0, true), true, false);
 					bwBlack.add(new Double((double) (new BlackDensity()).measureGrayMatrix(matrixBW)[0].value));
 				}
 				

@@ -1,8 +1,12 @@
 package cz.vutbr.fit.dashapp.image.colorspace;
 
+import java.awt.Color;
+
+import org.colormine.colorspace.ColorSpaceConverter;
+import org.colormine.colorspace.Hsl;
+
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
-import extern.HSLColor;
 
 /**
  * 
@@ -20,10 +24,10 @@ public class HSL implements ColorSpace {
 	public float l;
 
 	public HSL(int rgb) {
-		float[] hsbvals = HSLColor.fromRGB(ColorMatrix.getRed(rgb), ColorMatrix.getGreen(rgb), ColorMatrix.getBlue(rgb));
-		this.h = hsbvals[0]/360;
-		this.s = hsbvals[1]/100;
-		this.l = hsbvals[2]/100;
+		Hsl hsbvals = ColorSpaceConverter.colorToHsl(new Color(ColorMatrix.getRed(rgb), ColorMatrix.getGreen(rgb), ColorMatrix.getBlue(rgb)));
+		this.h = (float) hsbvals.H;
+		this.s = (float) hsbvals.S;
+		this.l = (float) hsbvals.L;
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public class HSL implements ColorSpace {
 	
 	public int toRGB()
 	{
-		return HSLColor.toRGB(s, l, h).getRGB();
+		return ColorSpaceConverter.hslToColor(h, s, l).getRGB();
 	}
 	
 	public static HSL[][] fromRGB(int[][] matrix) {
