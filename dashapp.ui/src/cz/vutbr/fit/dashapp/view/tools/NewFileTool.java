@@ -23,23 +23,33 @@ import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
  */
 public class NewFileTool extends AbstractGUITool implements IGUITool {
 	
+	private static final String LABEL = "New";
+	
 	NewFileAction newFileAction;
 	
 	public NewFileTool() {
+		this(false);
+	}
+	
+	public NewFileTool(boolean addSeparator) {
+		super(addSeparator);
 		newFileAction = new NewFileAction();
 	}
 	
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
-		menuBar.addItem(subMenu, "New", newFileAction);
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
+		menuBar.addItem(subMenu, LABEL, newFileAction);
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addButton("New", "/icons/Document.png", newFileAction, 0);
+		toolbar.addButton(LABEL, "/icons/Document.png", newFileAction, 0);
 	}
 	
 	/**

@@ -7,6 +7,11 @@ import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.SideBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public interface IGUITool {
 	
 	void init(Canvas canvas);

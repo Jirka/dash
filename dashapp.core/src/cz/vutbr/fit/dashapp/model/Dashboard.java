@@ -296,6 +296,9 @@ public class Dashboard extends GraphicalElement {
 		return listY.size();
 	}
 	
+	/**
+	 * Creates copy of dashboard
+	 */
 	public Dashboard copy() {
 		Dashboard d = new Dashboard();
 		d.setParent(d);

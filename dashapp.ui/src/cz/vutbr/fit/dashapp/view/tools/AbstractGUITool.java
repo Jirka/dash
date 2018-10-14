@@ -7,9 +7,23 @@ import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.SideBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class AbstractGUITool implements IGUITool {
 	
 	protected Canvas canvas;
+	protected boolean addSeparator;
+	
+	public AbstractGUITool() {
+		this(false);
+	}
+	
+	public AbstractGUITool(boolean addSeparator) {
+		this.addSeparator = addSeparator;
+	}
 
 	@Override
 	public void init(Canvas canvas) {

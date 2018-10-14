@@ -13,6 +13,11 @@ import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.view.Canvas;
 import cz.vutbr.fit.dashapp.view.util.CanvasUtils.WorkingCopy;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class PaintUtil {
 	
 	public final static float DASH[] = { 10.0f };

@@ -9,6 +9,11 @@ import javax.swing.ButtonGroup;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class RectanglesTool extends AbstractCanvasTool {
 	
 	public RectanglesTool(boolean requiresSeparator, boolean isDefault, ButtonGroup buttonGroup) {

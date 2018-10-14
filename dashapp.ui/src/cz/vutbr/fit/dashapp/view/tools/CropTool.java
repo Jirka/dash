@@ -22,6 +22,7 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
 
 /**
+ * Filters area outside of dashboard body and exports it into a new image.
  * 
  * @author Jiri Hynek
  *
@@ -35,13 +36,18 @@ public class CropTool extends AbstractGUITool implements IGUITool {
 	CropAction cropAction;
 	
 	public CropTool() {
+		this(false);
+	}
+	
+	public CropTool(boolean addSeparator) {
+		super(addSeparator);
 		cropAction = new CropAction();
 	}
 
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("Edit");
-		if(subMenu.getItemCount() > 0) {
+		if(addSeparator && subMenu.getItemCount() > 0) {
 			subMenu.addSeparator();
 		}
 		menuBar.addItem(subMenu, LABEL, cropAction);
@@ -49,7 +55,7 @@ public class CropTool extends AbstractGUITool implements IGUITool {
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		toolbar.addButton(LABEL, "/icons/Cut.png", cropAction, 0);

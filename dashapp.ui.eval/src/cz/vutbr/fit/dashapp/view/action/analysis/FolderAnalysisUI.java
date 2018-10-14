@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import cz.vutbr.fit.dashapp.controller.DashAppController;
-import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.IFolderAnalysis;
 import cz.vutbr.fit.dashapp.model.DashAppModel;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.view.DashAppView;
@@ -28,14 +28,14 @@ import cz.vutbr.fit.dashapp.view.dialog.DashAppProgressDialog.DashAppTask;
  */
 public class FolderAnalysisUI implements IDashActionUI {
 	
-	protected AbstractAnalysis analysis;
+	protected IFolderAnalysis analysis;
 	protected JTextField folderRegexInput;
 	
 	public static final String DEFAULT_FOLDER_REGEX = ".*";
 	
 	private String chosenFolderRegex;
 	
-	public FolderAnalysisUI(AbstractAnalysis analysis) {
+	public FolderAnalysisUI(IFolderAnalysis analysis) {
 		super();
 		this.analysis = analysis;
 	}
@@ -114,11 +114,11 @@ public class FolderAnalysisUI implements IDashActionUI {
 	 */
 	public static class FolderAnalysisTask extends DashAppTask {
 		
-		private AbstractAnalysis analysis;
+		private IFolderAnalysis analysis;
 		private String folderRegex;
 		private String message;
 
-		public FolderAnalysisTask(AbstractAnalysis analysis, String folderRegex) {
+		public FolderAnalysisTask(IFolderAnalysis analysis, String folderRegex) {
 			super();
 			this.analysis = analysis;
 			this.folderRegex = folderRegex;

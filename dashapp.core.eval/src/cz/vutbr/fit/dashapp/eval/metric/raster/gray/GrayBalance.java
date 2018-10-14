@@ -91,9 +91,9 @@ public class GrayBalance extends AbstractGrayRasterMetric {
 		double BM_V = getVerticalBalance(matrix);
 		double BM_H = getHorizontalBalance(matrix);
 		return new MetricResult[] {
-				new MetricResult("Balance", "BM'", 1-(Math.abs(BM_V)+Math.abs(BM_H))/2.0),
-				new MetricResult("Vertical Balance", "BM_v'", BM_V),
-				new MetricResult("Horizontal Balance", "BM_h'", BM_H)
+				new MetricResult("Gray Balance", "BM'", 1-(Math.abs(BM_V)+Math.abs(BM_H))/2.0),
+				new MetricResult("Gray Vertical Balance", "BM_v'", BM_V),
+				new MetricResult("Gray Horizontal Balance", "BM_h'", BM_H)
 		};
 	}
 

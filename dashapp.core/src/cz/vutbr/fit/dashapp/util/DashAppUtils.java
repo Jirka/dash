@@ -8,6 +8,11 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.IWorkspaceFile;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppUtils {
 	
 	public static Dashboard getSelectedDashboard() {

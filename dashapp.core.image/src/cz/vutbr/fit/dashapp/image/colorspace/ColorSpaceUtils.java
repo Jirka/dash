@@ -130,33 +130,12 @@ public class ColorSpaceUtils {
 	 * @param matrix
 	 * @param colorChannel
 	 */
-	public static void normalizeColorChannel(ColorSpace[][] matrixHSB, int[][] matrix, int colorChannel) {
+	public static void normalizeColorChannel(ColorSpace[][] matrixHSB, int[][] matrix, int colorChannel, int maxValue) {
 		int mW = MatrixUtils.width(matrixHSB);
 		int mH = MatrixUtils.height(matrixHSB);
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
-				int act = 255-(int)(((double) matrixHSB[i][j].getColorChannel(colorChannel)/4)*255);
-				matrix[i][j] = ColorMatrix.getRGB(act, act, act);
-			}
-		}
-	}
-	
-	/**
-	 * ?
-	 * 
-	 * @param matrixHSB
-	 * @param matrix
-	 * @param colorChannel
-	 */
-	public static void normalizeSaturationVariance(ColorSpace[][] matrixHSB, int[][] matrix, int colorChannel) {
-		double mean = getColorChannelMean(matrixHSB, colorChannel);
-		int mW = MatrixUtils.width(matrixHSB);
-		int mH = MatrixUtils.height(matrixHSB);
-		for (int i = 0; i < mW; i++) {
-			for (int j = 0; j < mH; j++) {
-				double variance = (double) matrixHSB[i][j].getColorChannel(colorChannel);
-				variance = Math.abs((mean-variance)*(mean-variance));
-				int act = 255-(int)((variance/4)*255);
+				int act = 255-(int)(((double) matrixHSB[i][j].getColorChannel(colorChannel)/maxValue)*255);
 				matrix[i][j] = ColorMatrix.getRGB(act, act, act);
 			}
 		}

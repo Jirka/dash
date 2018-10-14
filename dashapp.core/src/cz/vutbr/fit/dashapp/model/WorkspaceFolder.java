@@ -8,6 +8,11 @@ import java.util.List;
 import cz.vutbr.fit.dashapp.util.DashboardFileFilter;
 import cz.vutbr.fit.dashapp.util.FolderFilter;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class WorkspaceFolder extends WorkspaceFile implements IWorkspaceFile {
 	
 	File folderFile;

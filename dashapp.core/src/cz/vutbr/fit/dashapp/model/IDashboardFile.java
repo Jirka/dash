@@ -2,6 +2,11 @@ package cz.vutbr.fit.dashapp.model;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public interface IDashboardFile extends IWorkspaceFile {
 
 	SerializedDashboard getSerializedDashboard();

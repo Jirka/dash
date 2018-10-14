@@ -9,8 +9,10 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 
 import cz.vutbr.fit.dashapp.view.DashAppView;
+import cz.vutbr.fit.dashapp.view.MenuBar;
 import cz.vutbr.fit.dashapp.view.ToolBar;
 
 /**
@@ -21,17 +23,37 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
  */
 public class FullScreenTool extends AbstractGUITool implements IGUITool {
 	
+	private static final String LABEL = "Full screen";
 	private JFrame frame;
 	private Dimension frameSize;
 	private int splitPanePosition;
 	private ToolBar toolbar;
+	private FullScreenAction fullScreenAction;
+	
+	public FullScreenTool() {
+		this(false);
+	}
+	
+	public FullScreenTool(boolean addSeparator) {
+		super(addSeparator);
+		fullScreenAction = new FullScreenAction();
+	}
+	
+	@Override
+	public void provideMenuItems(MenuBar menuBar) {
+		JMenu subMenu = menuBar.getSubMenu("View");
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
+		menuBar.addItem(subMenu, LABEL, fullScreenAction);
+	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if(toolbar.getAmountOfItems() > 0) {
+		if(addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addButton("Full screen", "/icons/Zoom.png", new FullScreenAction(), 0);
+		toolbar.addButton(LABEL, "/icons/Zoom.png", fullScreenAction, 0);
 	}
 	
 	/**

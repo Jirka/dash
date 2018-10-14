@@ -400,6 +400,10 @@ public class DownloadActionUI implements IDashActionUI {
 					// select file
 					DashAppController.getEventManager().
 					changeSelectedWorkspaceFile(fileName, fileExtension);
+					
+					// format XML
+					DashAppController.getEventManager().
+					formatDashboardXml();
 				}
 			}
 		}

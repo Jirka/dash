@@ -43,6 +43,11 @@ public class ZoomTool extends AbstractGUITool implements IGUITool/*, IPropertyCh
 	 * Initializes zoom tool.
 	 */
 	public ZoomTool() {
+		this(false);
+	}
+	
+	public ZoomTool(boolean addSeparator) {
+		super(addSeparator);
 		zoomLevel = DEFAULT_ZOOM_LEVEL;
 		zoomAction = new ZoomAction();
 		btnsZoomIn = new ArrayList<>();
@@ -53,13 +58,16 @@ public class ZoomTool extends AbstractGUITool implements IGUITool/*, IPropertyCh
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("View");
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
 		btnsZoomIn.add(menuBar.addItem(subMenu, STR_ZOOM_IN, zoomAction));
 		btnsZoomOut.add(menuBar.addItem(subMenu, STR_ZOOM_OUT, zoomAction));
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if(toolbar.getAmountOfItems() > 0) {
+		if(addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		btnsZoomIn.add(toolbar.addButton(STR_ZOOM_IN, "/icons/Zoom in.png", zoomAction, 0));

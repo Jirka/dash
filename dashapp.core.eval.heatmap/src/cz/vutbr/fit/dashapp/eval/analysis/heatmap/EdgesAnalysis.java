@@ -8,6 +8,11 @@ import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.PixelCalculator;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class EdgesAnalysis extends AbstractHeatMapAnalysis implements PixelCalculator {
 	
 	public static final String LABEL = "Edge Detection";

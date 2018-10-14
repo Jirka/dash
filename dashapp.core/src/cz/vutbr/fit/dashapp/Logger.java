@@ -1,5 +1,10 @@
 package cz.vutbr.fit.dashapp;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class Logger {
 	
 	/**

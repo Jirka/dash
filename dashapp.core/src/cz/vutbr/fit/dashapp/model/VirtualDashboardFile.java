@@ -4,6 +4,11 @@ import java.awt.image.BufferedImage;
 
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class VirtualDashboardFile extends WorkspaceFile implements IDashboardFile {
 	
 	protected Dashboard dashboard;

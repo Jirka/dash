@@ -49,6 +49,9 @@ public class MenuBar implements IComponent {
 		}
         
         // exit application menu item
+        if(fileMenu.getItemCount() > 0) {
+        	fileMenu.addSeparator();
+        }
         addItem(fileMenu, "Exit", new ExitAction());
     }
 

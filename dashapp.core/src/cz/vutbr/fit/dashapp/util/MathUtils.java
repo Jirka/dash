@@ -1,5 +1,10 @@
 package cz.vutbr.fit.dashapp.util;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class MathUtils {
 
 	public static final double LOG_e_2 = Math.log(2);
@@ -22,12 +27,6 @@ public class MathUtils {
 	}
 	
 	public static double adaptNormalized(double act, double min, double max) {
-		// a = (max-min)/(oldMax-oldMin)
-		// (a * act) + (oldMax - a * oldMax)
-		// oldMax = 1
-		// oldMin = 0
-		// (max-min)/1 * act + 1-(max-min)/1 * 1
-		// (max-min) * act + 1 - (max-min)
 		double a = max-min;
 		return a*act+(1-a);
 	}

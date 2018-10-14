@@ -7,6 +7,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToggleButton;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class ViewUtils {
 	
 	/**

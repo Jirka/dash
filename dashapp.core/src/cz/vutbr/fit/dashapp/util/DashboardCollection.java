@@ -6,6 +6,11 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 import cz.vutbr.fit.dashapp.util.matrix.BooleanMatrix;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashboardCollection {
 	
 	public Dashboard[] dashboards;

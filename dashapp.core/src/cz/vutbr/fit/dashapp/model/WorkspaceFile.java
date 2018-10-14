@@ -3,6 +3,11 @@ package cz.vutbr.fit.dashapp.model;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public abstract class WorkspaceFile implements IWorkspaceFile {
 	
 	/**

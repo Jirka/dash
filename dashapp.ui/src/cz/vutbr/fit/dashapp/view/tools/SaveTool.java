@@ -31,12 +31,19 @@ import cz.vutbr.fit.dashapp.view.dialog.SimpleDialogs;
  */
 public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChangeListener {
 	
+	public static final String LABEL = "Save all";
+	
 	SaveAction saveAction;
 	SaveAction saveAllAction;
 	private List<AbstractButton> btnsSave;
 	private List<AbstractButton> btnsSaveAll;
 	
 	public SaveTool() {
+		this(false);
+	}
+	
+	public SaveTool(boolean addSeparator) {
+		super(addSeparator);
 		saveAction = new SaveAction(SaveAction.SAVE);
 		saveAllAction = new SaveAction(SaveAction.SAVE_ALL);
 		btnsSave = new ArrayList<>();
@@ -47,23 +54,26 @@ public class SaveTool extends AbstractGUITool implements IGUITool, IPropertyChan
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
 		AbstractButton btn = menuBar.addItem(subMenu, "Save", saveAction);
 		btn.setEnabled(false);
 		btnsSave.add(btn);
-		btn = menuBar.addItem(subMenu, "Save all", saveAllAction);
+		btn = menuBar.addItem(subMenu, LABEL, saveAllAction);
 		btn.setEnabled(false);
 		btnsSaveAll.add(btn);
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		AbstractButton btn = toolbar.addButton("Save", "/icons/Save.png", saveAction, 0);
 		btn.setEnabled(false);
 		btnsSave.add(btn);
-		btn = toolbar.addButton("Save all", "/icons/Save as.png", saveAllAction, 0);
+		btn = toolbar.addButton(LABEL, "/icons/Save as.png", saveAllAction, 0);
 		btn.setEnabled(false);
 		btnsSaveAll.add(btn);
 	}

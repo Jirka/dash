@@ -1,5 +1,10 @@
 package cz.vutbr.fit.dashapp.util.matrix;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class StatsUtils {
 	
 	public static class MeanStatistics {

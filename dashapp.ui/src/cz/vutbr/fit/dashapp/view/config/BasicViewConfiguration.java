@@ -61,7 +61,7 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	/**
 	 * version
 	 */
-	public static final String VERSION = "rel-master";
+	public static final String VERSION = "rel-min";
 	
 	public BasicViewConfiguration() {
 		// set workspace path
@@ -78,10 +78,10 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		guiTools.add(new NewFileTool());
 		guiTools.add(new OpenTool());
 		guiTools.add(new ReloadTool());
-		guiTools.add(new SaveTool());
-		guiTools.add(new HistoryTool());
-		guiTools.add(new ZoomTool());
-		guiTools.add(new FullScreenTool());
+		guiTools.add(new SaveTool(true));
+		guiTools.add(new HistoryTool(true));
+		guiTools.add(new ZoomTool(true));
+		guiTools.add(new FullScreenTool(true));
 		
 		guiTools.add(new FolderTool());
 		guiTools.add(new FileInfoTool());
@@ -95,8 +95,8 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		guiTools.add(new InsertTool(false, false, buttonGroup));
 		guiTools.add(new RectanglesTool(false, false, buttonGroup));
 		
-		guiTools.add(new AttachTool());
-		guiTools.add(new CropTool());
+		guiTools.add(new AttachTool(true));
+		guiTools.add(new CropTool(true));
 		guiTools.add(new GETypeTool());
 		
 		guiTools.add(new GrayScaleTool());
@@ -142,12 +142,45 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	
 	@Override
 	public String getDefaultWorkspacePath() {
-		// for debug purposes
-		String dashSamplesPath = PathUtils.getDashSamplesPath();
-		if(dashSamplesPath != null) {
-			return dashSamplesPath;
+		// basic workspace path
+		String basicWorkspacePath = replaceSeparators(getBasicWorkspacePath());
+		
+		// try debug workspace path suffixes
+		String[] debugPathSuffixes = getDebugWorkspacePathSuffixes();
+		if(debugPathSuffixes != null) {
+			for (String debugPathSuffix : debugPathSuffixes) {
+				String advancedWorkspacePath = replaceSeparators(basicWorkspacePath + debugPathSuffix);
+				File asvancedWorkspacePathFile = new File(advancedWorkspacePath);
+				if(asvancedWorkspacePathFile.exists() && asvancedWorkspacePathFile.isDirectory()) {
+					return advancedWorkspacePath;
+				}
+			}
 		}
+		
+		return basicWorkspacePath;
+	}
+	
+	private String replaceSeparators(String path) {
+		return path.replaceAll("/", File.separator);
+	}
+	
+	protected String getBasicWorkspacePath() {
+		// for debug purposes (private)
+		String workspacePath = PathUtils.getDashSamplesPath();
+		if(workspacePath != null) {
+			return workspacePath;
+		}
+		// for eval purposes (public)
+		workspacePath = PathUtils.getDashEvalPath();
+		if(workspacePath != null) {
+			return workspacePath;
+		}
+		// home path
 		return PathUtils.DEFAULT_WORKSPACE_HOME_PATH;
+	}
+
+	protected String[] getDebugWorkspacePathSuffixes() {
+		return null;
 	}
 
 }

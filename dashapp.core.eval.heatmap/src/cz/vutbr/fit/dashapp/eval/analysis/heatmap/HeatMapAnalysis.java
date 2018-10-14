@@ -12,6 +12,11 @@ import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class HeatMapAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Heatmap Analysis";

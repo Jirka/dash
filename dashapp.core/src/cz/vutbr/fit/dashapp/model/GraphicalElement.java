@@ -226,9 +226,11 @@ public class GraphicalElement {
 		}
 		
 		List<GraphicalElement> filteredGraphicalElements = new ArrayList<>();
-		for (GraphicalElement ge : children) {
-			if(GEType.contains(types, ge.type)) {
-				filteredGraphicalElements.add(ge);
+		if(children != null) {
+			for (GraphicalElement ge : children) {
+				if(GEType.contains(types, ge.type)) {
+					filteredGraphicalElements.add(ge);
+				}
 			}
 		}
 		return filteredGraphicalElements;

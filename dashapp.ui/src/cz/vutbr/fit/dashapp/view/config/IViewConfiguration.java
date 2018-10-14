@@ -4,6 +4,11 @@ import java.util.List;
 
 import cz.vutbr.fit.dashapp.view.tools.IGUITool;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public interface IViewConfiguration {
 
 	List<IGUITool> getGUITools();

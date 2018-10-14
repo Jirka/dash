@@ -7,6 +7,11 @@ import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class BooleanMatrix {
 	
 	public static int getRGB(boolean boolValue) {

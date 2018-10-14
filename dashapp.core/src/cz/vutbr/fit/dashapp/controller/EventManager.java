@@ -49,8 +49,8 @@ public class EventManager {
 	public static enum EventKind {
 		FOLDER_PATH_CHANGED,
 		FILE_SELECTION_CHANGED,
-		FILE_SELECTION_CHANGED_IMPLICIT,
 		XML_CHANGED,
+		XML_FORMATTED,
 		GRAPHICAL_ELEMENT_CHANGED,
 		GRAPHICAL_ELEMENT_CREATED,
 		GRAPHICAL_ELEMENT_DELETED,
@@ -108,6 +108,21 @@ public class EventManager {
 				// updates dashboard state
 				updateDashboardFileState(dashboardFile);
 			}			
+		}
+	}
+	
+	public void formatDashboardXml() {
+		IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
+		if(selectedFile != null && selectedFile instanceof DashboardFile) {
+			DashboardFile dashboardFile = (DashboardFile) selectedFile;
+			String oldXML = dashboardFile.getSerializedDashboard().getXml();
+			Dashboard dashboard = dashboardFile.getDashboard(true);
+			String newXML = XMLUtils.serialize(dashboard);
+			dashboardFile.getSerializedDashboard().setXml(newXML);
+			if(newXML != null && !newXML.equals(oldXML)) {
+				// fire change
+				controller.firePropertyChange(new PropertyChangeEvent(EventKind.XML_FORMATTED, dashboardFile, null, new Change(oldXML, newXML)));
+			}
 		}
 	}
 	

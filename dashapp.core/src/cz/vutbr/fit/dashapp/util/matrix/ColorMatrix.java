@@ -6,6 +6,11 @@ import java.awt.image.BufferedImage;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class ColorMatrix {
 	
 	public static final int WHITE = Color.white.getRGB();

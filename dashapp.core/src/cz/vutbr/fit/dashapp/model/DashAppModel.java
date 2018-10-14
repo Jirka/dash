@@ -4,6 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppModel {
 	
 	private static DashAppModel model;

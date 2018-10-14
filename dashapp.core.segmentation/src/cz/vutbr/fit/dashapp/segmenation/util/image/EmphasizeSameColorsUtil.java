@@ -5,7 +5,6 @@ import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 
 /**
  * 
- * 
  * @author Jiri Hynek
  *
  */

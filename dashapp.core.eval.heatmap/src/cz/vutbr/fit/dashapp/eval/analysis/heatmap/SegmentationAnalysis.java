@@ -14,6 +14,11 @@ import cz.vutbr.fit.dashapp.segmenation.ISegmentationAlgorithm;
 import cz.vutbr.fit.dashapp.segmenation.ISegmentationDebugListener;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class SegmentationAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Segmentation Analysis";

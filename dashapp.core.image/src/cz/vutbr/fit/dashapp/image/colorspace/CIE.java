@@ -58,6 +58,10 @@ public class CIE implements ColorSpace {
 	}
 	
 	private double getC() {
+		return Math.sqrt(a * a + b * b);
+	}
+	
+	private double getH() {
 		double h = Math.atan2(b, a);
 
 		// radians to degrees
@@ -74,10 +78,6 @@ public class CIE implements ColorSpace {
 		}
 
 		return h;
-	}
-	
-	private double getH() {
-		return Math.sqrt(a * a + b * b);
 	}
 
 	@Override

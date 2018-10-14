@@ -23,6 +23,11 @@ import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdCalculator;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class HeatMapWidgetAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Heatmap Widget Detection";

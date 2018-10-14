@@ -1,43 +1,31 @@
 package cz.vutbr.fit.dashapp.view.config;
 
-import java.util.ArrayList;
-
-import javax.swing.ButtonGroup;
-
 import cz.vutbr.fit.dashapp.segmenation.methods.Experimental1;
 import cz.vutbr.fit.dashapp.segmenation.methods.Experimental2;
 import cz.vutbr.fit.dashapp.segmenation.methods.Experimental4;
 import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUp;
 import cz.vutbr.fit.dashapp.segmenation.thesis.mejia.BottomUpRefactorized;
-import cz.vutbr.fit.dashapp.view.tools.AttachTool;
-import cz.vutbr.fit.dashapp.view.tools.DashboardSegmentationUI;
-import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
-import cz.vutbr.fit.dashapp.view.tools.FolderTool;
-import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
-import cz.vutbr.fit.dashapp.view.tools.GETypeTool;
-import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
-import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
-import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
-import cz.vutbr.fit.dashapp.view.tools.OpenTool;
-import cz.vutbr.fit.dashapp.view.tools.ReloadTool;
-import cz.vutbr.fit.dashapp.view.tools.SaveTool;
-import cz.vutbr.fit.dashapp.view.tools.SegmentationAlgorithmUI;
+import cz.vutbr.fit.dashapp.view.action.image.ImageActionFactory;
+import cz.vutbr.fit.dashapp.view.action.image.segmentation.SegmentationImageActionFactory;
+import cz.vutbr.fit.dashapp.view.action.segmentatiion.DashboardSegmentationUI;
+import cz.vutbr.fit.dashapp.view.action.segmentatiion.SegmentationAlgorithmUI;
+import cz.vutbr.fit.dashapp.view.tools.ImageTool;
 import cz.vutbr.fit.dashapp.view.tools.SegmentationTool;
-import cz.vutbr.fit.dashapp.view.tools.XMLTool;
-import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-import cz.vutbr.fit.dashapp.view.tools.image.ImageActionFactory;
-import cz.vutbr.fit.dashapp.view.tools.image.ImageTool;
-import cz.vutbr.fit.dashapp.view.tools.image.segmentation.SegmentationImageActionFactory;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
-	@Override
-	public String getDefaultWorkspacePath() {
-		return super.getDefaultWorkspacePath() + "/research/widget-based/gen/all/segmentation/color";
+	protected String[] getDebugWorkspacePathSuffixes() {
+		return new String[] {
+				"/research/widget-based/gen/all/segmentation/color",
+				"/widget-based/gen/all/segmentation/color",
+				"/research/widget-based/gen/all/color",
+				"/widget-based/gen/all/color",
+		};
 	}
 	
 	/**
@@ -51,35 +39,10 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 	}
 	
 	protected void initTools() {
+		super.initTools();
 		
-		guiTools = new ArrayList<>();;
-		// basic UI tools
-		guiTools.add(new NewFileTool());
-		guiTools.add(new OpenTool());
-		guiTools.add(new ReloadTool());
-		guiTools.add(new SaveTool());
-		guiTools.add(new HistoryTool());
-		guiTools.add(new ZoomTool());
-		guiTools.add(new FullScreenTool());
-		
-		guiTools.add(new FolderTool());
-		guiTools.add(new FileInfoTool());
-		guiTools.add(new XMLTool());
-		
-		// canvas tools
-		ButtonGroup buttonGroup = new ButtonGroup();
-		guiTools.add(new ViewTool(true, true, buttonGroup));
-		guiTools.add(new BoundTool(false, false, buttonGroup));
-		guiTools.add(new SelectTool(false, false, buttonGroup));
-		guiTools.add(new InsertTool(false, false, buttonGroup));
-		
-		guiTools.add(new AttachTool());
-		guiTools.add(new GETypeTool());
-		
-		guiTools.add(new GrayScaleTool());
-		
-		guiTools.add(new ImageTool(ImageActionFactory.getRecommendedActions()));
-		guiTools.add(new ImageTool(SegmentationImageActionFactory.getRecommendedActions()));
+		guiTools.add(new ImageTool(true, ImageActionFactory.getRecommendedActions()));
+		guiTools.add(new ImageTool(true, SegmentationImageActionFactory.getRecommendedActions()));
 		
 		// segmentation algorithm tool
 		SegmentationAlgorithmUI[] segmentationUIs = new SegmentationAlgorithmUI[] {
@@ -90,7 +53,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 				new SegmentationAlgorithmUI(new BottomUp()),
 				new SegmentationAlgorithmUI(new BottomUpRefactorized()),
 		};
-		guiTools.add(new SegmentationTool(segmentationUIs));
+		guiTools.add(new SegmentationTool(true, segmentationUIs));
 	}
 	
 

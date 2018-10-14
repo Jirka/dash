@@ -11,7 +11,12 @@ import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.EntrophyNormalization;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
-	
+
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class EntropyAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Entrophy Analysis";

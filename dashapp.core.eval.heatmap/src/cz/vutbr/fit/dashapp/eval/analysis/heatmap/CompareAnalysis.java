@@ -17,6 +17,11 @@ import cz.vutbr.fit.dashapp.util.matrix.MatrixUtils;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class CompareAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Compare 2 Files";

@@ -98,6 +98,7 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 	@Override
 	public void firePropertyChange(PropertyChangeEvent e) {
 		if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED ||
+				e.propertyKind == EventKind.XML_FORMATTED ||
 				EventKind.isModelChanged(e)) {
 			IWorkspaceFile selectedFile = DashAppModel.getInstance().getSelectedFile();
 			if(selectedFile != null && selectedFile instanceof DashboardFile && selectedFile == e.selectedFile) {

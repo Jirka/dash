@@ -8,6 +8,11 @@ import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix.ThresholdNormalization;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class ThresholdAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Threshold Analysis";

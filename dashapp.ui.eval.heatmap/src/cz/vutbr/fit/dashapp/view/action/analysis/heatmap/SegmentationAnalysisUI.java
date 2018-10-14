@@ -18,6 +18,11 @@ import cz.vutbr.fit.dashapp.eval.analysis.heatmap.SegmentationAnalysis;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 import cz.vutbr.fit.dashapp.view.action.analysis.FolderAnalysisUI;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class SegmentationAnalysisUI extends FolderAnalysisUI {
 	
 	private SegmentationType[] availableSegmentationTypes;

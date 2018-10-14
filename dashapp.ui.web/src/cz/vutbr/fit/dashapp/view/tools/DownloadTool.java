@@ -23,18 +23,26 @@ public class DownloadTool extends AbstractGUITool implements IGUITool {
 	BasicDashAction downloadAction;
 	
 	public DownloadTool() {
+		this(false);
+	}
+	
+	public DownloadTool(boolean addSeparator) {
+		super(addSeparator);
 		downloadAction = new BasicDashAction(new DownloadActionUI());
 	}
 	
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
 		menuBar.addItem(subMenu, LABEL, downloadAction);
 	}
 	
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		toolbar.addButton(LABEL, ICON, downloadAction, 0);

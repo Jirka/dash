@@ -6,6 +6,11 @@ import java.util.Arrays;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class GrayMatrix {
 	
 	public static final int BLACK = 0;

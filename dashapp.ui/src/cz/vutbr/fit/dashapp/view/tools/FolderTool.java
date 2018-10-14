@@ -82,15 +82,12 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 						index = e.getLastIndex();
 					}
 					if(index >= 0) {
-						DashboardFile selectedDashboardFile = null;
+						IWorkspaceFile selectedWorkspaceFile = null;
 						if(!listModel.isEmpty() && index < listModel.size()) {
-							IWorkspaceFile selectedDashboardSource = listModel.get(index);
-							if(selectedDashboardSource instanceof DashboardFile) {
-								selectedDashboardFile = (DashboardFile) selectedDashboardSource;
-							}
+							selectedWorkspaceFile = listModel.get(index);
 						}
 						propertyChangeDiasbled = true;
-						DashAppController.getEventManager().reloadSelectedWorkspaceFile(selectedDashboardFile);
+						DashAppController.getEventManager().reloadSelectedWorkspaceFile(selectedWorkspaceFile);
 						propertyChangeDiasbled = false;
 						previousIndex = index;
 					}

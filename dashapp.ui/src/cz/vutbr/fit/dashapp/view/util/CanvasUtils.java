@@ -6,6 +6,11 @@ import java.util.List;
 
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class CanvasUtils {
 	
 	public static final int BORDER_RANGE = 10;

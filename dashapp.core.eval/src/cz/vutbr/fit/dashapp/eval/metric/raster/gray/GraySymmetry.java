@@ -79,9 +79,9 @@ public class GraySymmetry extends AbstractGrayRasterMetric {
 		double SM_V = getVerticalSymmetry(matrix);
 		double SM_H = getHorizontalSymmetry(matrix);
 		return new MetricResult[] {
-				new MetricResult("Symmetry", "SYM", (Math.abs(SM_V)+Math.abs(SM_H))/2.0),
-				new MetricResult("Vertical Symmetry", "SYM_v", SM_V),
-				new MetricResult("Horizontal Symmetry", "SYM_h", SM_H)
+				new MetricResult("Gray Symmetry", "SYM", (Math.abs(SM_V)+Math.abs(SM_H))/2.0),
+				new MetricResult("Gray Vertical Symmetry", "SYM_v", SM_V),
+				new MetricResult("Gray Horizontal Symmetry", "SYM_h", SM_H)
 		};
 	}
 

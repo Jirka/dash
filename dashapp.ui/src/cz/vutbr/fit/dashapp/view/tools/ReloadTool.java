@@ -23,18 +23,26 @@ public class ReloadTool extends AbstractGUITool implements IGUITool {
 	RefreshAction refreshAction;
 	
 	public ReloadTool() {
+		this(false);
+	}
+	
+	public ReloadTool(boolean addSeparator) {
+		super(addSeparator);
 		refreshAction = new RefreshAction();
 	}
 
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
 		menuBar.addItem(subMenu, "Reload dashboard", refreshAction);
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		toolbar.addButton("Reload dashboard from file", "/icons/Refresh.png", refreshAction, 0);

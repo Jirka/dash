@@ -8,6 +8,11 @@ import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.GraphicalElement;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class TestOfGEBoundariesAnalysis extends AbstractHeatMapAnalysis {
 	
 	List<WorkspaceFolder> folders;

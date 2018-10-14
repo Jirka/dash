@@ -38,9 +38,12 @@ public class DownloadPageUtils {
 				preferredPhantomBin = new File(candidatePhantomBin).getAbsolutePath();
 			} else {
 				// else take dash.samples installation (only for debug purposes if exists)
-				String dashSamplesPath = PathUtils.getDashSamplesPath();
-				if(dashSamplesPath != null) {
-					candidatePhantomBin = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_BIN;
+				String dashWorkspacePath = PathUtils.getDashSamplesPath();
+				if(dashWorkspacePath == null) {
+					dashWorkspacePath = PathUtils.getDashWebPath();
+				}
+				if(dashWorkspacePath != null) {
+					candidatePhantomBin = dashWorkspacePath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_BIN;
 					if(isExistingFile(candidatePhantomBin)) {
 						preferredPhantomBin = candidatePhantomBin;
 					}
@@ -95,8 +98,6 @@ public class DownloadPageUtils {
 	
 	private static boolean isPhantomInstalled() {
 		//TODO
-//		System.out.println(System.getenv("PATH"));
-
 		return false;
 	}
 	

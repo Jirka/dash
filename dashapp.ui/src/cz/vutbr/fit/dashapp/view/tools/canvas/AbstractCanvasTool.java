@@ -18,6 +18,11 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
 import cz.vutbr.fit.dashapp.view.tools.AbstractGUITool;
 import cz.vutbr.fit.dashapp.view.util.PaintUtil;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public abstract class AbstractCanvasTool extends AbstractGUITool implements MouseListener, MouseMotionListener, KeyListener {
 	
 	protected boolean requiresSeparator;

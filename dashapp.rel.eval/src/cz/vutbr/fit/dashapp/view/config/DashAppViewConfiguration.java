@@ -1,60 +1,46 @@
 package cz.vutbr.fit.dashapp.view.config;
 
-import java.util.ArrayList;
+import cz.vutbr.fit.dashapp.eval.analysis.file.ColorAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.ColorfulnessAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.ComplexRasterAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.ComplexWidgetAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.GrayscaleAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.KimRasterAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.file.NgoAnalysis;
+import cz.vutbr.fit.dashapp.eval.metric.MetricType;
+import cz.vutbr.fit.dashapp.view.action.analysis.FileAnalysisUI;
+import cz.vutbr.fit.dashapp.view.action.analysis.file.FileMetricAnalysisUI;
+import cz.vutbr.fit.dashapp.view.action.image.ImageActionFactory;
+import cz.vutbr.fit.dashapp.view.tools.FileAnalysisTool;
+import cz.vutbr.fit.dashapp.view.tools.ImageTool;
 
-import javax.swing.ButtonGroup;
-
-import cz.vutbr.fit.dashapp.view.tools.AttachTool;
-import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
-import cz.vutbr.fit.dashapp.view.tools.FolderTool;
-import cz.vutbr.fit.dashapp.view.tools.FullScreenTool;
-import cz.vutbr.fit.dashapp.view.tools.GETypeTool;
-import cz.vutbr.fit.dashapp.view.tools.GrayScaleTool;
-import cz.vutbr.fit.dashapp.view.tools.HistoryTool;
-import cz.vutbr.fit.dashapp.view.tools.NewFileTool;
-import cz.vutbr.fit.dashapp.view.tools.OldAnalysisTool;
-import cz.vutbr.fit.dashapp.view.tools.OpenTool;
-import cz.vutbr.fit.dashapp.view.tools.ReloadTool;
-import cz.vutbr.fit.dashapp.view.tools.SaveTool;
-import cz.vutbr.fit.dashapp.view.tools.XMLTool;
-import cz.vutbr.fit.dashapp.view.tools.ZoomTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.BoundTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
-import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
-
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
-	public static final String EVAL_VERSION = "rel-eval-2016";
+	public static final String EVAL_VERSION = "rel-eval";
 	
 	protected void initTools() {
-		guiTools = new ArrayList<>();;
-		// basic UI tools
-		guiTools.add(new NewFileTool());
-		guiTools.add(new OpenTool());
-		guiTools.add(new ReloadTool());
-		guiTools.add(new SaveTool());
-		guiTools.add(new HistoryTool());
-		guiTools.add(new ZoomTool());
-		guiTools.add(new FullScreenTool());
+		super.initTools();
 		
-		guiTools.add(new FolderTool());
-		guiTools.add(new FileInfoTool());
-		guiTools.add(new XMLTool());
+		guiTools.add(new ImageTool(true, ImageActionFactory.getRecommendedActions()));
 		
-		// canvas tools
-		ButtonGroup buttonGroup = new ButtonGroup();
-		guiTools.add(new ViewTool(true, true, buttonGroup));
-		guiTools.add(new BoundTool(false, false, buttonGroup));
-		guiTools.add(new SelectTool(false, false, buttonGroup));
-		guiTools.add(new InsertTool(false, false, buttonGroup));
-		
-		guiTools.add(new AttachTool());
-		guiTools.add(new GETypeTool());
-		
-		guiTools.add(new GrayScaleTool());
-		
-		guiTools.add(new OldAnalysisTool());
+		// file analysis tools
+		MetricType[] metricTypes = MetricType.values();
+		FileAnalysisUI[] fileActionsUIs = new FileAnalysisUI[] {
+				new FileMetricAnalysisUI(metricTypes),
+				new FileAnalysisUI(new GrayscaleAnalysis()),
+				new FileAnalysisUI(new ColorAnalysis()),
+				new FileAnalysisUI(new ColorfulnessAnalysis()),
+				new FileAnalysisUI(new KimRasterAnalysis()),
+				new FileAnalysisUI(new NgoAnalysis()),
+				new FileAnalysisUI(new ComplexRasterAnalysis()),
+				new FileAnalysisUI(new ComplexWidgetAnalysis()),
+		};
+		guiTools.add(new FileAnalysisTool(true, fileActionsUIs));
 	}
 	
 	@Override

@@ -18,6 +18,11 @@ import cz.vutbr.fit.dashapp.view.tools.canvas.InsertTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.SelectTool;
 import cz.vutbr.fit.dashapp.view.tools.canvas.ViewTool;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class DashAppViewConfiguration extends BasicViewConfiguration {
 	
 	public static final String DEFAULT_WORKSPACE_PATH = "dashboards/";
@@ -35,10 +40,10 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools = new ArrayList<>();;
 		// basic UI tools
 		guiTools.add(new OpenTool());
-		guiTools.add(new SaveTool());
-		guiTools.add(new HistoryTool());
-		guiTools.add(new ZoomTool());
-		guiTools.add(new FullScreenTool());
+		guiTools.add(new SaveTool(true));
+		guiTools.add(new HistoryTool(true));
+		guiTools.add(new ZoomTool(true));
+		guiTools.add(new FullScreenTool(true));
 		
 		guiTools.add(new FolderTool());
 		guiTools.add(new XMLTool());
@@ -49,7 +54,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools.add(new SelectTool(false, false, buttonGroup));
 		guiTools.add(new InsertTool(false, false, buttonGroup));
 		
-		guiTools.add(new AttachTool());
+		guiTools.add(new AttachTool(true));
 		
 		guiTools.add(new GrayScaleTool());
 	}

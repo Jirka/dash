@@ -21,6 +21,11 @@ import cz.vutbr.fit.dashapp.util.FileUtils;
 import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class AverageMetricAnalysis extends AbstractHeatMapAnalysis {
 	
 	public static final String LABEL = "Average Metric Analysis";

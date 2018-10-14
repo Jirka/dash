@@ -22,10 +22,18 @@ public class AttachTool extends AbstractGUITool implements IGUITool {
 	public static final int ATTACH_TOLERANCE = 4;
 	
 	protected AbstractButton btn;
+	
+	public AttachTool() {
+		this(false);
+	}
+	
+	public AttachTool(boolean addSeparator) {
+		super(addSeparator);
+	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if(toolbar.getAmountOfItems() > 0) {
+		if(addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		btn = toolbar.addToggleButton("Enable attach function", "/icons/magnet_off.png",

@@ -5,20 +5,22 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import cz.vutbr.fit.dashapp.eval.analysis.AbstractAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.AbstractFolderAnalysis;
 import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
-import cz.vutbr.fit.dashapp.util.DashAppUtils;
-import cz.vutbr.fit.dashapp.util.DashboardCollection;
 import cz.vutbr.fit.dashapp.util.FileUtils;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 
-public abstract class AbstractHeatMapAnalysis extends AbstractAnalysis {
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
+public abstract class AbstractHeatMapAnalysis extends AbstractFolderAnalysis {
 	
 	public static final String DEFAULT_LOGIN_PREFIX = "x";
 	public static final String DEFAULT_FILE_REGEX = DEFAULT_LOGIN_PREFIX + ".*";
-	public static final String DEFAULT_OUTPUT_PATH = "../all/";
 	
 	public static final String FILE_SUFFIX_BASIC = "";
 	public static final String FILE_SUFFIX_BASIC_BODY = "_body";
@@ -45,10 +47,6 @@ public abstract class AbstractHeatMapAnalysis extends AbstractAnalysis {
 		}
 		// copy
 		return matrix;
-	}
-	
-	protected DashboardCollection getDashboardCollection(WorkspaceFolder dashboardFolder, String fileRegex) {
-		return new DashboardCollection(DashAppUtils.getDashboards(dashboardFolder.getChildren(DashboardFile.class, fileRegex, true)));
 	}
 	
 	protected String replaceVariables(String string, WorkspaceFolder actWorkspaceFolder) {

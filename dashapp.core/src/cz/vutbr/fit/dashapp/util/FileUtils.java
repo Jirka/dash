@@ -9,6 +9,11 @@ import javax.imageio.ImageIO;
 
 import cz.vutbr.fit.dashapp.model.Dashboard;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class FileUtils {
 	
 	public static final String IMAGE_EXTENSION = "png";

@@ -76,6 +76,11 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.GrayMatrix;
 import cz.vutbr.fit.dashapp.util.matrix.StatsUtils.MeanStatistics;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class WidgetMetricAnalysis extends AbstractHeatMapAnalysis {
 	
 	private static final String LABEL = "Widget Metric Analysis";

@@ -45,6 +45,11 @@ import cz.vutbr.fit.dashapp.image.colorspace.CIE;
 import cz.vutbr.fit.dashapp.image.colorspace.HSB;
 import cz.vutbr.fit.dashapp.model.GraphicalElement.GEType;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public enum MetricType {
 	// raster color
 	Colorfulness_HSB_s,

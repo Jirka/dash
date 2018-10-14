@@ -21,24 +21,34 @@ import cz.vutbr.fit.dashapp.view.ToolBar;
  */
 public class OpenTool extends AbstractGUITool implements IGUITool {
 	
+	public static final String LABEL = "Open folder";
+	
 	OpenFolderAction openFolderAction;
 	
 	public OpenTool() {
+		this(false);
+	}
+	
+	public OpenTool(boolean addSeparator) {
+		super(addSeparator);
 		openFolderAction = new OpenFolderAction();
 	}
 
 	@Override
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("File");
-		menuBar.addItem(subMenu, "Open folder", openFolderAction);
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
+		menuBar.addItem(subMenu, LABEL, openFolderAction);
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if (toolbar.getAmountOfItems() > 0) {
+		if (addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
-		toolbar.addButton("Open folder", "/icons/Open file.png", openFolderAction, 0);
+		toolbar.addButton(LABEL, "/icons/Open file.png", openFolderAction, 0);
 	}
 
 	/**

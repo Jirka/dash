@@ -4,6 +4,11 @@ import java.awt.Rectangle;
 
 import cz.vutbr.fit.dashapp.util.MathUtils;
 
+/**
+ * 
+ * @author Jiri Hynek
+ *
+ */
 public class MatrixUtils {
 	
 	public static int width(int[][] matrix) {

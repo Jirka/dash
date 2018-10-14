@@ -39,7 +39,15 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 	private List<AbstractButton> btnsUndo;
 	private List<AbstractButton> btnsRedo;
 	
+	private static final String LABEL_UNDO = "Undo";
+	private static final String LABEL_REDO = "Redo";
+	
 	public HistoryTool() {
+		this(false);
+	}
+	
+	public HistoryTool(boolean addSeparator) {
+		super(addSeparator);
 		historyCache = new HashMap<IWorkspaceFile, History>();
 		userBrowsingHistory = false;
 		btnsUndo = new ArrayList<>();
@@ -51,31 +59,35 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 	public void provideMenuItems(MenuBar menuBar) {
 		JMenu subMenu = menuBar.getSubMenu("Edit");
 		
+		if(addSeparator && subMenu.getItemCount() > 0) {
+			subMenu.addSeparator();
+		}
+		
 		// undo
-		AbstractButton btn = menuBar.addItem(subMenu, "Undo", new HistoryAction(HistoryAction.UNDO));
+		AbstractButton btn = menuBar.addItem(subMenu, LABEL_UNDO, new HistoryAction(HistoryAction.UNDO));
 		btn.setEnabled(false);
 		btnsUndo.add(btn);
 		
 		// redo
-		btn = menuBar.addItem(subMenu, "Redo", new HistoryAction(HistoryAction.REDO));
+		btn = menuBar.addItem(subMenu, LABEL_REDO, new HistoryAction(HistoryAction.REDO));
 		btn.setEnabled(false);
 		btnsRedo.add(btn);
 	}
 
 	@Override
 	public void provideToolbarItems(ToolBar toolbar) {
-		if(toolbar.getAmountOfItems() > 0) {
+		if(addSeparator && toolbar.getAmountOfItems() > 0) {
 			toolbar.addSeparator();
 		}
 		
 		// undo
-        AbstractButton btn = toolbar.addButton("Undo", "/icons/Undo.png", new HistoryAction(HistoryAction.UNDO), 0);
+        AbstractButton btn = toolbar.addButton(LABEL_UNDO, "/icons/Undo.png", new HistoryAction(HistoryAction.UNDO), 0);
         btn.setPreferredSize(new Dimension(24, 24));
         btn.setEnabled(false);
         btnsUndo.add(btn);
         
         // redo
-		btn = toolbar.addButton("Redo", "/icons/Redo.png", new HistoryAction(HistoryAction.REDO), 0);
+		btn = toolbar.addButton(LABEL_REDO, "/icons/Redo.png", new HistoryAction(HistoryAction.REDO), 0);
 		btn.setPreferredSize(new Dimension(24, 24));
 		btn.setEnabled(false);
 		btnsRedo.add(btn);
@@ -87,8 +99,10 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 	 * @param history
 	 */
 	private void updateButtons(History history) {
-		enableButtons(btnsUndo, history.canUndo());
-		enableButtons(btnsRedo, history.canRedo());
+		if(history != null) {
+			enableButtons(btnsUndo, history.canUndo());
+			enableButtons(btnsRedo, history.canRedo());
+		}
 	}
 	
 	/**
@@ -103,11 +117,11 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 		}
 	}
 	
-	private History getHistory(IWorkspaceFile dashboardFile) {
-		History history = historyCache.get(dashboardFile);
-		if(history == null) {
+	private History getHistory(IWorkspaceFile workspaceFile) {
+		History history = historyCache.get(workspaceFile);
+		if(history == null && workspaceFile instanceof DashboardFile) {
 			history = new History(HISTORY_LIMIT);
-			historyCache.put(dashboardFile, history);
+			historyCache.put(workspaceFile, history);
 		}
 		return history;
 	}
@@ -236,10 +250,12 @@ public class HistoryTool extends AbstractGUITool implements IGUITool, IPropertyC
 		if(!userBrowsingHistory && EventKind.isModelChanged(e) && e.xmlChange != null) {
 			IWorkspaceFile updatedFile = e.selectedFile;
 			History history = getHistory(updatedFile);
-			history.save((String) e.xmlChange.oldValue);
-			DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
-			if(selectedDashboardFile != null && selectedDashboardFile == updatedFile) {
-				updateButtons(history);
+			if(history != null) {
+				history.save((String) e.xmlChange.oldValue);
+				DashboardFile selectedDashboardFile = DashAppUtils.getSelectedDashboardFile();
+				if(selectedDashboardFile != null && selectedDashboardFile == updatedFile) {
+					updateButtons(history);
+				}
 			}
 		} else if(e.propertyKind == EventKind.FILE_SELECTION_CHANGED) {
 			updateButtons(getHistory(e.selectedFile));
