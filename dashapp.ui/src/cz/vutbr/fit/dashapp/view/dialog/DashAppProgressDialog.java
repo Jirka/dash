@@ -50,7 +50,6 @@ public class DashAppProgressDialog implements PropertyChangeListener {
      * Invoked when task's progress property changes.
      */
     public void propertyChange(PropertyChangeEvent e) {
-    	System.out.println(e);
         if (e.getPropertyName() ==  "progress") {
             int progress = (Integer) e.getNewValue();
             monitor.setProgress(progress);

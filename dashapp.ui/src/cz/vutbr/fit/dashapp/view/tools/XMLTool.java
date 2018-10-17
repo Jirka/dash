@@ -108,6 +108,8 @@ public class XMLTool extends AbstractGUITool implements IGUITool, IComponent, IP
 					updateEditor((DashboardFile) selectedFile);
 				}
 				// else - workflow 2: text input -> proper editor text update -> change of serialized XML -> model change event
+			} else {
+				editor.setText("");
 			}
 		}
 	}

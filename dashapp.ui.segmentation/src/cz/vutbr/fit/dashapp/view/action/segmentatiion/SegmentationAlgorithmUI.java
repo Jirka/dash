@@ -157,6 +157,9 @@ public class SegmentationAlgorithmUI implements IDashActionUI {
 
         @Override
         public void done() {
+        	if(debug) {
+				segmentationAlgorithm.removeSegmentationDebugListener(this);
+			}
         	System.out.println("segmentation done");
         }
 

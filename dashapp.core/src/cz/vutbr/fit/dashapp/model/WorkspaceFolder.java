@@ -35,7 +35,9 @@ public class WorkspaceFolder extends WorkspaceFile implements IWorkspaceFile {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof WorkspaceFolder) {
+		if(obj == null) {
+			return false;
+		} else if(obj instanceof WorkspaceFolder) {
 			((WorkspaceFolder) obj).getFile();
 			return folderFile.getAbsolutePath().equals(((WorkspaceFolder) obj).getFile().getAbsolutePath());
 		}

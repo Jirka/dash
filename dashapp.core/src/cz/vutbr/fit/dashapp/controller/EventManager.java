@@ -349,7 +349,7 @@ public class EventManager {
 	public void reloadSelectedWorkspaceFile(IWorkspaceFile workspaceFile) {
 		DashAppModel model = DashAppModel.getInstance();
 		IWorkspaceFile oldFile = model.getSelectedFile();
-		if(oldFile != workspaceFile) {
+		if(!areSameFiles(oldFile, workspaceFile)) {
 			model.setSelectedFile(workspaceFile);
 			if(workspaceFile instanceof DashboardFile) {
 				DashboardFile dashboardFile = (DashboardFile) workspaceFile;
@@ -364,13 +364,21 @@ public class EventManager {
 		}
 	}
 	
+	private boolean areSameFiles(IWorkspaceFile file1, IWorkspaceFile file2) {
+		if(file1 == null || file2 == null) {
+			return file1 == file2;
+		}
+		
+		return file1.equals(file2);
+	}
+
 	public void changeSelectedWorkspaceFile(String fileName) {
 		changeSelectedWorkspaceFile(fileName, null);
 	}
 	
 	public void changeSelectedWorkspaceFile(String fileName, String imageExtension) {
     	DashAppModel model = DashAppModel.getInstance();
-    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(true);
+    	IWorkspaceFile[] children = model.getWorkspaceFolder().getChildren(false);
     	DashboardFile df = null;
     	String fullName = imageExtension != null ? (fileName + "." + imageExtension) : fileName;
     	for (IWorkspaceFile child : children) {

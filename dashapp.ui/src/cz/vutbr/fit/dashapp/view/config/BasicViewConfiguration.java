@@ -143,13 +143,13 @@ public class BasicViewConfiguration implements IViewConfiguration {
 	@Override
 	public String getDefaultWorkspacePath() {
 		// basic workspace path
-		String basicWorkspacePath = replaceSeparators(getBasicWorkspacePath());
+		String basicWorkspacePath = PathUtils.replaceSeparators(getBasicWorkspacePath());
 		
 		// try debug workspace path suffixes
 		String[] debugPathSuffixes = getDebugWorkspacePathSuffixes();
 		if(debugPathSuffixes != null) {
 			for (String debugPathSuffix : debugPathSuffixes) {
-				String advancedWorkspacePath = replaceSeparators(basicWorkspacePath + debugPathSuffix);
+				String advancedWorkspacePath = PathUtils.replaceSeparators(basicWorkspacePath + debugPathSuffix);
 				File asvancedWorkspacePathFile = new File(advancedWorkspacePath);
 				if(asvancedWorkspacePathFile.exists() && asvancedWorkspacePathFile.isDirectory()) {
 					return advancedWorkspacePath;
@@ -158,10 +158,6 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		}
 		
 		return basicWorkspacePath;
-	}
-	
-	private String replaceSeparators(String path) {
-		return path.replaceAll("/", File.separator);
 	}
 	
 	protected String getBasicWorkspacePath() {

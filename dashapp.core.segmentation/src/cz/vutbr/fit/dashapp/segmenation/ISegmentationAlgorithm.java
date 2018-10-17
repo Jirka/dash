@@ -33,6 +33,13 @@ public interface ISegmentationAlgorithm {
 	 * @param debugListener
 	 */
 	void addSegmentationDebugListener(ISegmentationDebugListener debugListener);
+	
+	/**
+	 * Unregister debug listener (for debug purposes).
+	 * 
+	 * @param segmentationAlgorithmTask
+	 */
+	void removeSegmentationDebugListener(ISegmentationDebugListener debugListener);
 
 	/**
 	 * 

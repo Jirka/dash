@@ -160,7 +160,7 @@ public class BottomUp extends AbstractSegmentationAlgorithm implements ISegmenta
 		}
 	
 		int[] outThresholdArray = new int[2];
-		BottomUpUtil.getTreshold(outMatrix, outThresholdArray, _w, _h);
+		BottomUpUtil.getThreshold(outMatrix, outThresholdArray, _w, _h);
 		_hMaxLineSize = outThresholdArray[0];
 		_vMaxLineSize = outThresholdArray[1];
 

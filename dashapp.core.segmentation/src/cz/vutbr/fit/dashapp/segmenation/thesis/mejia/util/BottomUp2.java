@@ -47,9 +47,9 @@ public class BottomUp2 {
 		BottomUp2Result result = new BottomUp2Result();
 		
 		// redraw rectangles
-		// TODO: BUJoinRectanglesUtil.getTreshold contains some uclear code which should be replaced
-		result.hMaxLineSize = BUJoinRectanglesUtil.getTreshold(resultMatrix, Constants.X);
-		result.vMaxLineSize = BUJoinRectanglesUtil.getTreshold(resultMatrix, Constants.Y);
+		// TODO: BUJoinRectanglesUtil.getThreshold contains some uclear code which should be replaced
+		result.hMaxLineSize = BUJoinRectanglesUtil.getThreshold(resultMatrix, Constants.X);
+		result.vMaxLineSize = BUJoinRectanglesUtil.getThreshold(resultMatrix, Constants.Y);
 		result.matrix = BUJoinRectanglesUtil.reDrawRectangles(resultMatrix, result.hMaxLineSize, result.vMaxLineSize);
 
 		return result;

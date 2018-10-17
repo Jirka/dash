@@ -19,12 +19,12 @@ public class DownloadPageUtils {
 	/**
 	 * for debug purposes
 	 */
-	public static final String DASH_SAMPLES_PHANTOM_INSTALLATION = "/phantom/src/";
+	public static final String DASH_SAMPLES_PHANTOM_INSTALLATION = PathUtils.replaceSeparators("/phantom/src/");
 	
 	/**
 	 * for debug purposes
 	 */
-	public static final String DASH_SAMPLES_CONFIG_LOCATION = "/phantom/src/config/";
+	public static final String DASH_SAMPLES_CONFIG_LOCATION = PathUtils.replaceSeparators("/phantom/src/config/");
 	
 	
 	public static String getPreferredPhantomBin() {
@@ -63,9 +63,12 @@ public class DownloadPageUtils {
 			preferredPhantomMain = new File(candidatePhantomMain).getAbsolutePath();
 		} else {
 			// else take dash.samples installation (only for debug purposes if exists)
-			String dashSamplesPath = PathUtils.getDashSamplesPath();
-			if(dashSamplesPath != null) {
-				candidatePhantomMain = dashSamplesPath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_MAIN;
+			String dashWorkspacePath = PathUtils.getDashSamplesPath();
+			if(dashWorkspacePath == null) {
+				dashWorkspacePath = PathUtils.getDashWebPath();
+			}
+			if(dashWorkspacePath != null) {
+				candidatePhantomMain = dashWorkspacePath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_MAIN;
 				if(isExistingFile(candidatePhantomMain)) {
 					preferredPhantomMain = candidatePhantomMain;
 				}
@@ -84,9 +87,12 @@ public class DownloadPageUtils {
 			preferredConfigFile = new File(candidateConfigFile).getAbsolutePath();
 		} else {
 			// else take dash.samples configuration file (only for debug purposes if exists)
-			String dashSamplesPath = PathUtils.getDashSamplesPath();
-			if(dashSamplesPath != null) {
-				candidateConfigFile = dashSamplesPath + DASH_SAMPLES_CONFIG_LOCATION + CONFIG_FILE;
+			String dashWorkspacePath = PathUtils.getDashSamplesPath();
+			if(dashWorkspacePath == null) {
+				dashWorkspacePath = PathUtils.getDashWebPath();
+			}
+			if(dashWorkspacePath != null) {
+				candidateConfigFile = dashWorkspacePath + DASH_SAMPLES_CONFIG_LOCATION + CONFIG_FILE;
 				if(isExistingFile(candidateConfigFile)) {
 					preferredConfigFile = candidateConfigFile;
 				}

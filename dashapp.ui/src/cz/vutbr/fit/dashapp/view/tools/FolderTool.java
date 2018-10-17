@@ -42,6 +42,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 	private JList<IWorkspaceFile> list;
 	private ListModel listModel;
 	private boolean propertyChangeDiasbled;
+	private boolean valueChangedDiasbled;
 
 	public FolderTool() {
 		initModel();
@@ -76,7 +77,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 			
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if(!e.getValueIsAdjusting()) {
+				if(!e.getValueIsAdjusting() && !valueChangedDiasbled) {
 					int index = e.getFirstIndex();
 					if(index == previousIndex) {
 						index = e.getLastIndex();
@@ -159,6 +160,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 	}
 	
 	private void changeFolder(WorkspaceFolder folder) {
+		valueChangedDiasbled = true;
 		listModel.clear();
 		File folderFile = folder.getFile();
 		if(folderFile.exists() && folderFile.isDirectory()) {
@@ -172,6 +174,7 @@ public class FolderTool extends AbstractGUITool implements IGUITool, IComponent,
 				listModel.addElement(child);
 			}
 		}
+		valueChangedDiasbled = false;
 	}
 	
 	/**

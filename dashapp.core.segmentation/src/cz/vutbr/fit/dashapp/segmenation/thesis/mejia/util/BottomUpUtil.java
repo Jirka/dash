@@ -503,7 +503,7 @@ public class BottomUpUtil {
 	 * @param w
 	 * @param h
 	 */	
-	public static void getTreshold(int[][] inMatrix, int[] outArray, int w, int h) {
+	public static void getThreshold(int[][] inMatrix, int[] outArray, int w, int h) {
 		int hMaxLineSize = 0;
 		int vMaxLineSize = 0;
 		//	horizontal

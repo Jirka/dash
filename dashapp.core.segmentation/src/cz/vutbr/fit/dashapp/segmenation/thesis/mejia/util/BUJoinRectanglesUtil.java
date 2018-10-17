@@ -25,7 +25,7 @@ public class BUJoinRectanglesUtil {
 	 * @param w
 	 * @param h
 	 */	
-	public static int getTreshold(int[][] matrix, int dm) {
+	public static int getThreshold(int[][] matrix, int dm) {
 		int maxLineSize = 0;
 		
 		// transpose matrix for X dimension (so the method can be universally used in both directions)

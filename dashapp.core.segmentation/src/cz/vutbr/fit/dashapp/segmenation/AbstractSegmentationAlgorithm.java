@@ -27,6 +27,11 @@ public abstract class AbstractSegmentationAlgorithm implements ISegmentationAlgo
 	}
 	
 	@Override
+	public void removeSegmentationDebugListener(ISegmentationDebugListener debugListener) {
+		debugListeners.remove(debugListener);
+	}
+	
+	@Override
 	public List<ISegmentationDebugListener> getDebugListeners() {
 		return debugListeners;
 	}

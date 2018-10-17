@@ -10,7 +10,7 @@ import cz.vutbr.fit.dashapp.util.matrix.ColorMatrix;
  * @author Jiri Hynek
  *
  */
-public class TresholdActions {
+public class ThresholdActions {
 
 	/**
 	 * 

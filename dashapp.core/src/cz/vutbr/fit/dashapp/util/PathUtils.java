@@ -22,17 +22,17 @@ public class PathUtils {
 	/**
 	 * default private workspace dashboard.samples path for debug purposes
 	 */
-	public static final String DASHBOARD_SAMPLES_RELATIVE_PATH = "/dash.samples";
+	public static final String DASHBOARD_SAMPLES_RELATIVE_PATH = File.separator + "dash.samples";
 	
 	/**
 	 * default public workspace dashboard.eval path
 	 */
-	public static final String DASHBOARD_EVAL_RELATIVE_PATH = "/dash.eval";
+	public static final String DASHBOARD_EVAL_RELATIVE_PATH = File.separator + "dash.eval";
 	
 	/**
 	 * default workspace dashboard.web path for web tools
 	 */
-	public static final String DASHBOARD_WEB_RELATIVE_PATH = "/dash.web";
+	public static final String DASHBOARD_WEB_RELATIVE_PATH = File.separator + "dash.web";
 	
 	/**
 	 * For debug purposes.
@@ -65,16 +65,53 @@ public class PathUtils {
 		return ACTUAL_PATH;
 	}
 	
-	private static String getDashWorkspacePath(String path) {
-		File actFile = new File(ACTUAL_PATH);
-		if(actFile.getParentFile() != null) {
-			File gitDirectory = actFile.getParentFile().getParentFile();
-			File dash_samples_dir = new File(gitDirectory.getPath() + path);
-			if(dash_samples_dir.exists() && dash_samples_dir.isDirectory()) {
-				return dash_samples_dir.getAbsolutePath();
+	private static String getDashWorkspacePath(String workspaceName) {
+		// test act folder (jar file)
+		File workspaceParentFolder = new File(ACTUAL_PATH);
+		String workspacePath = getDashWorkspacePath(workspaceParentFolder, workspaceName);
+		
+		// test parent path
+		if(workspacePath == null) {
+			workspaceParentFolder = workspaceParentFolder.getParentFile();
+			workspacePath = getDashWorkspacePath(workspaceParentFolder, workspaceName);
+		}
+		
+		// test grand parent path (git folder)
+		if(workspacePath == null) {
+			if(workspaceParentFolder != null) {
+				workspacePath = getDashWorkspacePath(workspaceParentFolder.getParentFile(), workspaceName);
+			}
+		}
+		
+		// test home folder
+		if(workspacePath == null) {
+			workspacePath = getDashWorkspacePath(new File(DEFAULT_WORKSPACE_HOME_PATH).getParentFile(), workspaceName);
+		}
+		
+		return workspacePath;
+	}
+	
+	private static String getDashWorkspacePath(File workspaceParentFolder, String workspaceName) {
+		if(workspaceParentFolder != null) {
+			File workskapceFolder = new File(workspaceParentFolder.getPath() + workspaceName);
+			
+			// debug
+			//System.out.println(workspaceParentFolder.getAbsolutePath());
+			//System.out.println("-> "  + workskapceFolder.getAbsolutePath());
+			
+			if(workskapceFolder.exists() && workskapceFolder.isDirectory()) {
+				return workskapceFolder.getAbsolutePath();
 			}
 		}
 		return null;
+	}
+	
+	public static String replaceSeparators(String path) {
+		String separator = File.separator;
+		if(separator.equals("\\")) {
+			separator = "\\\\";
+		}
+		return path.replaceAll("/", separator);
 	}
 
 }

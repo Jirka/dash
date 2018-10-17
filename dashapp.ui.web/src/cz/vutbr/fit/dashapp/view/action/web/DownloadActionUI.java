@@ -112,7 +112,7 @@ public class DownloadActionUI implements IDashActionUI {
 			marginY = new SimpleTextField("Margin Y:", "0");
 			maximumHierarchyLevel = new SimpleTextField("Maximum hierarchy level", "1");
 			selector = new SimpleTextField("Selector:", "body");
-			timeout = new SimpleTextField("Timeout", "6000");
+			timeout = new SimpleTextField("Timeout", "10000");
 			onlyScreen = new SimpleCheckBox("Generate only screen", false);
 			generateWidgetScreenshots = new SimpleCheckBox("Generate Widget screenshots", false);
 			

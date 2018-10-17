@@ -185,7 +185,26 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 
 	@Override
 	public boolean equals(Object obj) {
-		return toString().equals(obj.toString());
+		if(obj == null) {
+			return false;
+		} else if(obj instanceof DashboardFile) {
+			if(imageFile != null) {
+				File imageFile2 = ((DashboardFile) obj).getImageFile();
+				if(imageFile2 == null) {
+					return false;
+				} else {
+					return imageFile.getPath().equals(imageFile2.getPath());
+				}
+			} else {
+				File xmlFile2 = ((DashboardFile) obj).getXmlFile();
+				if(xmlFile2 == null) {
+					return false;
+				} else {
+					return xmlFile2.getPath().equals(xmlFile2.getPath());
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**
