@@ -19,12 +19,15 @@ public class DownloadPageUtils {
 	/**
 	 * for debug purposes
 	 */
-	public static final String DASH_SAMPLES_PHANTOM_INSTALLATION = PathUtils.replaceSeparators("/phantom/src/");
+	public static final String DASH_SAMPLES_PHANTOM_INSTALLATION = PathUtils.replaceSeparators("/phantomjs/bin/");
+	
+	
+	public static final String DASH_SAMPLES_MAIN_FILE_LOCATION = PathUtils.replaceSeparators("/");
 	
 	/**
 	 * for debug purposes
 	 */
-	public static final String DASH_SAMPLES_CONFIG_LOCATION = PathUtils.replaceSeparators("/phantom/src/config/");
+	public static final String DASH_SAMPLES_CONFIG_LOCATION = PathUtils.replaceSeparators("/config/");
 	
 	
 	public static String getPreferredPhantomBin() {
@@ -68,7 +71,7 @@ public class DownloadPageUtils {
 				dashWorkspacePath = PathUtils.getDashWebPath();
 			}
 			if(dashWorkspacePath != null) {
-				candidatePhantomMain = dashWorkspacePath + DASH_SAMPLES_PHANTOM_INSTALLATION + PHANTOM_MAIN;
+				candidatePhantomMain = dashWorkspacePath + DASH_SAMPLES_MAIN_FILE_LOCATION + PHANTOM_MAIN;
 				if(isExistingFile(candidatePhantomMain)) {
 					preferredPhantomMain = candidatePhantomMain;
 				}

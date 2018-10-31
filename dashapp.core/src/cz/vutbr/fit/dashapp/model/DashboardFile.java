@@ -200,7 +200,7 @@ public class DashboardFile extends WorkspaceFile implements IDashboardFile {
 				if(xmlFile2 == null) {
 					return false;
 				} else {
-					return xmlFile2.getPath().equals(xmlFile2.getPath());
+					return xmlFile2.getPath().equals(xmlFile.getPath());
 				}
 			}
 		}

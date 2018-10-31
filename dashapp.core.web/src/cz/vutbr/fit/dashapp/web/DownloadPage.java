@@ -46,12 +46,12 @@ public class DownloadPage {
 		command += isStringSet(imageFormat) ? " -imageFormat " + imageFormat : "";
 		command += isStringSet(selector)? " -selector " + selector : "";
 		
-		command += height != null ? " -heigth " + height : "";
+		command += height != null ? " -height " + height : "";
 		command += width != null ? " -width " + width : "";
 		command += timeout != null ?  " -timeout " + timeout : "";
 		command += maximumHierarchyLevel != null ? " -maximumHierarchyLevel " + maximumHierarchyLevel : "";
 		command += marginX != null ? " -marginX " + marginX : "";
-		command += marginY != null ?  " -timeout " + marginY : "";
+		command += marginY != null ?  " -marginY " + marginY : "";
 		
 		command += isOnlyScreen != null ? (" -onlyScreen " + (isOnlyScreen ? "true " : "false ")) : "";
 		command += isGenerateWidgetScreenshots != null ? (" -generateWidgetScreenshots " + (isGenerateWidgetScreenshots ? "true " : "false ")) : "";

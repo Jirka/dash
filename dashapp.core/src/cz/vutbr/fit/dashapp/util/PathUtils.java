@@ -32,7 +32,7 @@ public class PathUtils {
 	/**
 	 * default workspace dashboard.web path for web tools
 	 */
-	public static final String DASHBOARD_WEB_RELATIVE_PATH = File.separator + "dash.web";
+	public static final String DASHBOARD_WEB_RELATIVE_PATH = File.separator + "web-download-tool";
 	
 	/**
 	 * For debug purposes.
