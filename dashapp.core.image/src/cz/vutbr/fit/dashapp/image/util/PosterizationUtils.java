@@ -42,6 +42,9 @@ public class PosterizationUtils {
 		
 		for (int i = 0; i < mW; i++) {
 			for (int j = 0; j < mH; j++) {
+				if(createCopy) {
+					workingCopy[i][j] = new Gray(0);
+				}
 				workingCopy[i][j].grayValue = posterizeGrayValue(matrix[i][j].grayValue, mod);
 			}
 		}
