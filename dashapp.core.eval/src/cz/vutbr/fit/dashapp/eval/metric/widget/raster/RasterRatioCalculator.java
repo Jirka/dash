@@ -164,6 +164,8 @@ public abstract class RasterRatioCalculator {
 	 *
 	 */
 	public static class PosterizedIntensityRatioCalculator extends RasterRatioCalculator {
+		
+		public static String POSTERIZED = "Posterized";
 
 		@Override
 		public double calculateRatio(ColorSpace[][] matrix) {
@@ -172,7 +174,7 @@ public abstract class RasterRatioCalculator {
 
 		@Override
 		public ColorSpace[][] prepareImage(IDashboardFile dashboardFile) {
-			Object value = dashboardFile.getCachedObject(Gray.class);
+			Object value = dashboardFile.getCachedObject(POSTERIZED);
 			Gray[][] imageMatrixGray = null;
 			if(value != null && value instanceof Gray[][]) {
 				imageMatrixGray = (Gray[][]) value;
@@ -180,8 +182,9 @@ public abstract class RasterRatioCalculator {
 				int[][] imageMatrix = dashboardFile.getImageMatrix();
 				if(imageMatrix != null) {
 					imageMatrixGray = Gray.fromRGB(imageMatrix);
-					PosterizationUtils.posterizeMatrix(imageMatrixGray, (int)(Math.pow(2, 4)), false);
 					dashboardFile.putIntoCache(Gray.class, imageMatrixGray);
+					imageMatrixGray = PosterizationUtils.posterizeMatrix(imageMatrixGray, (int)(Math.pow(2, 4)), true);
+					dashboardFile.putIntoCache(POSTERIZED, imageMatrixGray);
 				}
 			}
 			return imageMatrixGray;
