@@ -12,7 +12,9 @@ import cz.vutbr.fit.dashapp.eval.metric.MetricType;
 import cz.vutbr.fit.dashapp.eval.metric.MetricResult.MetricResultAttribute;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GrayBalance;
 import cz.vutbr.fit.dashapp.eval.metric.raster.gray.GraySymmetry;
+import cz.vutbr.fit.dashapp.model.Dashboard;
 import cz.vutbr.fit.dashapp.model.DashboardFile;
+import cz.vutbr.fit.dashapp.model.VirtualDashboardFile;
 import cz.vutbr.fit.dashapp.model.WorkspaceFolder;
 import cz.vutbr.fit.dashapp.util.FileUtils;
 
@@ -116,12 +118,27 @@ public class FolderMetricAnalysis extends AbstractHeatMapAnalysis {
 	public void processFolder(WorkspaceFolder actWorkspaceFolder) {
 		//int[][] heatMap = getDashboardMatrix(actWorkspaceFolder, actDashboards, getDashboardFileName(actWorkspaceFolder, actDashboards));
 		DashboardFile df = getDashboardFile(actWorkspaceFolder, getDashboardFileName(actWorkspaceFolder));
-		if(df != null) {
+		
+		// cache
+		VirtualDashboardFile vdf = new VirtualDashboardFile(df.getModel());
+		vdf.setImage(df.getImage());
+		Dashboard dashboardCopy = df.getDashboard(true).copy();
+		vdf.setDashboard(dashboardCopy);
+		dashboardCopy.setDashboardFile(vdf);
+		
+		if(vdf != null) {
 			Map<IMetric, Map<WorkspaceFolder, MetricResult[]>> resultMap = getResultsMap();
 			for (Entry<IMetric, Map<WorkspaceFolder, MetricResult[]>> metricEntry : resultMap.entrySet()) {
-				metricEntry.getValue().put(actWorkspaceFolder, metricEntry.getKey().measure(df));
+				metricEntry.getValue().put(actWorkspaceFolder, metricEntry.getKey().measure(vdf));
 			}
+			// clear file
+			df = null;
+			vdf.clearCache();
+			vdf = null;
+			System.gc();
 		}
+		
+		
 	}
 
 	@Override
