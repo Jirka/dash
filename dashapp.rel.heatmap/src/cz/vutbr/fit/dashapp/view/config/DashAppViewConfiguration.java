@@ -12,6 +12,7 @@ import cz.vutbr.fit.dashapp.view.action.analysis.heatmap.FolderMetricAnalysisUI;
 import cz.vutbr.fit.dashapp.view.action.analysis.heatmap.ThresholdAnalysisUI;
 import cz.vutbr.fit.dashapp.view.action.analysis.heatmap.WidgetAnalysisUI;
 import cz.vutbr.fit.dashapp.view.action.image.ImageActionFactory;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.ReduceColorAnalysis;
 //import cz.vutbr.fit.dashapp.eval.analysis.heatmap.TestOfGEBoundariesAnalysis;
 //import cz.vutbr.fit.dashapp.eval.analysis.heatmap.old.WidgetMetricAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricType;
@@ -53,6 +54,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 				new ThresholdAnalysisUI(),
 				new EdgesAnalysisUI(),
 				new WidgetAnalysisUI(),
+				new FolderAnalysisUI(new ReduceColorAnalysis()),
 				new CompareAnalysisUI(),
 				new CompareAllAnalysisUI(),
 				new FolderMetricAnalysisUI(metricTypes),

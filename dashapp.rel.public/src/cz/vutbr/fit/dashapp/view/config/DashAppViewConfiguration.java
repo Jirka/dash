@@ -11,6 +11,7 @@ import cz.vutbr.fit.dashapp.eval.analysis.file.ComplexWidgetAnalysis;
 import cz.vutbr.fit.dashapp.eval.analysis.file.GrayscaleAnalysis;
 import cz.vutbr.fit.dashapp.eval.analysis.file.KimRasterAnalysis;
 import cz.vutbr.fit.dashapp.eval.analysis.file.NgoAnalysis;
+import cz.vutbr.fit.dashapp.eval.analysis.heatmap.ReduceColorAnalysis;
 import cz.vutbr.fit.dashapp.eval.metric.MetricType;
 import cz.vutbr.fit.dashapp.segmenation.SegmentationType;
 import cz.vutbr.fit.dashapp.segmenation.methods.Experimental1;
@@ -38,6 +39,7 @@ import cz.vutbr.fit.dashapp.view.action.segmentatiion.SegmentationAlgorithmUI;
 import cz.vutbr.fit.dashapp.view.tools.AttachTool;
 import cz.vutbr.fit.dashapp.view.tools.CropTool;
 import cz.vutbr.fit.dashapp.view.tools.DownloadTool;
+import cz.vutbr.fit.dashapp.view.tools.ExportImageTool;
 import cz.vutbr.fit.dashapp.view.tools.FileAnalysisTool;
 import cz.vutbr.fit.dashapp.view.tools.FileInfoTool;
 import cz.vutbr.fit.dashapp.view.tools.FolderAnalysisTool;
@@ -84,6 +86,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 		guiTools.add(new DownloadTool());
 		guiTools.add(new ReloadTool());
 		guiTools.add(new SaveTool(true));
+		guiTools.add(new ExportImageTool(true));
 		guiTools.add(new HistoryTool(true));
 		guiTools.add(new ZoomTool(true));
 		guiTools.add(new FullScreenTool(true));
@@ -143,6 +146,7 @@ public class DashAppViewConfiguration extends BasicViewConfiguration {
 				new ThresholdAnalysisUI(),
 				new EdgesAnalysisUI(),
 				new WidgetAnalysisUI(),
+				new FolderAnalysisUI(new ReduceColorAnalysis()),
 				new CompareAnalysisUI(),
 				new CompareAllAnalysisUI(),
 				new FolderMetricAnalysisUI(metricTypes),
