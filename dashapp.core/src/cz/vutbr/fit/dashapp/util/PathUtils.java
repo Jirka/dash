@@ -30,6 +30,11 @@ public class PathUtils {
 	public static final String DASHBOARD_EVAL_RELATIVE_PATH = File.separator + "dash.eval";
 	
 	/**
+	 * default public workspace dashboard.thesis path
+	 */
+	public static final String DASHBOARD_THESIS_RELATIVE_PATH = File.separator + "dash.thesis";
+	
+	/**
 	 * default workspace dashboard.web path for web tools
 	 */
 	public static final String DASHBOARD_WEB_RELATIVE_PATH = File.separator + "web-download-tool";
@@ -50,6 +55,15 @@ public class PathUtils {
 	 */
 	public static String getDashEvalPath() {
 		return getDashWorkspacePath(DASHBOARD_EVAL_RELATIVE_PATH);
+	}
+	
+	/**
+	 * For thesis purposes.
+	 * 
+	 * @return
+	 */
+	public static String getDashThesisPath() {
+		return getDashWorkspacePath(DASHBOARD_THESIS_RELATIVE_PATH);
 	}
 	
 	/**

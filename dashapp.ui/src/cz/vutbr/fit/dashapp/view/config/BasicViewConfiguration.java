@@ -171,6 +171,11 @@ public class BasicViewConfiguration implements IViewConfiguration {
 		if(workspacePath != null) {
 			return workspacePath;
 		}
+		// for thesis purposes (public)
+		workspacePath = PathUtils.getDashThesisPath();
+		if(workspacePath != null) {
+			return workspacePath;
+		}
 		// home path
 		return PathUtils.DEFAULT_WORKSPACE_HOME_PATH;
 	}
